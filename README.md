@@ -1,2 +1,2 @@
-Web link - https://roshan-mallick.github.io/documentation/
+Web link - https://roshan-mallick.github.io/docs/
 
