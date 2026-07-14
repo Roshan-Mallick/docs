@@ -2265,7 +2265,6 @@ function showHome() {
   articleView.style.display = "none";
   rightSidebar.classList.remove("visible");
   document.querySelectorAll(".sidebar-item.active, .sidebar-child.active").forEach((el) => el.classList.remove("active"));
-  mainEl.scrollTo(0, 0);
   window.scrollTo(0, 0);
 }
 
@@ -2297,17 +2296,16 @@ function buildCards() {
 
 function buildPopularArticles() {
   const popular = [
-    docs[0].articles[0],
-    docs[2].articles[0],
-    docs[3].articles[0],
-    docs[4].articles[0],
-    docs[5].articles[0],
-    docs[6].articles[0],
-    docs[1].articles[0],
+    { topic: docs[0], article: docs[0].articles[0] },
+    { topic: docs[2], article: docs[2].articles[0] },
+    { topic: docs[3], article: docs[3].articles[0] },
+    { topic: docs[4], article: docs[4].articles[0] },
+    { topic: docs[5], article: docs[5].articles[0] },
+    { topic: docs[6], article: docs[6].articles[0] },
+    { topic: docs[1], article: docs[1].articles[0] },
   ];
 
-  popular.forEach((article) => {
-    const topic = docs.find((t) => t.articles.some((a) => a.id === article.id));
+  popular.forEach(({ topic, article }) => {
     const item = document.createElement("div");
     item.className = "article-item";
     item.innerHTML = `
@@ -2363,19 +2361,17 @@ function openArticle(topic, article) {
     pre.appendChild(btn);
   });
 
-  const allArticles = [];
-  docs.forEach((t) => t.articles.forEach((a) => allArticles.push({ topic: t, article: a })));
-  const idx = allArticles.findIndex((a) => a.article.id === article.id);
+  const idx = flatAll.findIndex((a) => a.article.id === article.id);
 
   let navHTML = "";
   if (idx > 0) {
-    const prev = allArticles[idx - 1];
+    const prev = flatAll[idx - 1];
     navHTML += `<button class="article-nav-btn prev" data-topic="${prev.topic.id}" data-article="${prev.article.id}"><div class="article-nav-label">Previous</div><div class="article-nav-title">${prev.article.title}</div></button>`;
   } else {
     navHTML += "<div></div>";
   }
-  if (idx < allArticles.length - 1) {
-    const next = allArticles[idx + 1];
+  if (idx < flatAll.length - 1) {
+    const next = flatAll[idx + 1];
     navHTML += `<button class="article-nav-btn next" data-topic="${next.topic.id}" data-article="${next.article.id}"><div class="article-nav-label">Next</div><div class="article-nav-title">${next.article.title}</div></button>`;
   }
   articleNav.innerHTML = navHTML;
@@ -2406,7 +2402,6 @@ function openArticle(topic, article) {
 
   buildTOC();
   window.scrollTo(0, 0);
-  mainEl.scrollTo(0, 0);
 }
 
 function buildTOC() {
