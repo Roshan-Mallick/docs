@@ -2108,6 +2108,57 @@ firejail firefox</code></pre>` },
       { id: "lin-07", title: "Security Checklist", difficulty: "intermediate", time: "5 min", desc: "Quick hardening runbook.",
         content: `<h1>Security Checklist</h1><span class="step-badge">Quick Runbook</span><ol><li>Update: <code>sudo apt update && sudo apt full-upgrade</code></li><li>Firewall: <code>sudo ufw enable</code></li><li>Install tools: <code>sudo apt install fail2ban lynis clamav rkhunter</code></li><li>Scan: <code>sudo rkhunter --check</code></li><li>Audit: <code>sudo lynis audit system</code></li><li>AppArmor: <code>sudo aa-status</code></li><li>Auto-updates: <code>sudo dpkg-reconfigure --priority=low unattended-upgrades</code></li></ol>` }
     ]
+  },
+  {
+    id: "tripleboot", label: "Triple Boot", icon: `<img src="assets/icons/tripleboot.svg" width="24" height="24" alt="Triple Boot">`,
+    desc: "Windows 11 + Kali Linux + Fedora 43 on HP Victus.",
+    tags: ["dual boot", "GRUB", "partitioning"],
+    articles: [
+      { id: "tb-01", title: "Quick Reference", difficulty: "beginner", time: "2 min", desc: "Partition sizes, file systems, and install order.",
+        content: `<h1>Quick Reference</h1><table><thead><tr><th>OS</th><th>Partition</th><th>File System</th><th>Install Order</th><th>Bootloader</th></tr></thead><tbody><tr><td>Windows 11</td><td>150 GB</td><td>NTFS</td><td>1st</td><td>Windows Boot Manager</td></tr><tr><td>Kali Linux</td><td>80 GB</td><td>ext4</td><td>2nd</td><td>Kali GRUB (temporary)</td></tr><tr><td>Fedora 43</td><td>220 GB</td><td>ext4</td><td>3rd (LAST)</td><td>Fedora GRUB (FINAL)</td></tr></tbody></table><blockquote><strong>GOLDEN RULE:</strong> Always install Windows FIRST. Windows will destroy GRUB if installed after Linux! Fedora installs LAST — Fedora's GRUB becomes the boot manager for all 3 OSes.</blockquote>` },
+      { id: "tb-02", title: "BIOS Settings", difficulty: "beginner", time: "3 min", desc: "Configure BIOS before installing any OS.",
+        content: `<h1>BIOS Settings</h1><p>Before installing ANY OS, configure BIOS:</p><table><thead><tr><th>Setting</th><th>Value</th><th>Why</th></tr></thead><tbody><tr><td>Secure Boot</td><td>DISABLE</td><td>Required for Kali Linux</td></tr><tr><td>Boot Mode</td><td>UEFI</td><td>Modern standard, required</td></tr><tr><td>Fast Boot</td><td>DISABLE</td><td>Prevents boot issues</td></tr><tr><td>Boot Order</td><td>USB first</td><td>To boot from USB installer</td></tr></tbody></table><p><strong>How to enter BIOS on HP Victus:</strong> Press F10 or Esc repeatedly right after powering on.</p>` },
+      { id: "tb-03", title: "Creating Bootable USBs", difficulty: "beginner", time: "3 min", desc: "Tools and steps for flashing ISOs.",
+        content: `<h1>Creating Bootable USB Drives</h1><p>Tools needed:</p><ul><li><strong>Rufus</strong> (Windows) — for flashing any ISO</li><li><strong>Fedora Media Writer</strong> — best for Fedora ISO</li><li><strong>balenaEtcher</strong> — works on any OS</li></ul><table><thead><tr><th>OS</th><th>ISO Size</th><th>USB Size</th><th>Recommended Tool</th></tr></thead><tbody><tr><td>Windows 11</td><td>~5-6 GB</td><td>8 GB+</td><td>Rufus</td></tr><tr><td>Kali Linux</td><td>~4 GB</td><td>8 GB+</td><td>Rufus / Etcher</td></tr><tr><td>Fedora 43</td><td>~2 GB</td><td>4 GB+</td><td>Fedora Media Writer</td></tr></tbody></table>` },
+      { id: "tb-04", title: "Install Windows 11", difficulty: "beginner", time: "5 min", desc: "Step 1: Partition and install Windows.",
+        content: `<h1>Installing Windows 11 (Step 1)</h1><h2>During Installation</h2><ol><li>Create partition of <strong>150 GB</strong> for Windows</li><li>Leave remaining ~300 GB as <strong>UNALLOCATED</strong> — do NOT touch it</li><li>Install Windows on the 150 GB partition</li></ol><h2>After Install — Setup Checklist</h2><ul><li>Complete Windows setup (skip Microsoft account, use local account)</li><li>Turn OFF all privacy settings</li><li>Do NOT shrink C: drive again — leave unallocated space as is</li></ul><blockquote><strong>Do NOT install Windows updates before Kali/Fedora</strong> — it may re-enable Secure Boot!</blockquote>` },
+      { id: "tb-05", title: "Install Kali Linux", difficulty: "beginner", time: "5 min", desc: "Step 2: Install Kali and fix WiFi.",
+        content: `<h1>Installing Kali Linux (Step 2)</h1><h2>Installation</h2><ol><li>Choose 'Graphical Install'</li><li>Network: Select wlan0 (WiFi) or eth0 (LAN)</li><li>Partitioning: Choose 'Guided - use largest continuous free space'</li><li>This will use the 80 GB unallocated space automatically</li><li>When asked to write changes — select YES</li></ol><h2>Software Selection</h2><ul><li>Xfce (default, lightweight) OR GNOME</li><li>top10 tools</li><li>default recommended tools</li></ul><p>If software installation fails, install desktop later:</p><pre><code>sudo apt update && sudo apt install kali-desktop-gnome -y</code></pre><h2>Fix WiFi (NetworkManager)</h2><pre><code>sudo nano /etc/NetworkManager/NetworkManager.conf
+# Set managed=true under [ifupdown]
+sudo systemctl restart NetworkManager</code></pre><h2>Fix WiFi Power Management</h2><pre><code>sudo nano /etc/NetworkManager/conf.d/wifi-fix.conf
+[device]
+wifi.scan-rand-mac-address=no
+[connection]
+wifi.powersave=2
+
+sudo iwconfig wlan0 power off</code></pre>` },
+      { id: "tb-06", title: "Install Fedora 43", difficulty: "beginner", time: "5 min", desc: "Step 3: Install Fedora LAST — it controls GRUB.",
+        content: `<h1>Installing Fedora 43 (Step 3 - LAST)</h1><blockquote><strong>Fedora MUST be installed last</strong> — it will control the GRUB boot menu!</blockquote><h2>During Installation</h2><ol><li>Choose 'Custom' or 'Automatic' partitioning</li><li>Select the remaining unallocated space (~220 GB)</li><li>Fedora will automatically use it</li><li>Bootloader location: <code>/dev/nvme0n1</code> (main drive)</li></ol><p>After Fedora installs, GRUB menu will show all 3 OSes automatically!</p>` },
+      { id: "tb-07", title: "Fedora Post-Install", difficulty: "intermediate", time: "6 min", desc: "NVIDIA drivers, GPU switching, sound fix, and apps.",
+        content: `<h1>Fedora 43 Post-Install Setup</h1><h2>NVIDIA RTX 3050 Driver</h2><pre><code># Enable RPM Fusion
+sudo dnf install -y https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
+
+# Install NVIDIA driver
+sudo dnf install -y akmod-nvidia xorg-x11-drv-nvidia-cuda
+sudo akmods --force
+sudo dracut --force</code></pre><blockquote>Wait 5 minutes after install before rebooting!</blockquote><h2>GPU On-Demand Switching</h2><pre><code>sudo dnf install -y switcheroo-control
+sudo systemctl enable switcheroo-control
+sudo systemctl start switcheroo-control</code></pre><h2>Sound Fix</h2><pre><code>sudo dnf install -y alsa-sof-firmware
+sudo reboot</code></pre><h2>Useful Apps</h2><table><thead><tr><th>App</th><th>Install Command</th></tr></thead><tbody><tr><td>VS Code</td><td>sudo dnf install code -y</td></tr><tr><td>Brave Browser</td><td>sudo dnf install brave-browser -y</td></tr><tr><td>GNOME Tweaks</td><td>sudo dnf install gnome-tweaks gnome-extensions-app -y</td></tr><tr><td>GParted</td><td>sudo dnf install gparted -y</td></tr><tr><td>LocalSend</td><td>flatpak install flathub app.localsend.LocalSend -y</td></tr><tr><td>Signal</td><td>flatpak install flathub org.signal.Signal -y</td></tr></tbody></table>` },
+      { id: "tb-08", title: "Command Reference", difficulty: "beginner", time: "3 min", desc: "Quick commands for Fedora and Kali.",
+        content: `<h1>Quick Command Reference</h1><h2>Fedora Terminal Commands</h2><table><thead><tr><th>App</th><th>Command</th></tr></thead><tbody><tr><td>Terminal</td><td>ptyxis</td></tr><tr><td>File Manager</td><td>nautilus</td></tr><tr><td>Settings</td><td>gnome-control-center</td></tr><tr><td>Tweaks</td><td>gnome-tweaks</td></tr><tr><td>Text Editor</td><td>gedit</td></tr><tr><td>Disk Tool</td><td>gparted</td></tr></tbody></table><h2>Kali Linux Commands</h2><table><thead><tr><th>Task</th><th>Command</th></tr></thead><tbody><tr><td>Update system</td><td>sudo apt update && sudo apt upgrade -y</td></tr><tr><td>Install GNOME</td><td>sudo apt install kali-desktop-gnome -y</td></tr><tr><td>Fix WiFi driver</td><td>sudo modprobe -r mt7921e && sudo modprobe mt7921e</td></tr><tr><td>Check WiFi</td><td>sudo nmcli device wifi list</td></tr><tr><td>Restart NetworkMgr</td><td>sudo systemctl restart NetworkManager</td></tr><tr><td>Check GPU</td><td>nvidia-smi</td></tr></tbody></table>` },
+      { id: "tb-09", title: "Common Issues & Fixes", difficulty: "intermediate", time: "5 min", desc: "GRUB, WiFi, sound, and NVIDIA troubleshooting.",
+        content: `<h1>Common Issues &amp; Fixes</h1><h2>GRUB not showing after install</h2><pre><code># Boot from Fedora USB → select 'Rescue' → run:
+sudo grub2-install /dev/nvme0n1
+sudo grub2-mkconfig -o /boot/grub2/grub.cfg</code></pre><h2>Windows not showing in GRUB</h2><pre><code># Boot into Fedora → run:
+sudo os-prober
+sudo grub2-mkconfig -o /boot/grub2/grub.cfg</code></pre><h2>Kali WiFi not working</h2><pre><code>sudo nmcli device set wlan0 managed yes
+sudo systemctl restart NetworkManager</code></pre><h2>No sound on Fedora</h2><pre><code>sudo dnf install alsa-sof-firmware -y
+sudo reboot</code></pre><h2>NVIDIA not working on Fedora</h2><pre><code>sudo akmods --force
+sudo dracut --force
+# Wait 5 min, then reboot</code></pre><h2>Black screen after NVIDIA install</h2><pre><code># Boot with nomodeset kernel param → reinstall:
+sudo dnf reinstall akmod-nvidia</code></pre>` }
+    ]
   }
 ];
 
