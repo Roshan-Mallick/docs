@@ -156,6 +156,19 @@ body {
 
 .topnav-center { flex: 1; max-width: 1700px; }
 
+.mobile-search-btn {
+  display: none;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 8px;
+  color: var(--text);
+  cursor: pointer;
+  transition: background var(--transition);
+}
+
+.mobile-search-btn:hover { background: var(--bg-hover); }
+
 .search-group {
   display: flex;
   line-height: 28px;
@@ -1115,4 +1128,5 @@ code {
   .article-nav { flex-direction: column; }
 
   .topnav-center { display: none; }
+  .mobile-search-btn { display: flex; }
 }

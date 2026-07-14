@@ -3075,6 +3075,11 @@ searchTrigger.addEventListener("focus", (e) => {
   openSearch();
 });
 
+const mobileSearchBtn = document.getElementById("mobileSearchBtn");
+if (mobileSearchBtn) {
+  mobileSearchBtn.addEventListener("click", openSearch);
+}
+
 searchOverlay.addEventListener("click", (e) => {
   if (e.target === searchOverlay) closeSearch();
 });
