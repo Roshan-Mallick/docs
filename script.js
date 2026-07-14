@@ -108,11 +108,208 @@ cd REPO_NAME</code></pre>` },
 &lt;a href="https://example.com"&gt;Link&lt;/a&gt;
 &lt;img src="photo.jpg" alt="description"&gt;</code></pre><h2>Common elements</h2><ul><li><code>&lt;h1&gt;</code> to <code>&lt;h6&gt;</code> — headings</li><li><code>&lt;p&gt;</code> — paragraph</li><li><code>&lt;div&gt;</code> — generic container</li><li><code>&lt;span&gt;</code> — inline container</li></ul>` },
       { id: "html-03", title: "Forms", difficulty: "intermediate", time: "5 min", desc: "Collect user input.",
-        content: `<h1>Forms</h1><span class="step-badge">Step 3</span><p>Forms collect user input and send it to a server.</p><pre><code>&lt;form action="/submit" method="POST"&gt;
+        content: `<h1>Forms</h1><span class="step-badge">Step 3</span><p>Forms collect user input and send it to a server.</p><h2>Basic Form</h2><pre><code>&lt;form action="/submit" method="POST"&gt;
   &lt;label for="name"&gt;Name&lt;/label&gt;
   &lt;input type="text" id="name" name="name"&gt;
   &lt;button type="submit"&gt;Send&lt;/button&gt;
-&lt;/form&gt;</code></pre>` }
+&lt;/form&gt;</code></pre><h2>Input Types</h2><table><thead><tr><th>Type</th><th>Purpose</th></tr></thead><tbody><tr><td><code>text</code></td><td>Single-line text</td></tr><tr><td><code>password</code></td><td>Hidden text</td></tr><tr><td><code>email</code></td><td>Email validation</td></tr><tr><td><code>number</code></td><td>Numeric input</td></tr><tr><td><code>checkbox</code></td><td>Multiple choices</td></tr><tr><td><code>radio</code></td><td>Single choice</td></tr><tr><td><code>file</code></td><td>Upload file</td></tr><tr><td><code>submit</code></td><td>Submit button</td></tr></tbody></table><h2>Select & Textarea</h2><pre><code>&lt;select name="color" id="color"&gt;
+  &lt;option value="red"&gt;Red&lt;/option&gt;
+  &lt;option value="blue"&gt;Blue&lt;/option&gt;
+&lt;/select&gt;
+
+&lt;textarea name="msg" rows="4" cols="50"&gt;
+  Default text
+&lt;/textarea&gt;</code></pre><h2>Form Attributes</h2><pre><code>&lt;form action="/submit" method="POST" enctype="multipart/form-data"&gt;
+  &lt;input type="text" name="user" required minlength="3" maxlength="20"&gt;
+  &lt;input type="email" name="email" required&gt;
+  &lt;input type="text" placeholder="Search..."&gt;
+  &lt;input type="text" readonly&gt;
+  &lt;input type="text" disabled&gt;
+&lt;/form&gt;</code></pre>` },
+      { id: "html-04", title: "Semantic Elements", difficulty: "beginner", time: "4 min", desc: "Meaningful HTML tags.",
+        content: `<h1>Semantic Elements</h1><span class="step-badge">Step 4</span><p>Semantic tags describe their meaning, improving accessibility and SEO.</p><h2>Why Semantic HTML?</h2><ul><li>Screen readers understand page structure</li><li>Search engines rank pages better</li><li>Code is easier to read and maintain</li></ul><h2>Layout Elements</h2><pre><code>&lt;header&gt;  — Page or section header
+&lt;nav&gt;     — Navigation links
+&lt;main&gt;    — Main content (one per page)
+&lt;section&gt; — Thematic grouping
+&lt;article&gt; — Self-contained content
+&lt;aside&gt;   — Sidebar / tangential content
+&lt;footer&gt;  — Page or section footer
+&lt;figure&gt;  — Image with optional caption
+&lt;figcaption&gt; — Caption for figure</code></pre><h2>Example</h2><pre><code>&lt;body&gt;
+  &lt;header&gt;
+    &lt;nav&gt;&lt;a href="/"&gt;Home&lt;/a&gt;&lt;/nav&gt;
+  &lt;/header&gt;
+  &lt;main&gt;
+    &lt;article&gt;
+      &lt;h1&gt;Blog Post&lt;/h1&gt;
+      &lt;p&gt;Content here...&lt;/p&gt;
+    &lt;/article&gt;
+    &lt;aside&gt;Related links&lt;/aside&gt;
+  &lt;/main&gt;
+  &lt;footer&gt;© 2025&lt;/footer&gt;
+&lt;/body&gt;</code></pre><blockquote>Never use <code>&lt;div&gt;</code> when a semantic tag fits. Use <code>&lt;button&gt;</code> not <code>&lt;div onclick&gt;</code>.</blockquote>` },
+      { id: "html-05", title: "Links & Images", difficulty: "beginner", time: "4 min", desc: "Anchor tags, paths, and image formats.",
+        content: `<h1>Links &amp; Images</h1><span class="step-badge">Step 5</span><h2>Anchor Tag</h2><pre><code>&lt;a href="https://example.com"&gt;External link&lt;/a&gt;
+&lt;a href="/about"&gt;Internal link&lt;/a&gt;
+&lt;a href="#section2"&gt;Jump to section&lt;/a&gt;
+&lt;a href="file.pdf" download&gt;Download file&lt;/a&gt;
+&lt;a href="mailto:user@example.com"&gt;Email&lt;/a&gt;
+
+&lt;a href="https://example.com" target="_blank" rel="noopener"&gt;
+  Opens in new tab
+&lt;/a&gt;</code></pre><h2>Relative vs Absolute Paths</h2><pre><code>/* Absolute — full URL */
+&lt;a href="https://example.com/about"&gt;
+
+/* Relative — from current file */
+&lt;a href="about.html"&gt;
+&lt;a href="../images/photo.jpg"&gt;
+&lt;a href="/css/style.css"&gt;</code></pre><h2>Images</h2><pre><code>&lt;img src="photo.jpg" alt="Description" width="600" height="400"&gt;
+
+&lt;picture&gt;
+  &lt;source srcset="photo.webp" type="image/webp"&gt;
+  &lt;source srcset="photo.jpg" type="image/jpeg"&gt;
+  &lt;img src="photo.jpg" alt="Description"&gt;
+&lt;/picture&gt;</code></pre><h2>Image Formats</h2><table><thead><tr><th>Format</th><th>Best For</th><th>Transparency</th></tr></thead><tbody><tr><td>JPEG</td><td>Photos</td><td>No</td></tr><tr><td>PNG</td><td>Graphics, screenshots</td><td>Yes</td></tr><tr><td>WebP</td><td>Web (best compression)</td><td>Yes</td></tr><tr><td>SVG</td><td>Icons, logos</td><td>Yes</td></tr></tbody></table><blockquote>Always include <code>alt</code> text. Use <code>loading="lazy"</code> for below-fold images.</blockquote>` },
+      { id: "html-06", title: "Lists", difficulty: "beginner", time: "3 min", desc: "Ordered, unordered, and description lists.",
+        content: `<h1>Lists</h1><span class="step-badge">Step 6</span><h2>Unordered List</h2><pre><code>&lt;ul&gt;
+  &lt;li&gt;HTML&lt;/li&gt;
+  &lt;li&gt;CSS&lt;/li&gt;
+  &lt;li&gt;JavaScript&lt;/li&gt;
+&lt;/ul&gt;</code></pre><h2>Ordered List</h2><pre><code>&lt;ol&gt;
+  &lt;li&gt;Install Node.js&lt;/li&gt;
+  &lt;li&gt;Run npm init&lt;/li&gt;
+  &lt;li&gt;Start coding&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;ol start="5"&gt;
+  &lt;li&gt;Starts at 5&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;ol reversed&gt;
+  &lt;li&gt;Counts down&lt;/li&gt;
+&lt;/ol&gt;</code></pre><h2>Description List</h2><pre><code>&lt;dl&gt;
+  &lt;dt&gt;HTML&lt;/dt&gt;
+  &lt;dd&gt;HyperText Markup Language&lt;/dd&gt;
+  &lt;dt&gt;CSS&lt;/dt&gt;
+  &lt;dd&gt;Cascading Style Sheets&lt;/dd&gt;
+&lt;/dl&gt;</code></pre><h2>Nested Lists</h2><pre><code>&lt;ul&gt;
+  &lt;li&gt;Frontend
+    &lt;ul&gt;
+      &lt;li&gt;HTML&lt;/li&gt;
+      &lt;li&gt;CSS&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Backend&lt;/li&gt;
+&lt;/ul&gt;</code></pre>` },
+      { id: "html-07", title: "Tables", difficulty: "beginner", time: "4 min", desc: "Rows, columns, and data tables.",
+        content: `<h1>Tables</h1><span class="step-badge">Step 7</span><h2>Basic Table</h2><pre><code>&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Name&lt;/th&gt;
+      &lt;th&gt;Role&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Alice&lt;/td&gt;
+      &lt;td&gt;Developer&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Bob&lt;/td&gt;
+      &lt;td&gt;Designer&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;</code></pre><h2>Colspan &amp; Rowspan</h2><pre><code>&lt;td colspan="2"&gt;Spans 2 columns&lt;/td&gt;
+&lt;td rowspan="3"&gt;Spans 3 rows&lt;/td&gt;</code></pre><h2>Table Elements</h2><table><thead><tr><th>Tag</th><th>Purpose</th></tr></thead><tbody><tr><td><code>&lt;table&gt;</code></td><td>Table container</td></tr><tr><td><code>&lt;thead&gt;</code></td><td>Header group</td></tr><tr><td><code>&lt;tbody&gt;</code></td><td>Body group</td></tr><tr><td><code>&lt;tfoot&gt;</code></td><td>Footer group</td></tr><tr><td><code>&lt;tr&gt;</code></td><td>Table row</td></tr><tr><td><code>&lt;th&gt;</code></td><td>Header cell</td></tr><tr><td><code>&lt;td&gt;</code></td><td>Data cell</td></tr></tbody></table><blockquote>Use tables for data only, not for page layout. Use Flexbox or Grid for layout.</blockquote>` },
+      { id: "html-08", title: "Media & Embedding", difficulty: "beginner", time: "4 min", desc: "Audio, video, iframes, and embeds.",
+        content: `<h1>Media &amp; Embedding</h1><span class="step-badge">Step 8</span><h2>Video</h2><pre><code>&lt;video src="video.mp4" controls width="640" autoplay muted loop&gt;
+  Your browser does not support video.
+&lt;/video&gt;</code></pre><h2>Audio</h2><pre><code>&lt;audio src="audio.mp3" controls autoplay&gt;
+  Your browser does not support audio.
+&lt;/audio&gt;</code></pre><h2>Iframe</h2><pre><code>&lt;iframe
+  src="https://example.com"
+  width="600"
+  height="400"
+  frameborder="0"
+  allowfullscreen
+&gt;&lt;/iframe&gt;</code></pre><h2>Embed &amp; Object</h2><pre><code>&lt;embed src="file.pdf" type="application/pdf" width="100%" height="500px"&gt;
+
+&lt;object data="file.pdf" type="application/pdf" width="100%" height="500px"&gt;
+  Fallback content
+&lt;/object&gt;</code></pre><h2>Responsive Video</h2><pre><code>&lt;div style="position:relative; padding-bottom:56.25%; height:0"&gt;
+  &lt;iframe src="..."
+    style="position:absolute; top:0; left:0; width:100%; height:100%"
+    allowfullscreen&gt;
+  &lt;/iframe&gt;
+&lt;/div&gt;</code></pre><blockquote>Use <code>loading="lazy"</code> on iframes to improve page load performance.</blockquote>` },
+      { id: "html-09", title: "Meta Tags & SEO", difficulty: "intermediate", time: "4 min", desc: "Viewport, descriptions, Open Graph.",
+        content: `<h1>Meta Tags &amp; SEO</h1><span class="step-badge">Step 9</span><p>Meta tags live in <code>&lt;head&gt;</code> and control how browsers and search engines treat your page.</p><h2>Essential Meta Tags</h2><pre><code>&lt;meta charset="UTF-8"&gt;
+&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+&lt;meta name="description" content="Page description for search engines"&gt;
+&lt;meta name="robots" content="index, follow"&gt;</code></pre><h2>Open Graph (Social Media)</h2><pre><code>&lt;meta property="og:title" content="Page Title"&gt;
+&lt;meta property="og:description" content="Page description"&gt;
+&lt;meta property="og:image" content="https://example.com/image.jpg"&gt;
+&lt;meta property="og:url" content="https://example.com/page"&gt;
+&lt;meta property="og:type" content="website"&gt;</code></pre><h2>Twitter Cards</h2><pre><code>&lt;meta name="twitter:card" content="summary_large_image"&gt;
+&lt;meta name="twitter:title" content="Page Title"&gt;
+&lt;meta name="twitter:description" content="Description"&gt;
+&lt;meta name="twitter:image" content="https://example.com/image.jpg"&gt;</code></pre><h2>Favicon</h2><pre><code>&lt;link rel="icon" href="/favicon.ico"&gt;
+&lt;link rel="icon" type="image/svg+xml" href="/icon.svg"&gt;
+&lt;link rel="apple-touch-icon" href="/icon-192.png"&gt;</code></pre><blockquote>The <code>viewport</code> meta tag is mandatory for responsive design. Without it, mobile browsers render at 960px width.</blockquote>` },
+      { id: "html-10", title: "Accessibility", difficulty: "intermediate", time: "5 min", desc: "ARIA, roles, and screen reader support.",
+        content: `<h1>Accessibility</h1><span class="step-badge">Step 10</span><p>Accessibility (a11y) ensures your site works for everyone, including users with disabilities.</p><h2>Why It Matters</h2><ul><li>15% of the world population has a disability</li><li>Screen readers need semantic HTML to navigate</li><li>Required by law in many countries (ADA, EAA)</li></ul><h2>ARIA Roles</h2><pre><code>&lt;div role="button" tabindex="0" onclick="handle()"&gt;
+  Click me
+&lt;/div&gt;
+
+&lt;div role="alert"&gt;
+  Error message shown here
+&lt;/div&gt;
+
+&lt;nav aria-label="Main navigation"&gt;
+  &lt;a href="/"&gt;Home&lt;/a&gt;
+&lt;/nav&gt;</code></pre><h2>ARIA Attributes</h2><pre><code>&lt;input aria-label="Search"&gt;
+&lt;div aria-hidden="true"&gt;Decorative content&lt;/div&gt;
+&lt;button aria-expanded="false" aria-controls="menu"&gt;Menu&lt;/button&gt;
+&lt;div aria-live="polite"&gt;Updates announced&lt;/div&gt;</code></pre><h2>Accessibility Checklist</h2><table><thead><tr><th>Rule</th><th>Why</th></tr></thead><tbody><tr><td>Use semantic HTML</td><td>Screen readers understand structure</td></tr><tr><td>Alt text on images</td><td>Describes image to blind users</td></tr><tr><td>Label form inputs</td><td>Screen readers announce field purpose</td></tr><tr><td>Keyboard navigation</td><td>Not everyone uses a mouse</td></tr><tr><td>Color contrast (4.5:1)</td><td>Low vision readability</td></tr><tr><td>Focus indicators</td><td>Shows where keyboard focus is</td></tr></tbody></table><blockquote>Use <code>tabindex="0"</code> to make non-interactive elements focusable. Use <code>tabindex="-1"</code> to remove from tab order.</blockquote>` },
+      { id: "html-11", title: "HTML5 APIs", difficulty: "intermediate", time: "4 min", desc: "Canvas, storage, geolocation overview.",
+        content: `<h1>HTML5 APIs</h1><span class="step-badge">Step 11</span><p>HTML5 introduced powerful APIs that extend beyond markup.</p><h2>Canvas</h2><pre><code>&lt;canvas id="myCanvas" width="400" height="300"&gt;&lt;/canvas&gt;
+
+&lt;script&gt;
+  const canvas = document.getElementById("myCanvas");
+  const ctx = canvas.getContext("2d");
+  ctx.fillStyle = "blue";
+  ctx.fillRect(10, 10, 150, 100);
+  ctx.font = "24px Arial";
+  ctx.fillText("Hello Canvas", 10, 80);
+&lt;/script&gt;</code></pre><h2>Web Storage</h2><pre><code>// localStorage — persists until cleared
+localStorage.setItem("theme", "dark");
+localStorage.getItem("theme");
+
+// sessionStorage — clears when tab closes
+sessionStorage.setItem("user", "Alice");
+
+// Remove
+localStorage.removeItem("theme");
+localStorage.clear();</code></pre><h2>Geolocation</h2><pre><code>navigator.geolocation.getCurrentPosition(
+  (pos) => {
+    console.log(pos.coords.latitude);
+    console.log(pos.coords.longitude);
+  },
+  (err) => console.error(err),
+  { enableHighAccuracy: true }
+);</code></pre><h2>Drag and Drop</h2><pre><code>&lt;div draggable="true" id="drag"&gt;Drag me&lt;/div&gt;
+&lt;div id="drop"&gt;Drop here&lt;/div&gt;
+
+&lt;script&gt;
+  drag.addEventListener("dragstart", (e) => {
+    e.dataTransfer.setData("text/plain", "hello");
+  });
+  drop.addEventListener("dragover", (e) => e.preventDefault());
+  drop.addEventListener("drop", (e) => {
+    e.preventDefault();
+    drop.textContent = e.dataTransfer.getData("text/plain");
+  });
+&lt;/script&gt;</code></pre><blockquote>These APIs are browser-only. For server-side, use Node.js equivalents.</blockquote>` }
     ]
   },
   {
@@ -139,7 +336,342 @@ nav a { text-decoration: none; }</code></pre>` },
   border: 2px solid #333;
   margin: 20px auto;
   box-sizing: border-box;
-}</code></pre>` }
+}</code></pre><h2>Box Sizing</h2><pre><code>/* content-box (default) — width = content only */
+width: 200px; /* total = 200 + padding + border */
+
+/* border-box — width = content + padding + border */
+box-sizing: border-box;
+width: 200px; /* total = 200px exactly */</code></pre><blockquote>Use <code>box-sizing: border-box</code> on everything. It makes layouts predictable.</blockquote>` },
+      { id: "css-03", title: "Typography & Colors", difficulty: "beginner", time: "4 min", desc: "Fonts, sizes, and color formats.",
+        content: `<h1>Typography &amp; Colors</h1><span class="step-badge">Step 3</span><h2>Font Properties</h2><pre><code>body {
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 1rem;       /* 16px default */
+  font-weight: 400;      /* normal */
+  font-weight: 700;      /* bold */
+  line-height: 1.6;
+  letter-spacing: -0.02em;
+}</code></pre><h2>Font Stacks</h2><pre><code>/* Sans-serif */
+font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
+
+/* Monospace */
+font-family: "JetBrains Mono", "Fira Code", monospace;
+
+/* Serif */
+font-family: "Georgia", "Times New Roman", serif;</code></pre><h2>Text Properties</h2><pre><code>text-align: center;          /* left | center | right | justify */
+text-decoration: underline;   /* none | underline | line-through */
+text-transform: uppercase;    /* none | uppercase | lowercase | capitalize */
+text-indent: 2em;             /* indent first line */
+white-space: nowrap;          /* prevent wrapping */
+overflow-wrap: break-word;    /* wrap long words */</code></pre><h2>Color Formats</h2><pre><code>color: #fa6e09;              /* hex */
+color: rgb(250, 110, 9);     /* rgb */
+color: rgba(250, 110, 9, 0.5);  /* rgb + alpha */
+color: hsl(26, 96%, 51%);    /* hue, saturation, lightness */
+color: hsl(26, 96%, 51%, 0.5);  /* hsl + alpha */
+color: currentColor;          /* inherits from parent */</code></pre><h2>Font Shorthand</h2><pre><code>/* font: weight size/line-height family */
+font: 700 1.2rem/1.4 "Inter", sans-serif;</code></pre>` },
+      { id: "css-04", title: "Flexbox", difficulty: "beginner", time: "5 min", desc: "One-dimensional layout system.",
+        content: `<h1>Flexbox</h1><span class="step-badge">Step 4</span><p>Flexbox handles layout in one direction (row or column).</p><h2>Container</h2><pre><code>.container {
+  display: flex;
+
+  /* Main axis (row) */
+  justify-content: flex-start;    /* flex-start | center | flex-end | space-between | space-around | space-evenly */
+
+  /* Cross axis */
+  align-items: stretch;           /* stretch | flex-start | center | flex-end | baseline */
+
+  /* Wrapping */
+  flex-wrap: wrap;                /* nowrap | wrap | wrap-reverse */
+
+  /* Direction */
+  flex-direction: row;            /* row | row-reverse | column | column-reverse */
+
+  /* Gap */
+  gap: 16px;
+  row-gap: 8px;
+  column-gap: 16px;
+}</code></pre><h2>Items</h2><pre><code>.item {
+  flex: 1;           /* grow equally */
+  flex: 0 0 200px;   /* fixed width */
+  flex-shrink: 0;    /* don't shrink */
+  align-self: center; /* override container align-items */
+  order: -1;          /* appear first */
+}</code></pre><h2>Common Patterns</h2><pre><code>/* Center anything */
+.center { display: flex; justify-content: center; align-items: center; }
+
+/* Space between items */
+.between { display: flex; justify-content: space-between; }
+
+/* Equal width columns */
+.cols { display: flex; gap: 16px; }
+.cols > * { flex: 1; }
+
+/* Sidebar layout */
+.layout { display: flex; gap: 24px; }
+.sidebar { flex: 0 0 250px; }
+.content { flex: 1; }</code></pre>` },
+      { id: "css-05", title: "Grid", difficulty: "beginner", time: "5 min", desc: "Two-dimensional layout system.",
+        content: `<h1>CSS Grid</h1><span class="step-badge">Step 5</span><p>Grid handles layout in two dimensions (rows AND columns).</p><h2>Container</h2><pre><code>.grid {
+  display: grid;
+
+  /* Define columns */
+  grid-template-columns: 200px 1fr 1fr;     /* fixed + flexible */
+  grid-template-columns: repeat(3, 1fr);     /* 3 equal columns */
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* responsive */
+
+  /* Define rows */
+  grid-template-rows: auto 1fr auto;
+
+  /* Gap */
+  gap: 16px;
+  row-gap: 8px;
+  column-gap: 16px;
+}</code></pre><h2>Item Placement</h2><pre><code>.item {
+  grid-column: 1 / 3;      /* span columns 1 to 3 */
+  grid-column: span 2;     /* span 2 columns */
+  grid-row: 1 / 2;         /* span rows 1 to 2 */
+  grid-row: span 3;        /* span 3 rows */
+}
+
+/* Named areas */
+.grid {
+  grid-template-areas:
+    "header header"
+    "sidebar main"
+    "footer footer";
+}
+.header  { grid-area: header; }
+.sidebar { grid-area: sidebar; }
+.main    { grid-area: main; }
+.footer  { grid-area: footer; }</code></pre><h2>Responsive Grid</h2><pre><code>/* Auto-fit: fills available space */
+grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+
+/* Auto-fill: creates empty tracks */
+grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));</code></pre><blockquote>Use Grid for page-level layouts. Use Flexbox for component-level layouts.</blockquote>` },
+      { id: "css-06", title: "Positioning", difficulty: "beginner", time: "4 min", desc: "Static, relative, absolute, fixed, sticky.",
+        content: `<h1>Positioning</h1><span class="step-badge">Step 6</span><h2>Position Values</h2><pre><code>/* static — default, no positioning */
+position: static;
+
+/* relative — moves from its normal position */
+position: relative;
+top: 10px;
+left: 20px;
+
+/* absolute — positioned relative to nearest positioned ancestor */
+position: absolute;
+top: 0;
+right: 0;
+
+/* fixed — positioned relative to viewport */
+position: fixed;
+bottom: 24px;
+right: 24px;
+
+/* sticky — toggles between relative and fixed */
+position: sticky;
+top: 0;</code></pre><h2>Centering with Absolute</h2><pre><code>.parent { position: relative; }
+
+.child {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}</code></pre><h2>z-index</h2><pre><code>.overlay {
+  position: fixed;
+  z-index: 100;  /* higher = on top */
+}
+
+/* Only works on positioned elements */
+z-index: auto | 0 | 100 | -1;</code></pre><h2>Common Patterns</h2><pre><code>/* Sticky header */
+.header { position: sticky; top: 0; z-index: 50; }
+
+/* Fixed back-to-top */
+.back-top { position: fixed; bottom: 24px; right: 24px; }
+
+/* Modal overlay */
+.modal { position: fixed; inset: 0; z-index: 200; }</code></pre><blockquote><code>z-index</code> only works on positioned elements (<code>relative</code>, <code>absolute</code>, <code>fixed</code>, <code>sticky</code>).</blockquote>` },
+      { id: "css-07", title: "Display & Visibility", difficulty: "beginner", time: "3 min", desc: "Block, inline, inline-block, none.",
+        content: `<h1>Display &amp; Visibility</h1><span class="step-badge">Step 7</span><h2>Display Values</h2><pre><code>/* block — full width, starts new line */
+div, p, h1, section, header { display: block; }
+
+/* inline — only takes content width, no width/height */
+span, a, strong { display: inline; }
+
+/* inline-block — inline but accepts width/height */
+.badge { display: inline-block; width: 20px; height: 20px; }
+
+/* flex — flex container */
+.container { display: flex; }
+
+/* grid — grid container */
+.grid { display: grid; }
+
+/* none — removes from layout entirely */
+.hidden { display: none; }</code></pre><h2>Visibility vs Display</h2><pre><code>/* display: none — element removed from layout */
+display: none;
+
+/* visibility: hidden — element hidden but keeps space */
+visibility: hidden;
+
+/* visibility: visible — default */
+visibility: visible;</code></pre><h2>Overflow</h2><pre><code>overflow: visible;  /* default, content spills out */
+overflow: hidden;   /* clips content */
+overflow: scroll;   /* always show scrollbar */
+overflow: auto;     /* scrollbar only when needed */
+overflow-x: auto;   /* horizontal scroll only */
+overflow-y: scroll; /* vertical scroll always */</code></pre>` },
+      { id: "css-08", title: "Pseudo-Classes & Elements", difficulty: "beginner", time: "4 min", desc: "State-based and generated content.",
+        content: `<h1>Pseudo-Classes &amp; Elements</h1><span class="step-badge">Step 8</span><h2>Common Pseudo-Classes</h2><pre><code>/* User interaction */
+a:hover { color: var(--accent); }
+a:active { transform: scale(0.98); }
+input:focus { border-color: var(--accent); }
+input:disabled { opacity: 0.5; }
+
+/* Structure */
+li:first-child { font-weight: 700; }
+li:last-child { margin-bottom: 0; }
+li:nth-child(odd) { background: #f5f5f5; }
+li:nth-child(3n) { color: red; }
+
+/* Form states */
+input:checked + label { color: var(--accent); }
+input:required { border-left: 3px solid red; }
+input:valid { border-color: green; }
+input:invalid { border-color: red; }</code></pre><h2>Pseudo-Elements</h2><pre><code>/* Double colon for pseudo-elements */
+.element::before {
+  content: "★";
+  margin-right: 4px;
+}
+
+.element::after {
+  content: "";
+  display: block;
+  clear: both;
+}
+
+/* Style first letter / line */
+p::first-letter { font-size: 2rem; font-weight: 700; }
+p::first-line { font-style: italic; }
+
+/* Selection highlight */
+::selection { background: var(--accent); color: white; }
+
+/* Placeholder */
+::placeholder { color: var(--text-muted); }</code></pre><h2>Link States Order</h2><pre><code>a:link    { }  /* unvisited */
+a:visited { }  /* visited */
+a:hover   { }  /* mouse over */
+a:active  { }  /* being clicked */
+/* Remember: LoVe HAte */</code></pre>` },
+      { id: "css-09", title: "Responsive Design", difficulty: "beginner", time: "4 min", desc: "Media queries, mobile-first, viewport units.",
+        content: `<h1>Responsive Design</h1><span class="step-badge">Step 9</span><h2>Media Queries</h2><pre><code>/* Mobile-first: base styles for mobile, override for larger */
+.container { padding: 16px; }
+
+@media (min-width: 768px) {
+  .container { padding: 24px; }
+}
+
+@media (min-width: 1024px) {
+  .container { padding: 40px; max-width: 1200px; margin: 0 auto; }
+}
+
+/* Max-width (desktop-first) */
+@media (max-width: 768px) {
+  .sidebar { display: none; }
+}</code></pre><h2>Viewport Units</h2><pre><code>height: 100vh;     /* 100% of viewport height */
+width: 100vw;      /* 100% of viewport width */
+font-size: 4vw;    /* relative to viewport width */
+min-height: 100dvh; /* dynamic viewport height (accounts for mobile bars) */</code></pre><h2>Responsive Typography</h2><pre><code>/* clamp(min, preferred, max) */
+font-size: clamp(1rem, 2.5vw, 2rem);
+line-height: clamp(1.4, 1.6, 1.8);</code></pre><h2>Container Queries</h2><pre><code>/* Style based on parent width, not viewport */
+.card-container { container-type: inline-size; }
+
+@container (min-width: 400px) {
+  .card { flex-direction: row; }
+}</code></pre><blockquote>Always design mobile-first. Write base styles for small screens, then add <code>min-width</code> breakpoints.</blockquote>` },
+      { id: "css-10", title: "Transitions & Animations", difficulty: "beginner", time: "4 min", desc: "Hover effects, keyframes, and motion.",
+        content: `<h1>Transitions &amp; Animations</h1><span class="step-badge">Step 10</span><h2>Transitions</h2><pre><code>.btn {
+  background: var(--accent);
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.btn:hover {
+  background: var(--accent-hover);
+  transform: translateY(-2px);
+}
+
+/* Transition shorthand */
+transition: property duration timing-function delay;
+transition: all 0.3s ease;
+
+/* Timing functions */
+transition-timing-function: ease | linear | ease-in | ease-out | cubic-bezier(0.4, 0, 0.2, 1);</code></pre><h2>Keyframe Animations</h2><pre><code>@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate {
+  animation: fadeIn 0.3s ease;
+  animation: spin 1s linear infinite;
+}
+
+/* Animation shorthand */
+animation: name duration timing-function delay iteration-count direction fill-mode;
+animation: fadeIn 0.3s ease 0s 1 normal forwards;</code></pre><h2>Common Animations</h2><pre><code>/* Subtle hover */
+.card { transition: transform 0.2s, box-shadow 0.2s; }
+.card:hover { transform: translateY(-4px); box-shadow: 0 8px 32px rgba(0,0,0,0.1); }
+
+/* Fade in on load */
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* Scale on click */
+.btn:active { transform: scale(0.96); }</code></pre><blockquote>Prefer CSS transitions for simple hover effects. Use <code>@keyframes</code> for complex multi-step animations.</blockquote>` },
+      { id: "css-11", title: "Variables & Units", difficulty: "beginner", time: "3 min", desc: "Custom properties, rem, em, percentages.",
+        content: `<h1>Variables &amp; Units</h1><span class="step-badge">Step 11</span><h2>CSS Custom Properties</h2><pre><code>:root {
+  --accent: #fa6e09;
+  --text: #1a1a1a;
+  --radius: 12px;
+  --sidebar-w: 280px;
+}
+
+.btn {
+  background: var(--accent);
+  border-radius: var(--radius);
+  color: var(--text);
+}
+
+/* Fallback */
+color: var(--accent, #333);</code></pre><h2>Length Units</h2><table><thead><tr><th>Unit</th><th>Relative To</th><th>Use Case</th></tr></thead><tbody><tr><td><code>px</code></td><td>Nothing (absolute)</td><td>Borders, small values</td></tr><tr><td><code>rem</code></td><td>Root font-size</td><td>Font sizes, spacing</td></tr><tr><td><code>em</code></td><td>Parent font-size</td><td>Padding, margins inside text</td></tr><tr><td><code>%</code></td><td>Parent element</td><td>Widths, responsive sizing</td></tr><tr><td><code>vw</code></td><td>Viewport width</td><td>Full-width elements</td></tr><tr><td><code>vh</code></td><td>Viewport height</td><td>Full-height sections</td></tr><tr><td><code>dvh</code></td><td>Dynamic viewport height</td><td>Mobile-safe full height</td></tr><tr><td><code>svh</code></td><td>Small viewport height</td><td>Mobile safe area</td></tr></tbody></table><h2>rem vs em</h2><pre><code>/* rem — relative to ROOT (16px default) */
+font-size: 1.5rem;  /* always 24px */
+
+/* em — relative to PARENT */
+.parent { font-size: 20px; }
+.child { font-size: 1.5em; }  /* 30px */</code></pre><blockquote>Use <code>rem</code> for font sizes (predictable). Use <code>em</code> for padding/margins that should scale with text.</blockquote>` },
+      { id: "css-12", title: "Specificity & Cascade", difficulty: "beginner", time: "4 min", desc: "Which rules win and why.",
+        content: `<h1>Specificity &amp; Cascade</h1><span class="step-badge">Step 12</span><p>When multiple rules target the same element, CSS uses specificity to decide which wins.</p><h2>Specificity Hierarchy</h2><pre><code>/* Order from lowest to highest: */
+
+1. Type selectors         p { }           /* 0-0-1 */
+2. Class selectors        .text { }       /* 0-1-0 */
+3. ID selectors           #header { }     /* 1-0-0 */
+4. Inline styles          style="..."     /* 1-0-0-0 */
+5. !important             color: red !important;</code></pre><h2>Specificity Examples</h2><pre><code>/* Specificity: 0-0-1 */
+p { color: blue; }
+
+/* Specificity: 0-1-0 — wins */
+.text { color: red; }
+
+/* Specificity: 1-0-0 — wins over class */
+#header { color: green; }
+
+/* Specificity: 0-1-1 — wins over ID */
+.text .title { color: purple; }</code></pre><h2>Cascade Rules</h2><ol><li>Specificity wins (higher beats lower)</li><li>Last rule wins (equal specificity)</li><li>Inheritance (child inherits from parent)</li><li><code>!important</code> overrides everything</li></ol><h2>Best Practices</h2><ul><li>Never use <code>!important</code> unless absolutely necessary</li><li>Keep specificity low — use classes over IDs</li><li>Use a naming convention (BEM) to avoid specificity wars</li><li>Override with higher specificity, not <code>!important</code></li></ul><pre><code>/* BEM naming */
+.card { }
+.card__title { }
+.card__title--large { }
+.card--featured { }</code></pre><blockquote>Specificity wars are a code smell. If you need <code>!important</code>, your selectors need refactoring.</blockquote>` }
     ]
   },
   {
