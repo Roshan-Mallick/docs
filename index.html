@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Roshan Docs</title>
+  <link rel="icon" type="image/x-icon" href="assets/icons/websitelogo.ico">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Reading progress bar -->
+  <div class="progress-bar" id="progressBar"></div>
+
+  <!-- ═══ Top Navigation ═══ -->
+  <header class="topnav" id="topnav">
+    <div class="topnav-inner">
+      <div class="topnav-left">
+        <button class="mobile-menu-btn" id="mobileMenuBtn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <a href="#" class="logo-link" id="logoLink">
+          <img src="assets/icons/websitelogo.png"  alt="Roshan Docs" class="logo-icon">
+          <span class="logo-text">Roshan Docs</span>
+        </a>
+      </div>
+      <div class="topnav-center">
+        <div class="search-group">
+          <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" class="search-input" id="searchTrigger" placeholder="Search..." readonly>
+          <kbd class="search-kbd">Ctrl K</kbd>
+        </div>
+      </div>
+      <div class="topnav-right">
+        <a href="https://github.com/Roshan-Mallick/docs" target="_blank" class="nav-btn github-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+          <span>GitHub</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ═══ Search Modal ═══ -->
+  <div class="search-overlay" id="searchOverlay">
+    <div class="search-modal">
+      <div class="search-modal-input-wrap">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" class="search-modal-input" id="searchModalInput" placeholder="Type to search..." autocomplete="off">
+        <kbd>Esc</kbd>
+      </div>
+      <div class="search-modal-results" id="searchModalResults">
+        <div class="search-modal-empty">Start typing to search across all documentation</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ Sidebar Overlay (mobile) ═══ -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- ═══ Left Sidebar ═══ -->
+  <aside class="sidebar" id="sidebar">
+    <nav class="sidebar-nav" id="sidebarNav"></nav>
+  </aside>
+
+  <!-- ═══ Main Content ═══ -->
+  <main class="main" id="main">
+
+    <!-- Hero Section -->
+    <section class="hero" id="heroSection">
+      <div class="hero-glow"></div>
+      <div class="hero-content">
+        <h1 class="hero-title">Welcome to <span class="hero-accent">Roshan Docs</span></h1>
+        <p class="hero-desc">Learn tech with beginner-friendly documentation and practical examples.</p>
+        <div class="hero-tags">
+          <span class="hero-tags-label">Popular:</span>
+          <button class="hero-tag" data-topic="git">Git</button>
+          <button class="hero-tag" data-topic="html">HTML</button>
+          <button class="hero-tag" data-topic="css">CSS</button>
+          <button class="hero-tag" data-topic="js">JavaScript</button>
+          <button class="hero-tag" data-topic="linux">Linux</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Documentation Cards -->
+    <section class="section" id="docCards">
+      <h2 class="section-title">Documentation</h2>
+      <div class="cards-grid" id="cardsGrid"></div>
+    </section>
+
+    <!-- Popular Articles -->
+    <section class="section" id="popularArticles">
+      <h2 class="section-title">Popular Articles</h2>
+      <div class="articles-list" id="articlesList"></div>
+    </section>
+
+    <!-- Article Content (hidden by default) -->
+    <section class="article-view" id="articleView" style="display:none;">
+      <div class="article-header" id="articleHeader"></div>
+      <div class="article-body" id="articleBody"></div>
+      <div class="article-nav" id="articleNav"></div>
+    </section>
+
+  </main>
+
+  <!-- ═══ Right Sidebar (On This Page) ═══ -->
+  <aside class="right-sidebar" id="rightSidebar">
+    <div class="right-sidebar-title">On This Page</div>
+    <nav class="toc" id="toc"></nav>
+  </aside>
+
+  <!-- ═══ Back to Top ═══ -->
+  <button class="back-to-top" id="backToTop">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
+
+  <script src="script.js"></script>
+</body>
+</html>
