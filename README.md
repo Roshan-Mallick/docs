@@ -2,7 +2,7 @@
 
 A personal documentation website built with HTML, CSS, and JavaScript.
 
-**Live:** [roshan-mallick.github.io/docs](https://roshan-mallick.github.io/docs/)
+**Live:** https://roshan-docs.vercel.app/
 
 ## What's Inside
 
