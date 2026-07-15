@@ -55,6 +55,39 @@
   --progress-bg: #E5E7EB;
 }
 
+[data-theme="dark"] {
+  --bg: #0F0F0F;
+  --bg-surface: #1A1A1A;
+  --bg-card: #1A1A1A;
+  --bg-hover: #262626;
+  --bg-elevated: #1E1E1E;
+  --border: #2E2E2E;
+  --border-strong: #404040;
+  --text: #E4E4E7;
+  --text-secondary: #A1A1AA;
+  --text-muted: #71717A;
+  --color-heading: #F4F4F5;
+  --accent: #fa6e09;
+  --accent-hover: #fb8c3a;
+  --accent-dim: #e85d00;
+  --accent-bg: rgba(250, 110, 9, 0.12);
+  --accent-glow: rgba(250, 110, 9, 0.18);
+  --code-bg: #1E1E1E;
+  --code-text: #E4E4E7;
+  --inline-code-bg: #262626;
+  --inline-code-text: #D4D4D8;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+  --hero-gradient: linear-gradient(135deg, rgba(250, 110, 9, 0.1) 0%, rgba(250, 110, 9, 0.03) 100%);
+  --logo-bg: #fa6e09;
+  --logo-doc: #fa6e09;
+  --logo-lines: #fa6e09;
+  --scrollbar: #3F3F46;
+  --scrollbar-hover: #52525B;
+  --progress-bg: #27272A;
+}
+
 html {
   scroll-behavior: smooth;
 }
@@ -260,6 +293,61 @@ body {
 .nav-btn:hover {
   background: var(--bg-hover);
   color: var(--text);
+}
+
+/* ── Theme Slider ──────────────────────────────── */
+
+.theme-slider-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: transparent;
+}
+
+.theme-icon {
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.theme-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 70px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--progress-bg);
+  outline: none;
+  cursor: pointer;
+}
+
+.theme-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  border: 2px solid var(--bg);
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.15s;
+}
+
+.theme-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+.theme-slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  border: 2px solid var(--bg);
+  box-shadow: var(--shadow-sm);
 }
 
 
@@ -586,81 +674,6 @@ body {
   border-radius: 6px;
   color: var(--text-muted);
   font-weight: 500;
-}
-
-/* ── Popular Articles ─────────────────────────── */
-
-.articles-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.article-item {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 16px 20px;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  cursor: pointer;
-  transition: background var(--transition), border-color var(--transition), transform 0.15s;
-}
-
-.article-item:hover {
-  background: var(--bg-elevated);
-  border-color: var(--border-strong);
-  transform: translateX(4px);
-}
-
-.article-item-info { flex: 1; }
-
-.article-item-title {
-  font-size: 0.92rem;
-  font-weight: 600;
-  margin-bottom: 2px;
-}
-
-.article-item-desc {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-}
-
-.article-item-meta {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-shrink: 0;
-}
-
-.article-badge {
-  font-size: 0.68rem;
-  font-weight: 600;
-  padding: 3px 8px;
-  border-radius: 6px;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.badge-beginner { background: rgba(34, 197, 94, 0.12); color: #22c55e; }
-.badge-intermediate { background: rgba(251, 191, 36, 0.12); color: #fbbf24; }
-.badge-advanced { background: rgba(239, 68, 68, 0.12); color: #ef4444; }
-
-.article-reading-time {
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  white-space: nowrap;
-}
-
-.article-item-arrow {
-  color: var(--text-muted);
-  transition: transform 0.2s;
-}
-
-.article-item:hover .article-item-arrow {
-  transform: translateX(3px);
-  color: var(--accent);
 }
 
 /* ── Article View ─────────────────────────────── */
@@ -1085,4 +1098,5 @@ code {
 
   .topnav-center { display: none; }
   .mobile-search-btn { display: flex; }
+  .theme-slider-wrap { display: none; }
 }
