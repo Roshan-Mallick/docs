@@ -3027,6 +3027,24 @@ function closeSearch() {
   searchOverlay.classList.remove("open");
 }
 
+function tokenize(text) {
+  return text
+    .toLowerCase()
+    .replace(/[^\w\s]/g, "")
+    .split(/\s+/)
+    .filter((t) => t.length >= 2);
+}
+
+function stem(word) {
+  if (word.length > 3 && word.endsWith("s")) return word.slice(0, -1);
+  if (word.length > 4 && word.endsWith("es")) return word.slice(0, -2);
+  return word;
+}
+
+function stemTokens(tokens) {
+  return tokens.map(stem);
+}
+
 function runSearch(query) {
   const q = query.toLowerCase().trim();
   if (!q) {
@@ -3035,16 +3053,57 @@ function runSearch(query) {
     return;
   }
 
-  const results = flatAll.filter((item) => {
-    return (
-      item.article.title.toLowerCase().includes(q) ||
-      item.article.desc.toLowerCase().includes(q) ||
-      item.topic.label.toLowerCase().includes(q) ||
-      (item.topic.tags && item.topic.tags.some((t) => t.includes(q)))
-    );
+  const queryTokens = tokenize(q);
+  if (!queryTokens.length) {
+    searchModalResults.innerHTML = '<div class="search-modal-empty">Start typing to search across all documentation</div>';
+    searchFocusIdx = -1;
+    return;
+  }
+
+  const stemmedQuery = stemTokens(queryTokens);
+
+  const scored = flatAll.map((item) => {
+    const titleText = item.article.title.toLowerCase();
+    const descText = item.article.desc.toLowerCase();
+    const labelText = item.topic.label.toLowerCase();
+    const tagsText = (item.topic.tags || []).join(" ").toLowerCase();
+
+    const titleTokens = stemTokens(tokenize(titleText));
+    const descTokens = stemTokens(tokenize(descText));
+    const labelTokens = stemTokens(tokenize(labelText));
+    const tagsTokens = stemTokens(tokenize(tagsText));
+
+    let matchCount = 0;
+    let titleHits = 0;
+    let descHits = 0;
+
+    for (let i = 0; i < stemmedQuery.length; i++) {
+      const st = stemmedQuery[i];
+      const raw = queryTokens[i];
+
+      const inTitle = titleTokens.some((t) => t === st || t.includes(raw));
+      const inLabel = labelTokens.some((t) => t === st || t.includes(raw));
+      const inTags = tagsTokens.some((t) => t === st || t.includes(raw));
+      const inDesc = descTokens.some((t) => t === st || t.includes(raw));
+
+      if (inTitle || inLabel || inTags || inDesc) matchCount++;
+      if (inTitle) titleHits++;
+      if (inDesc) descHits++;
+    }
+
+    const score =
+      (matchCount / stemmedQuery.length) +
+      (titleHits / stemmedQuery.length) * 1.5 +
+      (descHits / stemmedQuery.length) * 0.5;
+
+    return { item, score, matchCount };
   });
 
-  if (results.length === 0) {
+  const results = scored
+    .filter((r) => r.matchCount > 0)
+    .sort((a, b) => b.score - a.score);
+
+  if (!results.length) {
     searchModalResults.innerHTML = '<div class="search-modal-empty">No results found</div>';
     searchFocusIdx = -1;
     return;
@@ -3053,7 +3112,7 @@ function runSearch(query) {
   searchModalResults.innerHTML = "";
   searchFocusIdx = -1;
 
-  results.forEach((item) => {
+  results.forEach(({ item }) => {
     const div = document.createElement("div");
     div.className = "search-result-item";
     div.innerHTML = `
