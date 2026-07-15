@@ -2744,7 +2744,6 @@ const articlesList = document.getElementById("articlesList");
 const articleView = document.getElementById("articleView");
 const articleHeader = document.getElementById("articleHeader");
 const articleBody = document.getElementById("articleBody");
-const articleNav = document.getElementById("articleNav");
 const searchTrigger = document.getElementById("searchTrigger");
 const searchOverlay = document.getElementById("searchOverlay");
 const searchModalInput = document.getElementById("searchModalInput");
@@ -2926,29 +2925,6 @@ function openArticle(topic, article) {
     });
     pre.style.position = "relative";
     pre.appendChild(btn);
-  });
-
-  const idx = flatAll.findIndex((a) => a.article.id === article.id);
-
-  let navHTML = "";
-  if (idx > 0) {
-    const prev = flatAll[idx - 1];
-    navHTML += `<button class="article-nav-btn prev" data-topic="${prev.topic.id}" data-article="${prev.article.id}"><div class="article-nav-label">Previous</div><div class="article-nav-title">${prev.article.title}</div></button>`;
-  } else {
-    navHTML += "<div></div>";
-  }
-  if (idx < flatAll.length - 1) {
-    const next = flatAll[idx + 1];
-    navHTML += `<button class="article-nav-btn next" data-topic="${next.topic.id}" data-article="${next.article.id}"><div class="article-nav-label">Next</div><div class="article-nav-title">${next.article.title}</div></button>`;
-  }
-  articleNav.innerHTML = navHTML;
-
-  articleNav.querySelectorAll(".article-nav-btn").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const t = docs.find((d) => d.id === btn.dataset.topic);
-      const a = t.articles.find((ar) => ar.id === btn.dataset.article);
-      openArticle(t, a);
-    });
   });
 
   document.getElementById("articleBack")?.addEventListener("click", showHome);

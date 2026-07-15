@@ -860,48 +860,6 @@ code {
   background: var(--bg-hover);
 }
 
-.article-nav {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  margin-top: 48px;
-  padding-top: 24px;
-  border-top: 1px solid var(--border);
-}
-
-.article-nav-btn {
-  flex: 1;
-  padding: 16px;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  cursor: pointer;
-  transition: background var(--transition), border-color var(--transition);
-  text-align: left;
-  font-family: var(--font);
-}
-
-.article-nav-btn:hover {
-  background: var(--bg-elevated);
-  border-color: var(--border-strong);
-}
-
-.article-nav-btn.next { text-align: right; }
-
-.article-nav-label {
-  font-size: 0.72rem;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin-bottom: 4px;
-}
-
-.article-nav-title {
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: var(--text);
-}
-
 /* ── Right Sidebar (TOC) ──────────────────────── */
 
 .right-sidebar {
@@ -1124,8 +1082,6 @@ code {
   .cards-grid { grid-template-columns: 1fr; }
 
   .article-view { padding: 28px 24px; }
-
-  .article-nav { flex-direction: column; }
 
   .topnav-center { display: none; }
   .mobile-search-btn { display: flex; }
