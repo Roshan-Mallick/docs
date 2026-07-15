@@ -117,6 +117,7 @@ function lerpStops(stops, t) {
 function applyTheme(value) {
   const t = value / 100;
   const root = document.documentElement;
+  root.setAttribute("data-theme", t > 0.5 ? "dark" : "light");
   for (const key in themeStopsHSL) {
     const cssVar = key.replace(/([A-Z])/g, "-$1").toLowerCase();
     root.style.setProperty(`--${cssVar}`, lerpStops(themeStopsHSL[key], t));

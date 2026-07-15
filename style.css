@@ -629,13 +629,18 @@ body {
   align-items: center;
   justify-content: center;
   background: transparent;
-  border: 0.5px solid #ccc;
+  border: 0.5px solid var(--border-strong);
+  color: var(--text);
 }
 
 .doc-card-icon svg,
 .doc-card-icon img {
   width: 22px;
   height: auto;
+}
+
+[data-theme="dark"] .doc-card-icon img {
+  filter: invert(1);
 }
 
 .doc-card-arrow {
