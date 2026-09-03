@@ -1009,6 +1009,8 @@ code {
 .ptr-grid.cols-2 { grid-template-columns: repeat(2, auto); }
 .ptr-grid.cols-3 { grid-template-columns: repeat(3, auto); }
 .ptr-grid.cols-4 { grid-template-columns: repeat(4, auto); }
+.ptr-grid.cols-5 { grid-template-columns: repeat(5, auto); }
+.ptr-grid.cols-6 { grid-template-columns: repeat(6, auto); }
 
 .ptr-grid .g-col {
   display: flex;

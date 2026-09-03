@@ -2607,109 +2607,12 @@ for (int i = 0; i &lt; n; i++)
     ]
   },
   {
-    id: "leetcode", label: "LeetCode", icon: `<img src="assets/icons/leetcode.svg" width="24" height="24" alt="LeetCode">`,
-    desc: "Practice coding problems and ace technical interviews.",
-    tags: ["coding", "interview", "problems"],
+    id: "two-pointers", label: "Two Pointers Method", icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 6h14"/><path d="M5 12h14"/><path d="M5 18h14"/><path d="M9 3l-2 3 2 3"/><path d="M15 15l-2 3 2 3"/></svg>`,
+    desc: "Solve targeted problems using the Two Pointers pattern.",
+    tags: ["two-pointers", "pointers", "algorithms"],
     articles: [
-      { id: "lc-01", title: "What is LeetCode?", difficulty: "beginner", time: "3 min", desc: "Introduction to the platform.",
-        content: `<h1>What is LeetCode?</h1><p>LeetCode is a platform for preparing for technical interviews. It has a collection of coding problems asked by top tech companies like Google, Amazon, Meta, Microsoft, and Apple.</p><h2>Why LeetCode?</h2><ul><li>Practice problems sorted by difficulty (Easy, Medium, Hard)</li><li>Real interview questions from FAANG companies</li><li>Track your progress and compete in contests</li><li>Build problem-solving patterns that apply everywhere</li></ul><h2>Getting Started</h2><ol><li>Create a free account at <code>leetcode.com</code></li><li>Start with the "Top 150 Interview Questions" study plan</li><li>Solve 2-3 problems daily, focusing on patterns</li><li>After solving, study other people's solutions</li></ol><blockquote>The goal is not to memorize solutions — it is to learn patterns so you can solve any new problem you encounter.</blockquote>` },
-      { id: "lc-02", title: "Problem-Solving Framework", difficulty: "beginner", time: "4 min", desc: "A step-by-step approach to any problem.",
-        content: `<h1>Problem-Solving Framework</h1><p>Every LeetCode problem can be solved systematically using this framework:</p><h2>5-Step Approach</h2><ol><li><strong>Read & Understand</strong> — Read the problem twice. Identify input, output, and constraints.</li><li><strong>Examples & Edge Cases</strong> — Trace through examples by hand. Think about empty input, single element, large input.</li><li><strong>Brute Force</strong> — Write the simplest solution that works. Don't optimize yet.</li><li><strong>Optimize</strong> — Identify the bottleneck. Think about which data structure or pattern applies.</li><li><strong>Code & Test</strong> — Write clean code. Test with examples and edge cases.</li></ol><h2>Common Patterns</h2><table><thead><tr><th>Pattern</th><th>When to Use</th><th>Example Problems</th></tr></thead><tbody><tr><td>Two Pointers</td><td>Sorted array, pair problems</td><td>Two Sum II, Container With Most Water</td></tr><tr><td>Sliding Window</td><td>Subarray/substring problems</td><td>Longest Substring Without Repeating, Min Window Substring</td></tr><tr><td>Hash Map</td><td>Fast lookup, frequency counting</td><td>Two Sum, Group Anagrams, Valid Anagram</td></tr><tr><td>Binary Search</td><td>Sorted array, search space reduction</td><td>Search in Rotated Array, Find Minimum</td></tr><tr><td>Stack</td><td>Nested structure, next greater/smaller</td><td>Valid Parentheses, Daily Temperatures</td></tr><tr><td>DFS/BFS</td><td>Graph/tree traversal</td><td>Number of Islands, Course Schedule</td></tr><tr><td>Dynamic Programming</td><td>Overlapping subproblems, optimal substructure</td><td>Climbing Stairs, Coin Change, Longest Increasing Subsequence</td></tr></tbody></table><h2>Time Complexity Cheat Sheet</h2><pre><code>O(1)        — hash lookup, array access
-O(log n)    — binary search
-O(n)        — single loop
-O(n log n)  — merge sort, heap sort
-O(n²)       — nested loops
-O(2^n)      — recursive fibonacci, subsets</code></pre><blockquote>Before coding, always ask yourself: "What is the time and space complexity of my approach?"</blockquote>` },
-      { id: "lc-03", title: "Top Study Plans", difficulty: "beginner", time: "3 min", desc: "Structured paths for interview prep.",
-        content: `<h1>Top Study Plans</h1><h2>LeetCode Top 150 Interview Questions</h2><p>The most popular study plan. Covers all essential patterns.</p><h2>Recommended Order</h2><table><thead><tr><th>Week</th><th>Topics</th><th>Problems</th></tr></thead><tbody><tr><td>1-2</td><td>Arrays & Hashing, Two Pointers</td><td>15-20</td></tr><tr><td>3-4</td><td>Sliding Window, Stack, Binary Search</td><td>15-20</td></tr><tr><td>5-6</td><td>Linked Lists, Trees, Tries</td><td>15-20</td></tr><tr><td>7-8</td><td>Heap, Backtracking, Graphs</td><td>15-20</td></tr><tr><td>9-10</td><td>Dynamic Programming (1D then 2D)</td><td>15-20</td></tr><tr><td>11-12</td><td>Advanced DP, Greedy, Review</td><td>15-20</td></tr></tbody></table><h2>Tips for Success</h2><ul><li>Consistency beats intensity — solve 2 problems daily</li><li>Always write the brute force first</li><li>After solving, read 2-3 other solutions</li><li>Track patterns, not just problems</li><li>Revise solved problems every 2 weeks</li></ul><blockquote>Quality over quantity. Understanding 100 patterns is better than memorizing 500 solutions.</blockquote>` },
-      { id: "lc-04", title: "Essential Data Structures", difficulty: "beginner", time: "5 min", desc: "Quick reference for DSA on LeetCode.",
-        content: `<h1>Essential Data Structures for LeetCode</h1><h2>Arrays & Strings</h2><pre><code>// Two Sum — O(n) using hash map
-int twoSum(int[] nums, int target) {
-    Map&lt;Integer, Integer&gt; map = new HashMap&lt;&gt;();
-    for (int i = 0; i &lt; nums.length; i++) {
-        int complement = target - nums[i];
-        if (map.containsKey(complement))
-            return new int[]{map.get(complement), i};
-        map.put(nums[i], i);
-    }
-    return new int[]{};
-}</code></pre><h2>Linked List</h2><pre><code>// Reverse a Linked List — O(n), O(1) space
-ListNode reverse(ListNode head) {
-    ListNode prev = null, curr = head;
-    while (curr != null) {
-        ListNode next = curr.next;
-        curr.next = prev;
-        prev = curr;
-        curr = next;
-    }
-    return prev;
-}</code></pre><h2>Binary Tree</h2><pre><code>// Max Depth — O(n)
-int maxDepth(TreeNode root) {
-    if (root == null) return 0;
-    return 1 + Math.max(maxDepth(root.left), maxDepth(root.right));
-}</code></pre><h2>When to Use What</h2><table><thead><tr><th>Need</th><th>Use</th><th>Time</th></tr></thead><tbody><tr><td>Fast lookup</td><td>HashMap</td><td>O(1) avg</td></tr><tr><td>Sorted data + search</td><td>TreeMap / BST</td><td>O(log n)</td></tr><tr><td>Min/Max priority</td><td>PriorityQueue (Heap)</td><td>O(log n)</td></tr><tr><td>FIFO processing</td><td>Queue / Deque</td><td>O(1)</td></tr><tr><td>LIFO / nested</td><td>Stack</td><td>O(1)</td></tr><tr><td>Union/Connectivity</td><td>Union-Find</td><td>O(α(n))</td></tr></tbody></table><blockquote>Master these data structures and you can solve 80% of LeetCode problems.</blockquote>` },
-      { id: "ez-01", title: "Easy — Array", difficulty: "easy", time: "10 min", desc: "Master array-based easy problems.",
-        content: `<h1>Array — Easy Problems</h1><p>Arrays are the most fundamental data structure. Mastering easy array problems builds the foundation for everything else.</p><h2>Two Sum (LC #1)</h2><p>Given an array of integers <code>nums</code> and an integer <code>target</code>, return indices of the two numbers that add up to <code>target</code>.</p><pre><code>// Brute Force — O(n²)
-int* twoSum(int* nums, int numsSize, int target, int* returnSize) {
-    *returnSize = 2;
-    int *result = malloc(2 * sizeof(int));
-    for (int i = 0; i &lt; numsSize; i++)
-        for (int j = i + 1; j &lt; numsSize; j++)
-            if (nums[i] + nums[j] == target) {
-                result[0] = i;
-                result[1] = j;
-                return result;
-            }
-    return result;
-}</code></pre><h2>Contains Duplicate (LC #217)</h2><p>Return true if any value appears at least twice.</p><pre><code>// Sort + check adjacent — O(n log n)
-int cmp(const void *a, const void *b) {
-    return (*(int*)a - *(int*)b);
-}
-
-bool containsDuplicate(int* nums, int numsSize) {
-    qsort(nums, numsSize, sizeof(int), cmp);
-    for (int i = 1; i &lt; numsSize; i++)
-        if (nums[i] == nums[i-1]) return true;
-    return false;
-}</code></pre><h2>Max Subarray (LC #53)</h2><p>Find the contiguous subarray with the largest sum.</p><pre><code>// Kadane's Algorithm — O(n)
-int maxSubArray(int* nums, int numsSize) {
-    int maxSoFar = nums[0];
-    int maxEndingHere = nums[0];
-    for (int i = 1; i &lt; numsSize; i++) {
-        if (maxEndingHere + nums[i] > nums[i])
-            maxEndingHere = maxEndingHere + nums[i];
-        else
-            maxEndingHere = nums[i];
-        if (maxEndingHere > maxSoFar)
-            maxSoFar = maxEndingHere;
-    }
-    return maxSoFar;
-}</code></pre><h2>Move Zeroes (LC #283)</h2><p>Move all zeroes to the end while keeping relative order.</p><pre><code>// Two Pointers — O(n), O(1) space
-void moveZeroes(int* nums, int numsSize) {
-    int insertPos = 0;
-    for (int i = 0; i &lt; numsSize; i++) {
-        if (nums[i] != 0) {
-            int temp = nums[insertPos];
-            nums[insertPos] = nums[i];
-            nums[i] = temp;
-            insertPos++;
-        }
-    }
-}</code></pre><h2>Best Time to Buy and Sell Stock (LC #121)</h2><p>Find max profit from one buy and one sell.</p><pre><code>// Track min price, max profit — O(n)
-int maxProfit(int* prices, int pricesSize) {
-    int minPrice = prices[0];
-    int maxProfit = 0;
-    for (int i = 1; i &lt; pricesSize; i++) {
-        if (prices[i] &lt; minPrice)
-            minPrice = prices[i];
-        int profit = prices[i] - minPrice;
-        if (profit > maxProfit)
-            maxProfit = profit;
-    }
-    return maxProfit;
-}</code></pre><h2>Pattern Summary</h2><table><thead><tr><th>Problem</th><th>Pattern</th><th>Time</th><th>Space</th></tr></thead><tbody><tr><td>Two Sum</td><td>Brute Force</td><td>O(n²)</td><td>O(1)</td></tr><tr><td>Contains Duplicate</td><td>Sort + Compare</td><td>O(n log n)</td><td>O(1)</td></tr><tr><td>Max Subarray</td><td>Kadane's Algorithm</td><td>O(n)</td><td>O(1)</td></tr><tr><td>Move Zeroes</td><td>Two Pointers</td><td>O(n)</td><td>O(1)</td></tr><tr><td>Buy/Sell Stock</td><td>Track min + max profit</td><td>O(n)</td><td>O(1)</td></tr></tbody></table><blockquote>Key takeaway: Most easy array problems reduce to O(n) with the right pattern. Never settle for O(n²) when a linear solution exists.</blockquote>` },
-      { id: "tp-01", title: "Two Pointers Method", difficulty: "easy", time: "12 min", desc: "Two Sum II explained with diagrams, malloc, and pointer arithmetic.",
-        content: `<h1>Two Pointers Method</h1><p>Learn the Two Pointers pattern through problems, visual diagrams, dry runs, C code, and line-by-line explanations.</p>
+      { id: "tp-01", title: "Two Sum II", difficulty: "easy", time: "12 min", desc: "Two Sum II explained with diagrams, malloc, and pointer arithmetic.",
+        content: `<h1>Two Sum II</h1><p>Solve <strong>Two Sum II (LeetCode #167)</strong> with the Two Pointers pattern — visual diagrams, dry runs, C code, and line-by-line explanations.</p>
 
 <h2>What is Two Pointers?</h2><p>Two pointers means using <strong>two variables/pointers</strong> to move through an array instead of checking every possible pair.</p><div class="diagram-wrap"><span class="label">Two pointers moving toward each other</span><div class="ptr-grid cols-4">
 <div class="g-col"><span class="g-label">low</span></div><div class="g-col"></div><div class="g-col"></div><div class="g-col"><span class="g-label">high</span></div>
@@ -2900,7 +2803,141 @@ return NULL;</code></pre><h3>1. *returnSize = 0;</h3><p>This means: <em>"No elem
 </div>
 </div></div>
 
-<h2>Problems (Two Pointers)</h2><p>This section will grow as more Two Pointers problems are added. Each problem will include the problem, pattern, approach, dry run, diagram, C solution, line-by-line explanation, and complexity.</p><div class="problem-list"><div class="problem-card"><div class="problem-num">01</div><h4>Two Sum II</h4><p>Sorted array, find two numbers adding to target. <strong>Solved below.</strong></p></div><div class="problem-card"><div class="problem-num">02</div><h4>Valid Palindrome</h4><p>Check if a string reads the same forward and backward, ignoring non-alphanumerics.</p></div><div class="problem-card"><div class="problem-num">03</div><h4>3Sum</h4><p>Find all triplets that sum to zero using two pointers.</p></div><div class="problem-card"><div class="problem-num">04</div><h4>Container With Most Water</h4><p>Find the container that holds the most water using two pointers.</p></div><div class="problem-card"><div class="problem-num">05</div><h4>Remove Duplicates from Sorted Array</h4><p>Remove duplicates in place and return the new length.</p></div><div class="problem-card"><div class="problem-num">06</div><h4>Move Zeroes</h4><p>Move all zeroes to the end while keeping relative order.</p></div><div class="problem-card"><div class="problem-num">07</div><h4>Squares of a Sorted Array</h4><p>Return an array of squares in non-decreasing order.</p></div><div class="problem-card"><div class="problem-num">08</div><h4>Merge Sorted Array</h4><p>Merge two sorted arrays into one sorted array.</p></div></div><blockquote>Master the Two Pointers pattern and these problems become the same idea: use a sorted property to skip options, moving only toward the answer.</blockquote>` }
+<h2>Problems (Two Pointers)</h2><p>This section will grow as more Two Pointers problems are added. Each problem will include the problem, pattern, approach, dry run, diagram, C solution, line-by-line explanation, and complexity.</p><div class="problem-list"><div class="problem-card"><div class="problem-num">01</div><h4>Two Sum II</h4><p>Sorted array, find two numbers adding to target. <strong>Solved below.</strong></p></div><div class="problem-card"><div class="problem-num">02</div><h4>Valid Palindrome</h4><p>Check if a string reads the same forward and backward, ignoring non-alphanumerics.</p></div><div class="problem-card"><div class="problem-num">03</div><h4>3Sum</h4><p>Find all triplets that sum to zero using two pointers.</p></div><div class="problem-card"><div class="problem-num">04</div><h4>Container With Most Water</h4><p>Find the container that holds the most water using two pointers.</p></div><div class="problem-card"><div class="problem-num">05</div><h4>Remove Duplicates from Sorted Array</h4><p>Remove duplicates in place and return the new length.</p></div><div class="problem-card"><div class="problem-num">06</div><h4>Move Zeroes</h4><p>Move all zeroes to the end while keeping relative order.</p></div><div class="problem-card"><div class="problem-num">07</div><h4>Squares of a Sorted Array</h4><p>Return an array of squares in non-decreasing order.</p></div><div class="problem-card"><div class="problem-num">08</div><h4>Merge Sorted Array</h4><p>Merge two sorted arrays into one sorted array.</p></div></div><blockquote>Master the Two Pointers pattern and these problems become the same idea: use a sorted property to skip options, moving only toward the answer.</blockquote>` },
+      { id: "tp-02", title: "Valid Palindrome", difficulty: "easy", time: "10 min", desc: "Two pointers compare characters from both ends of a string.",
+        content: `<h1>Valid Palindrome</h1><p>Check a string the Two Pointers way, ignoring everything that isn't a letter or digit.</p>
+
+<h2>Problem Statement</h2><p>A phrase is a <strong>palindrome</strong> if, after converting all uppercase letters into lowercase letters and removing all non-alphanumeric characters, it reads the same forward and backward. Return <code>true</code> if the string is a palindrome, and <code>false</code> otherwise.</p><pre><code>Input:  s = "A man, a plan, a canal: Panama"
+Output: true
+
+Explanation: after cleanups s becomes "amanaplanacanalpanama",
+which reads the same forward and backward.</code></pre><blockquote>"amanaplanacanalpanama" is a palindrome.</blockquote>
+
+<h2>What is the Two Pointer approach?</h2><p>Using two pointers means starting one pointer at the <strong>beginning</strong> of the string and one at the <strong>end</strong>. They move <strong>toward each other</strong>, comparing one pair of characters at a time.</p><div class="diagram-wrap"><span class="label">low starts at the start, high at the end</span><div class="ptr-grid cols-5">
+<div class="g-col"><span class="g-label">low</span></div><div class="g-col"></div><div class="g-col"></div><div class="g-col"></div><div class="g-col"><span class="g-label">high</span></div>
+<div class="g-col"><span class="g-arrow">&#8595;</span></div><div class="g-col"></div><div class="g-col"></div><div class="g-col"></div><div class="g-col"><span class="g-arrow">&#8595;</span></div>
+<div class="h-row"><span class="arr-cell">A</span></div><div class="h-row"><span class="arr-cell">m</span></div><div class="h-row"><span class="arr-cell">a</span></div><div class="h-row"><span class="arr-cell">n</span></div><div class="h-row"><span class="arr-cell">a</span></div>
+</div></div><p>Just like Two Sum II, the two pointers meet in the middle.</p>
+
+<h2>Why Two Pointers works for this problem</h2><ul><li>A palindrome is defined by matching the <strong>outermost</strong> characters, then moving inward.</li><li>Every <code>low</code>/<code>high</code> pair either matches (keep going) or does not match (answer is <code>false</code>).</li><li>Non-alphanumeric characters are <strong>skipped</strong> by moving the pointer one step — they do not count.</li><li>Because we only move pointers inward, each character is visited at most once.</li></ul><blockquote>The string is a palindrome if, going from the outside inward, every pair of alphanumeric characters matches.</blockquote>
+
+<h2>Example</h2><p>We use the classic example:</p><pre><code>s = "A man, a plan, a canal: Panama"</code></pre><p>If we remove spaces, punctuation, and ignore case, we get:</p><pre><code>"amanaplanacanalpanama"</code></pre><p>which reads the same forwards and backwards.</p>
+
+<h2>Initial pointer positions</h2><p>The string has 30 characters, so:</p><pre><code>low  = 0
+high = strlen(s) - 1 = 29</code></pre><div class="diagram-wrap"><span class="label">low is at index 0, high is at index 29</span><div class="ptr-grid cols-6">
+<div class="g-col"><span class="g-label">low</span></div><div class="g-col"></div><div class="g-col"></div><div class="g-col"></div><div class="g-col"></div><div class="g-col"><span class="g-label">high</span></div>
+<div class="g-col"><span class="g-arrow">&#8595;</span></div><div class="g-col"></div><div class="g-col"></div><div class="g-col"></div><div class="g-col"></div><div class="g-col"><span class="g-arrow">&#8595;</span></div>
+<div class="h-row"><span class="arr-cell">A</span></div><div class="h-row"><span class="arr-cell">&#32;</span></div><div class="h-row"><span class="arr-cell">m</span></div><div class="h-row"><span class="arr-cell">.</span></div><div class="h-row"><span class="arr-cell">.</span></div><div class="h-row"><span class="arr-cell">a</span></div>
+</div></div><p><code>A</code> is at index 0 and the last character <code>a</code> is at index 29.</p>
+
+<h2>Step-by-step dry run</h2><p>We compare <code>s[low]</code> with <code>s[high]</code>, ignoring anything that is not a letter or digit.</p>
+
+<h3>Final step — they match</h3><p>As the pointers move inward, each matching pair brings them closer. Here is the whole process on the cleaned-up string:</p><div class="diagram-wrap"><span class="label">Clean string: "amanaplanacanalpanama"</span><div class="ptr-grid cols-4">
+<div class="g-col"><span class="g-label">low</span></div><div class="g-col"></div><div class="g-col"></div><div class="g-col"><span class="g-label">high</span></div>
+<div class="g-col"><span class="g-arrow">&#8595;</span></div><div class="g-col"></div><div class="g-col"></div><div class="g-col"><span class="g-arrow">&#8595;</span></div>
+<div class="h-row"><span class="arr-cell">a</span></div><div class="h-row"><span class="arr-cell">m</span></div><div class="h-row"><span class="arr-cell">a</span></div><div class="h-row"><span class="arr-cell">a</span></div>
+</div>
+<div class="v-flow"><span class="v-step">s[low] = 'a' and s[high] = 'a'</span><span class="v-step accent">tolower matches</span><span class="v-step">low++ (move right)</span><span class="v-step">high-- (move left)</span></div>
+</div></div><p>Because every pair matched and no <code>return false</code> was triggered, we reach the end and return <code>true</code>.</p>
+
+<h3>1. Compare outermost letters</h3><div class="diagram-wrap"><span class="label">s[0]='A', s[29]='a'</span><div class="ptr-grid cols-5">
+<div class="g-col"><span class="g-label">low</span></div><div class="g-col"></div><div class="g-col"></div><div class="g-col"></div><div class="g-col"><span class="g-label">high</span></div>
+<div class="g-col"><span class="g-arrow">&#8595;</span></div><div class="g-col"></div><div class="g-col"></div><div class="g-col"></div><div class="g-col"><span class="g-arrow">&#8595;</span></div>
+<div class="h-row"><span class="arr-cell">A</span></div><div class="h-row"><span class="arr-cell">m</span></div><div class="h-row"><span class="arr-cell">a</span></div><div class="h-row"><span class="arr-cell">n</span></div><div class="h-row"><span class="arr-cell">a</span></div>
+</div>
+<div class="v-flow"><span class="v-step">tolower('A') == tolower('a') &rarr; 'a' == 'a'</span><span class="v-step accent">Match</span><span class="v-step">low++ then high--</span></div>
+</div></div><p><code>'A'</code> and <code>'a'</code> are the same letter once we lower the case, so we move both pointers inward.</p>
+
+<h3>2. Skip the space (non-alphanumeric)</h3><p>Now <code>low = 1</code>, which is a space. A space is not alphanumeric, so we skip it with <code>low++</code> until we reach a letter.</p><div class="diagram-wrap"><span class="label">low skips the space at index 1</span><div class="ptr-grid cols-6">
+<div class="g-col"><span class="g-label">low</span></div><div class="g-col"></div><div class="g-col"></div><div class="g-col"></div><div class="g-col"></div><div class="g-col"></div>
+<div class="g-col"><span class="g-arrow">&#8595;</span></div><div class="g-col"></div><div class="g-col"></div><div class="g-col"></div><div class="g-col"></div><div class="g-col"></div>
+<div class="h-row"><span class="arr-cell">&#32;</span></div><div class="h-row"><span class="arr-cell">&#32;</span></div><div class="h-row"><span class="arr-cell">m</span></div><div class="h-row"><span class="arr-cell">a</span></div><div class="h-row"><span class="arr-cell">n</span></div><div class="h-row"><span class="arr-cell">&#32;</span></div>
+</div>
+<div class="v-flow"><span class="v-step accent">!isalnum(' ') is true</span><span class="v-step">low++ &rarr; move past the space</span></div>
+</div></div><p><code>low</code> now points at <code>'m'</code> (index 2), an actual letter.</p>
+
+<h2>The C Function</h2><p>Here is the complete solution. Do not change the algorithm.</p><pre><code>bool isPalindrome(char* s) {
+    int low = 0 ;
+    int high = strlen(s)-1;
+
+while (low &lt; high) {
+
+    while (low &lt; high &amp;&amp; !isalnum(s[low])){
+        low++;
+    }
+
+    while (low &lt; high &amp;&amp; !isalnum(s[high])){
+        high--;
+    }
+
+    if (tolower(s[low]) != tolower(s[high])){
+        return false;
+    }
+
+    low++;
+    high--;
+}
+   return true ;
+ 
+} </code></pre><p>Let's walk through each piece.</p>
+
+<h2>Line-by-line explanation</h2>
+
+<h3>The low pointer</h3><p><code>low</code> is an integer index that starts at <code>0</code> (the first character of the string). It moves <strong>rightward</strong> through the string as we progress.</p>
+<div class="diagram-wrap"><span class="label">low starts at index 0</span><div class="ptr-grid cols-5">
+<div class="g-col"><span class="g-label">low</span></div><div class="g-col"></div><div class="g-col"></div><div class="g-col"></div><div class="g-col"></div>
+<div class="g-col"><span class="g-arrow">&#8595;</span></div><div class="g-col"></div><div class="g-col"></div><div class="g-col"></div><div class="g-col"></div>
+<div class="h-row"><span class="arr-cell">A</span></div><div class="h-row"><span class="arr-cell">&#32;</span></div><div class="h-row"><span class="arr-cell">m</span></div><div class="h-row"><span class="arr-cell">a</span></div><div class="h-row"><span class="arr-cell">n</span></div>
+</div></div>
+
+<h3>The high pointer</h3><p><code>high</code> starts at <code>strlen(s) - 1</code> (the last character of the string). It moves <strong>leftward</strong> toward <code>low</code>.</p>
+<div class="diagram-wrap"><span class="label">high starts at index 29</span><div class="ptr-grid cols-5">
+<div class="g-col"></div><div class="g-col"></div><div class="g-col"></div><div class="g-col"></div><div class="g-col"><span class="g-label">high</span></div>
+<div class="g-col"></div><div class="g-col"></div><div class="g-col"></div><div class="g-col"></div><div class="g-col"><span class="g-arrow">&#8595;</span></div>
+<div class="h-row"><span class="arr-cell">a</span></div><div class="h-row"><span class="arr-cell">n</span></div><div class="h-row"><span class="arr-cell">a</span></div><div class="h-row"><span class="arr-cell">m</span></div><div class="h-row"><span class="arr-cell">a</span></div>
+</div></div>
+
+<h4>why low &lt; high in the inner while loops</h4><p>Each inner <code>while (low &lt; high &amp;&amp; !isalnum(...))</code> only skips forward if the two pointers have not crossed. This stops <code>low</code> from running past <code>high</code> and <code>high</code> from running past <code>low</code> while skipping punctuation.</p>
+
+<h3>strlen()</h3><p><code>strlen(s)</code> returns the number of characters in the string (not counting the null terminator <code>\\0</code>). We subtract <code>1</code> to get the index of the last character.</p><pre><code>int high = strlen(s) - 1;</code></pre><p>For <code>"A man, a plan, a canal: Panama"</code>, <code>strlen</code> returns <code>30</code>, so <code>high = 29</code>.</p>
+
+<h3>isalnum()</h3><p><code>isalnum(c)</code> returns <code>true</code> if <code>c</code> is a letter or a digit (alphanumeric). It returns <code>false</code> for spaces, punctuation, and symbols.</p><pre><code>while (low &lt; high &amp;&amp; !isalnum(s[low])) low++;</code></pre><p><code>!isalnum(s[low])</code> means "the character is NOT alphanumeric," so the loop just moves <code>low</code> past anything that should be ignored.</p>
+
+<h3>tolower()</h3><p><code>tolower(c)</code> converts an uppercase letter to lowercase so <code>'A'</code> and <code>'a'</code> compare equal. Comparing these makes the check case-insensitive.</p><pre><code>if (tolower(s[low]) != tolower(s[high])) return false;</code></pre>
+
+<h3>low++</h3><p><code>low++</code> moves the low pointer one step to the right after a successful match.</p>
+<div class="diagram-wrap"><span class="label">low++ moves right</span><div class="ptr-grid cols-5">
+<div class="g-col"><span class="g-label">low</span></div><div class="g-col"></div><div class="g-col"></div><div class="g-col"></div><div class="g-col"></div>
+<div class="g-col"><span class="g-arrow">&#8595;</span></div><div class="g-col"></div><div class="g-col"></div><div class="g-col"></div><div class="g-col"></div>
+<div class="h-row"><span class="arr-cell">a</span></div><div class="h-row"><span class="arr-cell">m</span></div><div class="h-row"><span class="arr-cell">a</span></div><div class="h-row"><span class="arr-cell">n</span></div><div class="h-row"><span class="arr-cell">&#32;</span></div>
+</div>
+<div class="v-flow"><span class="v-step accent">low++</span><span class="v-step">low now points to the next character on the right</span></div>
+</div></div>
+
+<h3>high--</h3><p><code>high--</code> moves the high pointer one step to the left after a successful match.</p>
+<div class="diagram-wrap"><span class="label">high-- moves left</span><div class="ptr-grid cols-5">
+<div class="g-col"></div><div class="g-col"></div><div class="g-col"></div><div class="g-col"></div><div class="g-col"><span class="g-label">high</span></div>
+<div class="g-col"></div><div class="g-col"></div><div class="g-col"></div><div class="g-col"></div><div class="g-col"><span class="g-arrow">&#8595;</span></div>
+<div class="h-row"><span class="arr-cell">a</span></div><div class="h-row"><span class="arr-cell">n</span></div><div class="h-row"><span class="arr-cell">a</span></div><div class="h-row"><span class="arr-cell">m</span></div><div class="h-row"><span class="arr-cell">a</span></div>
+</div>
+<div class="v-flow"><span class="v-step accent">high--</span><span class="v-step">high now points to the previous character on the left</span></div>
+</div></div>
+
+<h2>Important edge cases</h2><table><thead><tr><th>Case</th><th>Behaviour</th></tr></thead><tbody><tr><td>Empty string <code>""</code></td><td><code>strlen = 0</code>, <code>high = -1</code>, loop never runs &rarr; <code>true</code></td></tr><tr><td>Only punctuation <code>"!!!"</code></td><td>All skipped, loop ends &rarr; <code>true</code></td></tr><tr><td>Single character <code>"a"</code></td><td><code>low == high</code>, loop ends &rarr; <code>true</code></td></tr><tr><td>Mismatch in the middle</td><td>Unequal pair found &rarr; <code>return false</code> immediately</td></tr><tr><td>Case differences <code>"Aa"</code></td><td><code>tolower</code> makes them match &rarr; <code>true</code></td></tr></tbody></table>
+
+<h2>Time complexity</h2><p>Each character is examined at most once by <code>low</code> and once by <code>high</code>, so:</p><table><thead><tr><th></th><th>Complexity</th></tr></thead><tbody><tr><td>Time</td><td>O(n)</td></tr><tr><td>Space</td><td>O(1)</td></tr></tbody></table>
+
+<h2>Space complexity</h2><p>We only use two scalar integer variables (<code>low</code> and <code>high</code>). No extra arrays or strings are created, so the extra space is constant: <strong>O(1)</strong>.</p>
+
+<h2>Complete algorithm summary</h2><div class="diagram-wrap"><span class="label">Valid Palindrome — full flow</span><div class="arrow-figure">
+<div class="v-flow"><span class="v-step">while (low &lt; high)</span></div>
+<div class="decision-table">
+<div class="dt-cell"><span class="dt-cond">s[low] not alnum</span><span class="dt-arrow">&#8595;</span><span class="dt-act">low++</span></div>
+<div class="dt-cell"><span class="dt-cond">s[high] not alnum</span><span class="dt-arrow">&#8595;</span><span class="dt-act">high--</span></div>
+<div class="dt-cell"><span class="dt-cond">letters differ</span><span class="dt-arrow">&#8595;</span><span class="dt-act">return false</span></div>
+</div>
+<div class="v-flow"><span class="v-step accent">match &rarr; low++, high--</span><span class="v-arrow">&#8595;</span><span class="v-step">loop repeats toward the middle</span><span class="v-arrow">&#8595;</span><span class="v-step accent">return true</span></div>
+</div></div><p>The algorithm works only on the <strong>outer edges</strong>, skipping anything that is not alphanumeric and lowering case, until the pointers cross.</p><blockquote>Two pointers, one at each end, moving inward — if every alphanumeric pair matches after lowering case, it is a palindrome.</blockquote>` }
     ]
   },
   {
