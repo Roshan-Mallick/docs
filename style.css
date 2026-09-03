@@ -835,6 +835,323 @@ code {
   font-size: 0.9rem;
 }
 
+/* ── Student Notebook Diagrams ─────────────────── */
+
+.diagram-wrap {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 16px;
+  margin: 0 0 20px;
+  overflow-x: auto;
+  text-align: center;
+  font-family: var(--mono);
+  white-space: pre;
+}
+
+.diagram-wrap .label {
+  display: inline-block;
+  font-family: var(--font);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--accent);
+  text-align: center;
+  width: 100%;
+  white-space: normal;
+}
+
+.arr-cell {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 46px;
+  height: 42px;
+  padding: 0 8px;
+  border: 2px solid var(--accent);
+  border-radius: 6px;
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--color-heading);
+  background: var(--bg-elevated);
+}
+
+.arr-cell.highlight {
+  background: var(--accent-bg);
+  border-color: var(--accent-dim);
+}
+
+.mem-block {
+  display: inline-flex;
+  overflow: hidden;
+  border: 2px solid var(--accent);
+  border-radius: 6px;
+  background: var(--bg-elevated);
+  white-space: normal;
+  vertical-align: middle;
+}
+
+.mem-cell {
+  min-width: 64px;
+  min-height: 46px;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 6px 10px;
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  color: var(--color-heading);
+  white-space: nowrap;
+}
+
+.mem-cell + .mem-cell {
+  border-left: 1px dashed var(--border-strong);
+}
+
+.mem-cell .mem-addr {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+}
+
+.mem-cell .mem-val {
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+/* ── Pointer / arrow diagrams (flex + grid based) ── */
+
+/* Container for a pointer diagram; normalizes whitespace inside .diagram-wrap */
+.arrow-figure {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  margin: 6px 0;
+  white-space: normal;
+  font-family: var(--mono);
+}
+
+/* Vertical flow: a stack of centered lines separated by arrows with minimal gap */
+.v-flow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  width: 100%;
+  white-space: normal;
+  font-family: var(--mono);
+  margin: 4px 0;
+}
+
+.v-flow .v-step {
+  padding: 2px 10px;
+  color: var(--color-heading);
+  font-size: 0.88rem;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.v-flow .v-step.accent {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.v-flow .v-arrow {
+  color: var(--accent);
+  font-size: 0.95rem;
+  line-height: 1;
+  padding: 0;
+}
+
+/* Pointer label + down-arrow stacked over a target cell, dead-centered */
+.ptr-stack {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0;
+  white-space: nowrap;
+  font-family: var(--mono);
+}
+
+.ptr-stack .pt-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--color-heading);
+  line-height: 1.1;
+  text-align: center;
+  padding: 0 2px;
+}
+
+.ptr-stack .pt-arrow {
+  color: var(--accent);
+  font-size: 0.95rem;
+  line-height: 1;
+  padding: 0;
+}
+
+/* Multicolumn pointer/grid assembly: labels and arrows auto-align over their cells */
+.ptr-grid {
+  display: grid;
+  justify-content: center;
+  align-items: center;
+  white-space: normal;
+  font-family: var(--mono);
+  margin: 6px 0;
+  gap: 2px 12px;
+}
+
+.ptr-grid.cols-2 { grid-template-columns: repeat(2, auto); }
+.ptr-grid.cols-3 { grid-template-columns: repeat(3, auto); }
+.ptr-grid.cols-4 { grid-template-columns: repeat(4, auto); }
+
+.ptr-grid .g-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  text-align: center;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.ptr-grid .g-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--color-heading);
+  line-height: 1.15;
+  text-align: center;
+  white-space: nowrap;
+  padding: 0 2px;
+}
+
+.ptr-grid .g-label.hint {
+  color: var(--text-muted);
+  font-weight: 500;
+  font-size: 0.72rem;
+}
+
+.ptr-grid .g-arrow {
+  color: var(--accent);
+  font-size: 0.95rem;
+  line-height: 1.05;
+  text-align: center;
+  padding: 0;
+}
+
+.ptr-grid .g-arrow.dim {
+  color: var(--text-muted);
+}
+
+.ptr-grid .h-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0;
+}
+
+.ptr-grid .h-row .h-addr {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  line-height: 1.2;
+  margin-top: 2px;
+}
+
+/* Decision table (three-way branch) as a grid of rows */
+.decision-table {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border: 1.5px solid var(--border-strong);
+  border-radius: 8px;
+  overflow: hidden;
+  width: 100%;
+  max-width: 520px;
+  margin: 4px auto;
+  white-space: normal;
+  font-family: var(--mono);
+}
+
+.decision-table .dt-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 10px 8px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.decision-table .dt-cell + .dt-cell {
+  border-left: 1px solid var(--border-strong);
+}
+
+.decision-table .dt-cell .dt-cond {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.decision-table .dt-cell .dt-arrow {
+  color: var(--accent);
+  font-size: 0.9rem;
+  line-height: 1.1;
+}
+
+.decision-table .dt-cell .dt-act {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--color-heading);
+  line-height: 1.2;
+}
+
+/* Question / Problem cards section */
+.problem-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+  margin: 0 0 20px;
+}
+
+.problem-card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.problem-card .problem-num {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-bottom: 6px;
+}
+
+.problem-card h4 {
+  font-size: 0.95rem;
+  margin-bottom: 6px;
+  color: var(--color-heading);
+}
+
+.problem-card p {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin-bottom: 0;
+}
+
+@media (max-width: 768px) {
+  .problem-list { grid-template-columns: 1fr; }
+}
+
 /* ── Tables ────────────────────────────────────── */
 
 .article-body table {

@@ -2707,7 +2707,200 @@ int maxProfit(int* prices, int pricesSize) {
             maxProfit = profit;
     }
     return maxProfit;
-}</code></pre><h2>Pattern Summary</h2><table><thead><tr><th>Problem</th><th>Pattern</th><th>Time</th><th>Space</th></tr></thead><tbody><tr><td>Two Sum</td><td>Brute Force</td><td>O(n²)</td><td>O(1)</td></tr><tr><td>Contains Duplicate</td><td>Sort + Compare</td><td>O(n log n)</td><td>O(1)</td></tr><tr><td>Max Subarray</td><td>Kadane's Algorithm</td><td>O(n)</td><td>O(1)</td></tr><tr><td>Move Zeroes</td><td>Two Pointers</td><td>O(n)</td><td>O(1)</td></tr><tr><td>Buy/Sell Stock</td><td>Track min + max profit</td><td>O(n)</td><td>O(1)</td></tr></tbody></table><blockquote>Key takeaway: Most easy array problems reduce to O(n) with the right pattern. Never settle for O(n²) when a linear solution exists.</blockquote>` }
+}</code></pre><h2>Pattern Summary</h2><table><thead><tr><th>Problem</th><th>Pattern</th><th>Time</th><th>Space</th></tr></thead><tbody><tr><td>Two Sum</td><td>Brute Force</td><td>O(n²)</td><td>O(1)</td></tr><tr><td>Contains Duplicate</td><td>Sort + Compare</td><td>O(n log n)</td><td>O(1)</td></tr><tr><td>Max Subarray</td><td>Kadane's Algorithm</td><td>O(n)</td><td>O(1)</td></tr><tr><td>Move Zeroes</td><td>Two Pointers</td><td>O(n)</td><td>O(1)</td></tr><tr><td>Buy/Sell Stock</td><td>Track min + max profit</td><td>O(n)</td><td>O(1)</td></tr></tbody></table><blockquote>Key takeaway: Most easy array problems reduce to O(n) with the right pattern. Never settle for O(n²) when a linear solution exists.</blockquote>` },
+      { id: "tp-01", title: "Two Pointers Method", difficulty: "easy", time: "12 min", desc: "Two Sum II explained with diagrams, malloc, and pointer arithmetic.",
+        content: `<h1>Two Pointers Method</h1><p>Learn the Two Pointers pattern through problems, visual diagrams, dry runs, C code, and line-by-line explanations.</p>
+
+<h2>What is Two Pointers?</h2><p>Two pointers means using <strong>two variables/pointers</strong> to move through an array instead of checking every possible pair.</p><div class="diagram-wrap"><span class="label">Two pointers moving toward each other</span><div class="ptr-grid cols-4">
+<div class="g-col"><span class="g-label">low</span></div><div class="g-col"></div><div class="g-col"></div><div class="g-col"><span class="g-label">high</span></div>
+<div class="g-col"><span class="g-arrow">↓</span></div><div class="g-col"></div><div class="g-col"></div><div class="g-col"><span class="g-arrow">↓</span></div>
+<div class="h-row"><span class="arr-cell">2</span></div><div class="h-row"><span class="arr-cell">7</span></div><div class="h-row"><span class="arr-cell">11</span></div><div class="h-row"><span class="arr-cell">15</span></div>
+<div class="g-col"><span class="g-arrow dim">→</span></div><div class="g-col"></div><div class="g-col"></div><div class="g-col"><span class="g-arrow dim">←</span></div>
+</div></div><p>The key idea:</p><ul><li><code>low</code> starts from the beginning.</li><li><code>high</code> starts from the end.</li><li>Both pointers move toward each other.</li><li>The loop continues while <code>low &lt; high</code>.</li><li>We decide which pointer to move based on the current sum.</li></ul><div class="diagram-wrap"><span class="label">Moving the pointers</span><div class="v-flow">
+<span class="v-step">low++  &#8594; move toward right</span><span class="v-step">high-- &#8594; move toward left</span>
+</div></div>
+
+<h2>Why Two Pointers?</h2><p>The whole trick is deciding <strong>which pointer to move</strong>. This only works on a sorted array, because a sorted array tells us which direction leads to a bigger or smaller sum.</p><div class="diagram-wrap"><span class="label">The decision rule</span><div class="ptr-grid cols-3">
+<div class="g-col"><div class="v-flow"><span class="v-step">sum &lt; target</span><span class="v-arrow">&#8595;</span><span class="v-step accent">low++</span></div></div>
+<div class="g-col"><div class="v-flow"><span class="v-step">sum &gt; target</span><span class="v-arrow">&#8595;</span><span class="v-step accent">high--</span></div></div>
+<div class="g-col"><div class="v-flow"><span class="v-step">sum == target</span><span class="v-arrow">&#8595;</span><span class="v-step accent">return answer</span></div></div>
+</div></div><p><strong>If <code>sum &lt; target</code></strong> — the sum is too small. We need a larger value, so move <code>low++</code> (right) toward bigger numbers.</p><p><strong>If <code>sum &gt; target</code></strong> — the sum is too big. We need a smaller value, so move <code>high--</code> (left) toward smaller numbers.</p><p><strong>If <code>sum == target</code></strong> — we found the answer.</p><p>Why does this avoid checking every pair? Because at each step we can discard a whole side of the search. The brute-force way checks all <code>n²</code> pairs. Two pointers only walk each pointer once across the array.<p><table><thead><tr><th></th><th>Time</th><th>Space</th></tr></thead><tbody><tr><td>Brute force</td><td>O(n²)</td><td>O(1)</td></tr><tr><td>Two Pointers</td><td>O(n)</td><td>O(1)</td></tr></tbody></table><blockquote>Time: O(n) — Space: O(1) for the two-pointer logic (excluding the returned result array).</blockquote>
+
+<h2>Two Sum II (LeetCode #167)</h2><p>Given a <strong>sorted</strong> array of integers and a target, return the two indices whose values add up to the target.</p><p>Example:</p><pre><code>numbers = [2, 7, 11, 15]
+target = 9</code></pre><p>We start with:</p><pre><code>low  = 0
+high = 3</code></pre><div class="diagram-wrap"><span class="label">Start — low at index 0, high at index 3</span><div class="arrow-figure">
+<div class="ptr-grid cols-4">
+<div class="g-col"><span class="g-label">low</span></div><div class="g-col"></div><div class="g-col"></div><div class="g-col"><span class="g-label">high</span></div>
+<div class="g-col"><span class="g-arrow">&#8595;</span></div><div class="g-col"></div><div class="g-col"></div><div class="g-col"><span class="g-arrow">&#8595;</span></div>
+<div class="h-row"><span class="arr-cell">2</span></div><div class="h-row"><span class="arr-cell">7</span></div><div class="h-row"><span class="arr-cell">11</span></div><div class="h-row"><span class="arr-cell">15</span></div>
+</div>
+<div class="v-flow"><span class="v-step">sum = 2 + 15 = 17</span><span class="v-step accent">17 &gt; 9</span><span class="v-step">Therefore:</span><span class="v-step accent">high--</span></div>
+</div></div><p><code>17 &gt; 9</code> — the sum is too big, so we need a smaller number. Move <code>high--</code>.</p><div class="diagram-wrap"><span class="label">Step 2 — high moves left</span><div class="arrow-figure">
+<div class="ptr-grid cols-4">
+<div class="g-col"><span class="g-label">low</span></div><div class="g-col"></div><div class="g-col"><span class="g-label">high</span></div><div class="g-col"></div>
+<div class="g-col"><span class="g-arrow">&#8595;</span></div><div class="g-col"></div><div class="g-col"><span class="g-arrow">&#8595;</span></div><div class="g-col"></div>
+<div class="h-row"><span class="arr-cell">2</span></div><div class="h-row"><span class="arr-cell">7</span></div><div class="h-row"><span class="arr-cell">11</span></div><div class="h-row"><span class="arr-cell">15</span></div>
+</div>
+<div class="v-flow"><span class="v-step">sum = 2 + 11 = 13</span><span class="v-step accent">13 &gt; 9</span><span class="v-step">Therefore:</span><span class="v-step accent">high--</span></div>
+</div></div><p><code>13 &gt; 9</code> — still too big, move <code>high--</code> again.</p><div class="diagram-wrap"><span class="label">Step 3 — high moves to index 1</span><div class="arrow-figure">
+<div class="ptr-grid cols-4">
+<div class="g-col"><span class="g-label">low</span></div><div class="g-col"><span class="g-label">high</span></div><div class="g-col"></div><div class="g-col"></div>
+<div class="g-col"><span class="g-arrow">&#8595;</span></div><div class="g-col"><span class="g-arrow">&#8595;</span></div><div class="g-col"></div><div class="g-col"></div>
+<div class="h-row"><span class="arr-cell">2</span></div><div class="h-row"><span class="arr-cell">7</span></div><div class="h-row"><span class="arr-cell">11</span></div><div class="h-row"><span class="arr-cell">15</span></div>
+</div>
+<div class="v-flow"><span class="v-step">sum = 2 + 7 = 9</span><span class="v-step accent">9 == 9</span><span class="v-step">Answer:</span><span class="v-step accent">[1, 2]</span></div>
+</div></div><p><code>9 == 9</code> — we found the pair <code>2</code> and <code>7</code>.</p><p><strong>Important:</strong> LeetCode uses <strong>1-based indexing</strong> for this problem. The positions in the C array are <code>0</code> and <code>1</code>, but the answer LeetCode expects is <code>[1, 2]</code>. So:</p><pre><code>result[0] = low + 1
+result[1] = high + 1</code></pre><div class="diagram-wrap"><span class="label">C index vs. LeetCode answer</span><div class="arrow-figure">
+<div class="v-flow"><span class="v-step">C array:</span></div>
+<div class="ptr-grid cols-4">
+<div class="g-col"><span class="arr-cell">2</span></div><div class="g-col"><span class="arr-cell">7</span></div><div class="g-col"><span class="arr-cell">11</span></div><div class="g-col"><span class="arr-cell">15</span></div>
+<div class="g-col"><span class="g-label hint">0</span></div><div class="g-col"><span class="g-label hint">1</span></div><div class="g-col"><span class="g-label hint">2</span></div><div class="g-col"><span class="g-label hint">3</span></div>
+</div>
+<div class="v-flow"><span class="v-step">low = 0 → result[0] = 0 + 1 = 1</span><span class="v-step">high = 1 → result[1] = 1 + 1 = 2</span><span class="v-step accent">LeetCode answer: [1, 2]</span></div>
+</div></div>
+
+<h2>The C Function</h2><p>Here is the complete solution. Do not change the algorithm.</p><pre><code>int* twoSum(int* numbers, int numbersSize, int target, int* returnSize) {
+    
+    int low = 0;
+    int high = numbersSize - 1;
+
+    int *result = malloc(2 * sizeof(int));
+
+    while (low &lt; high) {
+ 
+        int sum = numbers[low] + numbers[high];
+
+        if (sum == target) {
+            result[0] = low + 1;
+            result[1] = high + 1;
+            *returnSize = 2;
+            return result;
+       
+        } else if (sum &lt; target) {
+            low++;
+
+        } else {
+            high--;
+        }
+    }
+
+    *returnSize = 0;
+    free(result);
+    return NULL;
+}</code></pre><p>Let's walk through each important piece.</p>
+
+<h2>Understanding malloc()</h2><p>This line allocates memory at runtime:</p><pre><code>int *result = malloc(2 * sizeof(int));</code></pre><div class="diagram-wrap"><span class="label">How malloc() works</span><div class="v-flow">
+<span class="v-step">malloc()</span><span class="v-arrow">&#8595;</span>
+<span class="v-step">allocates memory for 2 integers</span><span class="v-arrow">&#8595;</span>
+<span class="v-step">returns the address of the allocated memory</span><span class="v-arrow">&#8595;</span>
+<span class="v-step">result stores that address</span>
+</div></div><p><code>malloc(2 * sizeof(int))</code> asks the computer for enough memory to hold <strong>two integers</strong>. It returns the <strong>address</strong> where that memory starts.</p><div class="diagram-wrap"><span class="label">The allocated block</span><div class="arrow-figure">
+<div class="v-flow"><span class="v-step accent">result</span></div>
+<div class="ptr-grid cols-2">
+<div class="g-col"><span class="g-arrow">&#8595;</span></div><div class="g-col"></div>
+<div class="g-col"><span class="mem-cell"><span class="mem-val">result[0]</span></span></div><div class="g-col"><span class="mem-cell"><span class="mem-val">result[1]</span></span></div>
+</div>
+</div></div><p><strong>Important:</strong> the two elements do <strong>NOT</strong> have the same address. The memory is <strong>contiguous</strong> (one block right after the other).</p><div class="diagram-wrap"><span class="label">Each element has its own address</span><div class="ptr-grid cols-2">
+<div class="g-col"><span class="g-label">result</span></div><div class="g-col"><span class="g-label">result + 1</span></div>
+<div class="g-col"><span class="g-arrow">&#8595;</span></div><div class="g-col"><span class="g-arrow">&#8595;</span></div>
+<div class="g-col"><span class="g-label hint">address of result[0]</span></div><div class="g-col"><span class="g-label hint">address of result[1]</span></div>
+</div></div><p>For example, if <code>sizeof(int) = 4</code> (bytes), the addresses might look like this:</p><div class="diagram-wrap"><span class="label">Contiguous memory addresses</span><div class="ptr-grid cols-2">
+<div class="g-col"><span class="mem-cell"><span class="mem-addr">1000</span><span class="mem-val">&#8212;</span></span></div><div class="g-col"><span class="mem-cell"><span class="mem-addr">1004</span><span class="mem-val">&#8212;</span></span></div>
+<div class="g-col"><span class="g-label hint">result[0]</span></div><div class="g-col"><span class="g-label hint">result[1]</span></div>
+</div></div><p><code>malloc</code> gives you the <strong>starting address</strong> of the allocated block — that starting address is stored in <code>result</code>.</p>
+
+<h2>Pointer Arithmetic</h2><p>Pointer arithmetic means <strong>moving a pointer between elements</strong> of an array.</p><p>Example:</p><pre><code>int arr[3] = {10, 20, 30};
+int *p = arr;</code></pre><p>Here <code>p</code> points to the start of <code>arr</code>:</p><div class="diagram-wrap"><span class="label">p points to the first element</span><div class="arrow-figure">
+<div class="ptr-grid cols-3">
+<div class="g-col"><span class="g-label">p</span></div><div class="g-col"></div><div class="g-col"></div>
+<div class="g-col"><span class="g-arrow">&#8595;</span></div><div class="g-col"></div><div class="g-col"></div>
+<div class="h-row"><span class="arr-cell">10</span></div><div class="h-row"><span class="arr-cell">20</span></div><div class="h-row"><span class="arr-cell">30</span></div>
+</div>
+</div></div><div class="diagram-wrap"><span class="label">p + 1 points to the second element</span><div class="arrow-figure">
+<div class="ptr-grid cols-3">
+<div class="g-col"></div><div class="g-col"><span class="g-label">p + 1</span></div><div class="g-col"></div>
+<div class="g-col"></div><div class="g-col"><span class="g-arrow">&#8595;</span></div><div class="g-col"></div>
+<div class="h-row"><span class="arr-cell">10</span></div><div class="h-row"><span class="arr-cell">20</span></div><div class="h-row"><span class="arr-cell">30</span></div>
+</div>
+</div></div><p>Dereferencing (<code>*</code>) reads the value at the address the pointer holds:</p><pre><code>*(p)     → 10
+*(p + 1) → 20
+*(p + 2) → 30</code></pre><p><strong>Key idea:</strong> <code>p + 1</code> does <strong>NOT</strong> mean "move 1 byte". It means <strong>move by <code>sizeof(int)</code> bytes</strong>. C automatically calculates the correct memory offset based on the pointer type. For an <code>int</code> that is 4 bytes, <code>p + 1</code> moves the pointer forward by 4 bytes.</p>
+
+<h2>int* twoSum</h2><p>Let's read this function declaration very carefully:</p><pre><code>int* twoSum(...)</code></pre><div class="diagram-wrap"><span class="label">Breaking down the declaration</span><div class="v-flow">
+<span class="v-step accent">int*</span><span class="v-arrow">&#8595;</span><span class="v-step">return type is pointer to int</span>
+<span class="v-step accent">twoSum</span><span class="v-arrow">&#8595;</span><span class="v-step">function name</span>
+</div></div><p>So <code>int* twoSum(...)</code> means:</p><blockquote>"The twoSum function returns an address pointing to an integer."</blockquote><div class="diagram-wrap"><span class="label">What twoSum returns</span><div class="arrow-figure">
+<div class="v-flow"><span class="v-step">twoSum()</span><span class="v-arrow">&#8595;</span><span class="v-step hint">returns address</span></div>
+<div class="ptr-grid cols-2">
+<div class="g-col"><span class="g-arrow">&#8595;</span></div><div class="g-col"></div>
+<div class="g-col"><span class="mem-cell"><span class="mem-val">result[0]</span></span></div><div class="g-col"><span class="mem-cell"><span class="mem-val">result[1]</span></span></div>
+</div>
+</div></div><p>In this problem, that returned address points to the <strong>first element of the dynamically allocated result array</strong>.</p>
+
+<h2>returnSize Pointer</h2><p>In the parameter list we see:</p><pre><code>int* returnSize</code></pre><p><code>returnSize</code> is also a pointer — it points to some address where we are allowed to store the size of our answer.</p><p>Then inside the function:</p><pre><code>*returnSize = 2;</code></pre><div class="diagram-wrap"><span class="label">Memory diagram</span><div class="arrow-figure">
+<div class="ptr-stack"><span class="pt-label">returnSize</span><span class="pt-arrow">&#8595;</span></div>
+<div class="ptr-stack"><span class="pt-label hint">address 5000</span><span class="pt-arrow">&#8595;</span></div>
+<div class="mem-block"><span class="mem-cell"><span class="mem-val">2</span></span></div>
+</div></div><p>Here is the meaning:</p><ul><li><code>returnSize</code> contains an <strong>address</strong> (like 5000).</li><li><code>*returnSize</code> means: <em>"go to the address stored in returnSize and access the value there."</em></li></ul><p>So:</p><pre><code>*returnSize = 2;</code></pre><p>means: <em>"go to that address and store 2 there."</em></p><p><strong>Make sure you see the difference:</strong></p><div class="diagram-wrap"><span class="label">return vs. dereference</span><div class="v-flow">
+<span class="v-step accent">return result;</span><span class="v-step">&#8594; returns the address of the result array.</span>
+<span class="v-step accent">*returnSize = 2;</span><span class="v-step">&#8594; does NOT return anything.</span><span class="v-step">&#8594; it changes the value stored at the address</span><span class="v-step">provided through returnSize.</span>
+</div></div>
+
+<h2>result[0] and result[1]</h2><p>These two lines store the answer indexes:</p><pre><code>result[0] = low + 1;
+result[1] = high + 1;</code></pre><div class="diagram-wrap"><span class="label">Storing the answer</span><div class="arrow-figure">
+<div class="v-flow"><span class="v-step accent">result</span></div>
+<div class="ptr-grid cols-2">
+<div class="g-col"><span class="g-arrow">&#8595;</span></div><div class="g-col"></div>
+<div class="g-col"><span class="mem-cell"><span class="mem-val">result[0]</span><span class="mem-addr">low + 1</span></span></div><div class="g-col"><span class="mem-cell"><span class="mem-val">result[1]</span><span class="mem-addr">high + 1</span></span></div>
+</div>
+</div></div><p>Why is <code>+1</code> required?</p><ul><li>C arrays use <strong>0-based indexing</strong>.</li><li>LeetCode Two Sum II expects <strong>1-based positions</strong>.</li></ul><p>Example:</p><div class="diagram-wrap"><span class="label">Index translation</span><div class="arrow-figure">
+<div class="v-flow"><span class="v-step">C index:</span></div>
+<div class="ptr-grid cols-4">
+<div class="g-col"><span class="arr-cell">2</span></div><div class="g-col"><span class="arr-cell">7</span></div><div class="g-col"><span class="arr-cell">11</span></div><div class="g-col"><span class="arr-cell">15</span></div>
+<div class="g-col"><span class="g-label hint">0</span></div><div class="g-col"><span class="g-label hint">1</span></div><div class="g-col"><span class="g-label hint">2</span></div><div class="g-col"><span class="g-label hint">3</span></div>
+</div>
+<div class="v-flow"><span class="v-step accent">LeetCode answer:</span><span class="v-step">[1, 2]</span><span class="v-step">Therefore:</span><span class="v-step accent">low + 1</span><span class="v-step accent">high + 1</span></div>
+</div></div><p>So if <code>low = 0</code> and <code>high = 1</code>, we store <code>result[0] = 1</code> and <code>result[1] = 2</code>.</p>
+
+<h2>return result</h2><p>Finally, we give the answer back:</p><pre><code>return result;</code></pre><p>The pointer <code>result</code> contains the <strong>address of the allocated result array</strong>. Returning it gives the caller the <strong>address of the answer array</strong>.</p><div class="diagram-wrap"><span class="label">Returning the answer</span><div class="arrow-figure">
+<div class="v-flow"><span class="v-step accent">result</span></div>
+<div class="v-flow"><span class="v-step hint">address</span></div>
+<div class="ptr-grid cols-2">
+<div class="g-col"><span class="g-arrow">&#8595;</span></div><div class="g-col"></div>
+<div class="g-col"><span class="mem-cell"><span class="mem-val">1</span></span></div><div class="g-col"><span class="mem-cell"><span class="mem-val">2</span></span></div>
+</div>
+<div class="v-flow"><span class="v-step accent">return result;</span><span class="v-arrow">&#8595;</span><span class="v-step">caller receives this address</span></div>
+</div></div>
+
+<h2>No Solution</h2><p>What if no pair adds up to the target? The last three lines handle it:</p><pre><code>*returnSize = 0;
+free(result);
+return NULL;</code></pre><h3>1. *returnSize = 0;</h3><p>This means: <em>"No elements are being returned because no valid pair was found."</em> The caller sees size <code>0</code> and knows there is no answer.</p><h3>2. free(result);</h3><p>Earlier we allocated memory:</p><pre><code>int *result = malloc(2 * sizeof(int));</code></pre><p>Since there is no answer, we <strong>release that unused memory</strong> so the program does not leak it.</p><h3>3. return NULL;</h3><p>The function returns an <code>int*</code>. Since there is no valid result array, we return <code>NULL</code> (which means "no address").</p><div class="diagram-wrap"><span class="label">No pair found path</span><div class="v-flow">
+<span class="v-step">No pair found</span><span class="v-arrow">&#8595;</span>
+<span class="v-step">*returnSize = 0</span><span class="v-arrow">&#8595;</span>
+<span class="v-step">free(result)</span><span class="v-arrow">&#8595;</span>
+<span class="v-step">return NULL</span>
+</div></div>
+
+<h2>Complete Flow</h2><p>Here is the whole algorithm in one picture:</p><div class="diagram-wrap"><span class="label">Full algorithm summary</span><div class="arrow-figure">
+<div class="v-flow">
+<span class="v-step">Sorted Array</span><span class="v-arrow">&#8595;</span>
+<span class="v-step">low = beginning<br>high = end</span><span class="v-arrow">&#8595;</span>
+<span class="v-step">while (low &lt; high)</span><span class="v-arrow">&#8595;</span>
+<span class="v-step">sum = numbers[low] + numbers[high]</span><span class="v-arrow">&#8595;</span>
+</div>
+<div class="decision-table">
+<div class="dt-cell"><span class="dt-cond">sum &lt; target</span><span class="dt-arrow">&#8595;</span><span class="dt-act">low++</span></div>
+<div class="dt-cell"><span class="dt-cond">sum == target</span><span class="dt-arrow">&#8595;</span><span class="dt-act">return result</span></div>
+<div class="dt-cell"><span class="dt-cond">sum &gt; target</span><span class="dt-arrow">&#8595;</span><span class="dt-act">high--</span></div>
+</div>
+<div class="v-flow"><span class="v-step">Then:</span></div>
+<div class="ptr-grid cols-2">
+<div class="g-col"><div class="v-flow"><span class="v-step accent">Found</span><span class="v-arrow">&#8595;</span><span class="v-step">store indexes</span><span class="v-arrow">&#8595;</span><span class="v-step">*returnSize = 2</span><span class="v-arrow">&#8595;</span><span class="v-step">return result</span></div></div>
+<div class="g-col"><div class="v-flow"><span class="v-step accent">Not found</span><span class="v-arrow">&#8595;</span><span class="v-step">*returnSize = 0</span><span class="v-arrow">&#8595;</span><span class="v-step">free(result)</span><span class="v-arrow">&#8595;</span><span class="v-step">return NULL</span></div></div>
+</div>
+</div></div>
+
+<h2>Problems (Two Pointers)</h2><p>This section will grow as more Two Pointers problems are added. Each problem will include the problem, pattern, approach, dry run, diagram, C solution, line-by-line explanation, and complexity.</p><div class="problem-list"><div class="problem-card"><div class="problem-num">01</div><h4>Two Sum II</h4><p>Sorted array, find two numbers adding to target. <strong>Solved below.</strong></p></div><div class="problem-card"><div class="problem-num">02</div><h4>Valid Palindrome</h4><p>Check if a string reads the same forward and backward, ignoring non-alphanumerics.</p></div><div class="problem-card"><div class="problem-num">03</div><h4>3Sum</h4><p>Find all triplets that sum to zero using two pointers.</p></div><div class="problem-card"><div class="problem-num">04</div><h4>Container With Most Water</h4><p>Find the container that holds the most water using two pointers.</p></div><div class="problem-card"><div class="problem-num">05</div><h4>Remove Duplicates from Sorted Array</h4><p>Remove duplicates in place and return the new length.</p></div><div class="problem-card"><div class="problem-num">06</div><h4>Move Zeroes</h4><p>Move all zeroes to the end while keeping relative order.</p></div><div class="problem-card"><div class="problem-num">07</div><h4>Squares of a Sorted Array</h4><p>Return an array of squares in non-decreasing order.</p></div><div class="problem-card"><div class="problem-num">08</div><h4>Merge Sorted Array</h4><p>Merge two sorted arrays into one sorted array.</p></div></div><blockquote>Master the Two Pointers pattern and these problems become the same idea: use a sorted property to skip options, moving only toward the answer.</blockquote>` }
     ]
   },
   {
