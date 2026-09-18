@@ -2131,74 +2131,24 @@ index:    0   1   2
                   │
                  rear</code></pre><p>The notebook notes:</p><pre><code>40 ► higher priority
 30 ► rear</code></pre><blockquote>The element with highest priority is removed first, regardless of insertion order.</blockquote>` },
-      { id: "dsa-09", title: "Trees", difficulty: "intermediate", time: "5 min", desc: "BST, traversals, height, balance.",
-        content: `<h1>Trees</h1><span class="step-badge">Chapter 9</span><p>A tree is a non-linear hierarchical data structure consisting of nodes connected by edges. Trees are everywhere: file systems, HTML DOM, database indexes.</p><h2>Binary Search Tree (BST)</h2><pre><code>typedef struct Node {
+      { id: "dsa-09", title: "Linked Lists", difficulty: "beginner", time: "4 min", desc: "Singly linked list, node structure, memory example.",
+        content: `<h1>Linked Lists</h1><span class="step-badge">Chapter 9</span><h2>Linked List</h2><p>A linked list is a linear data structure where elements are stored in separate memory locations and connected using pointers.</p><pre><code>[data | address] ► [data | address] ► [data | address]</code></pre><p>Each node contains two parts:</p><pre><code>┌────────┬─────────┐
+│  data  │ address │
+└────────┴─────────┘</code></pre><p>The address stores the location of the next node. If no node is left, the next pointer points to <code>NULL</code>.</p><h2>Singly Linked List</h2><p>A singly linked list contains:</p><pre><code>[data | next] ► [data | next] ► [data | NULL]</code></pre><p>The <code>next</code> pointer stores the address of the next node.</p><h3>Node Structure in C</h3><p>In C, we create a node using <code>struct</code>.</p><pre><code>struct Node
+{
     int data;
-    struct Node *left, *right;
-} Node;
+    struct Node *next;
+};</code></pre><p>Here:</p><ul><li><code>int data</code> ► data/value</li><li><code>struct Node *next</code> ► address of next node</li></ul><h2>Singly Linked List Memory Example</h2><p>Three nodes are created.</p><pre><code>Address   Data   Next
+--------- ------ ------
+1000        10    5000
+5000        20    8000
+8000        30    NULL</code></pre><p>Visual:</p><pre><code> 1000            5000              8000
+┌────────┐       ┌────────┐       ┌────────┐
+│ 10     │       │ 20     │       │ 30     │
+│  5000 ─┼──────►│  8000 ─┼──────►│ NULL   │
+└────────┘       └────────┘       └────────┘
 
-// Insert — O(h) where h = height
-Node* bst_insert(Node *root, int val) {
-    if (!root) {
-        Node *n = malloc(sizeof(Node));
-        n->data = val; n->left = n->right = NULL;
-        return n;
-    }
-    if (val &lt; root->data) root->left = bst_insert(root->left, val);
-    else if (val &gt; root->data) root->right = bst_insert(root->right, val);
-    return root;
-}
-
-// Search — O(h)
-Node* bst_search(Node *root, int val) {
-    if (!root || root->data == val) return root;
-    if (val &lt; root->data) return bst_search(root->left, val);
-    return bst_search(root->right, val);
-}</code></pre><h2>Tree Traversals</h2><pre><code>// INORDER: Left → Root → Right (gives SORTED output for BST!)
-void inorder(Node *root) {
-    if (!root) return;
-    inorder(root->left);
-    printf("%d ", root->data);
-    inorder(root->right);
-}
-
-// PREORDER: Root → Left → Right (useful for copying a tree)
-void preorder(Node *root) {
-    if (!root) return;
-    printf("%d ", root->data);
-    preorder(root->left);
-    preorder(root->right);
-}
-
-// POSTORDER: Left → Right → Root (useful for deleting a tree)
-void postorder(Node *root) {
-    if (!root) return;
-    postorder(root->left);
-    postorder(root->right);
-    printf("%d ", root->data);
-}
-
-// LEVEL ORDER (BFS) — uses a queue
-void level_order(Node *root) {
-    Queue q; init_q(&amp;q);
-    enqueue(&amp;q, root);
-    while (!q_empty(&amp;q)) {
-        Node *curr = dequeue(&amp;q);
-        printf("%d ", curr->data);
-        if (curr->left) enqueue(&amp;q, curr->left);
-        if (curr->right) enqueue(&amp;q, curr->right);
-    }
-}</code></pre><h2>Height and Count</h2><pre><code>int height(Node *root) {
-    if (!root) return -1;
-    int lh = height(root->left);
-    int rh = height(root->right);
-    return 1 + (lh &gt; rh ? lh : rh);
-}
-
-int count(Node *root) {
-    if (!root) return 0;
-    return 1 + count(root->left) + count(root->right);
-}</code></pre><blockquote>Worst case for BST: inserting sorted data creates a straight line — O(n) for all operations. Balanced BSTs (AVL, Red-Black) guarantee O(log n).</blockquote>` },
+1000 ► 5000 ► 8000 ► NULL</code></pre><blockquote>Nodes are stored in separate memory locations and connected using pointers.</blockquote>` },
       { id: "dsa-10", title: "Graphs", difficulty: "intermediate", time: "5 min", desc: "Representations, BFS, DFS, topological sort.",
         content: `<h1>Graphs</h1><span class="step-badge">Chapter 10</span><p>A graph is a collection of vertices (nodes) connected by edges. Unlike trees, graphs can have cycles, multiple edges, and disconnected components.</p><h2>Graph Representations</h2><pre><code>// Adjacency Matrix — O(V²) space, O(1) edge check
 int adj[4][4] = {
