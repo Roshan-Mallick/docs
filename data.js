@@ -1977,88 +1977,69 @@ row 4   0  0  0  6</code></pre><p>Triplet representation:</p><pre><code>Row   Co
 1       1        3
 2       0        5
 3       2        6</code></pre><blockquote>Triplet representation stores only <code>(row, column, value)</code> for non-zero entries — it saves memory for sparse matrices.</blockquote>` },
-      { id: "dsa-05", title: "Linked Lists", difficulty: "beginner", time: "5 min", desc: "Singly, doubly, operations, cycle detection.",
-        content: `<h1>Linked Lists</h1><span class="step-badge">Chapter 5</span><p>A linked list is a sequence of nodes where each node stores a value and a pointer to the next node. Unlike arrays, nodes are scattered in memory and connected by pointers.</p><h2>Implementation</h2><pre><code>#include &lt;stdio.h&gt;
-#include &lt;stdlib.h&gt;
-
-typedef struct Node {
-    int data;
-    struct Node *next;
-} Node;
-
-// Create a new node — O(1)
-Node* create_node(int val) {
-    Node *node = (Node*)malloc(sizeof(Node));
-    node->data = val;
-    node->next = NULL;
-    return node;
-}
-
-// Insert at beginning — O(1)
-Node* insert_front(Node *head, int val) {
-    Node *new_node = create_node(val);
-    new_node->next = head;
-    return new_node;
-}
-
-// Insert at end — O(n)
-void insert_end(Node *head, int val) {
-    Node *curr = head;
-    while (curr->next != NULL) curr = curr->next;
-    curr->next = create_node(val);
-}
-
-// Delete a node by value — O(n)
-Node* delete_node(Node *head, int val) {
-    if (!head) return NULL;
-    if (head->data == val) {
-        Node *temp = head->next;
-        free(head);
-        return temp;
+      { id: "dsa-05", title: "Stacks", difficulty: "beginner", time: "5 min", desc: "LIFO, push, pop, peek, underflow, overflow, display.",
+        content: `<h1>Stacks</h1><span class="step-badge">Chapter 5</span><p>A stack is a linear data structure that follows the:</p><pre><code>LIFO principle
+Last In First Out</code></pre><p>The element inserted at last is removed first.</p><h2>Example</h2><pre><code>        ┌───────┐
+TOP ──→ │ plate3│
+        ├───────┤
+        │ plate2│
+        ├───────┤
+        │ plate1│
+        └───────┘</code></pre><p>If we want to remove a plate, remove <code>plate3</code> (TOP) first.</p><h2>Conditions in Stack</h2><p>There are two conditions:</p><ol><li><strong>Underflow</strong></li><li><strong>Overflow</strong></li></ol><h2>Three Main Stack Operations</h2><h3>1. Push</h3><p>Which insert element into stack.</p><h3>2. Pop</h3><p>Which delete the last inserted element in stack.</p><h3>3. Peek</h3><p>Which print the TOP element of stack, which basically is the last inserted element in the stack.</p><h2>Stack Display Function</h2><p>Display function is a stack traversal which travel the stack and print all the stack elements from top to bottom.</p><p>Example stack:</p><pre><code>Index:       0   1   2   3   4   5
+           ┌───┬───┬───┬───┬───┬───┐
+Stack:     │ 5 │ 4 │ 3 │ 9 │ 7 │12 │
+           └───┴───┴───┴───┴───┴───┘
+                                 ▲
+                                TOP</code></pre><p>Push direction:</p><pre><code>0 ► 1 ► 2 ► 3 ► 4 ► 5</code></pre><p>Pop direction:</p><pre><code>12 ► 7 ► 9 ► 3 ► 4 ► 5
+TOP                BOTTOM</code></pre><p>Notebook code:</p><pre><code>int display()
+{
+    if (top == -1) {
+        printf("stack is empty");
+        return 0;
     }
-    Node *curr = head;
-    while (curr->next &amp;&amp; curr->next->data != val)
-        curr = curr->next;
-    if (curr->next) {
-        Node *to_del = curr->next;
-        curr->next = to_del->next;
-        free(to_del);
-    }
-    return head;
-}
 
-// Traverse and print — O(n)
-void print_list(Node *head) {
-    while (head) {
-        printf("%d -> ", head->data);
-        head = head->next;
+    printf("Stack elements:\n");
+
+    for (int i = top; i &gt;= 0; i--) {
+        printf("%d ", stack[i]);
     }
-    printf("NULL\\n");
-}</code></pre><h2>Reverse a Linked List — O(n), O(1) space</h2><pre><code>Node* reverse(Node *head) {
-    Node *prev = NULL, *curr = head, *next = NULL;
-    while (curr) {
-        next = curr->next;   // save next
-        curr->next = prev;   // reverse pointer
-        prev = curr;          // advance prev
-        curr = next;          // advance curr
-    }
-    return prev;  // prev is now the new head
-}</code></pre><h2>Detect Cycle — Floyd's Tortoise and Hare</h2><pre><code>int has_cycle(Node *head) {
-    Node *slow = head, *fast = head;
-    while (fast &amp;&amp; fast->next) {
-        slow = slow->next;       // moves 1 step
-        fast = fast->next->next; // moves 2 steps
-        if (slow == fast) return 1;  // cycle detected!
-    }
+
     return 0;
-}</code></pre><h2>Find Middle Node</h2><pre><code>Node* find_middle(Node *head) {
-    Node *slow = head, *fast = head;
-    while (fast &amp;&amp; fast->next) {
-        slow = slow->next;
-        fast = fast->next->next;
+}</code></pre><h2>Stack Underflow</h2><h3>Meaning</h3><p>Underflow condition: when we try to pop elements from stack when stack is empty.</p><pre><code>int stack_isEmpty()
+{
+    if (top == -1) {
+        return printf("underflow");
     }
-    return slow;  // when fast reaches end, slow is at middle
-}</code></pre><blockquote>The two-pointer 'tortoise and hare' technique appears in cycle detection, finding middle, and detecting intersections. Master it — it's O(n) time, O(1) space.</blockquote>` },
+}</code></pre><p>Condition:</p><pre><code>top == -1</code></pre><p>means the stack is empty.</p><h2>Stack Overflow</h2><h3>Meaning</h3><p>Overflow happens when we try to push element into the stack when the stack is already full.</p><pre><code>int stack_isFull()
+{
+    if (top == size - 1) {
+        return printf("overflow");
+    }
+}</code></pre><p>Condition:</p><pre><code>top == size - 1</code></pre><p>means the stack is full.</p><h2>Push Operation</h2><p>Push operation: when we insert element into the stack at the TOP index.</p><p>TOP index means:</p><ul><li>If stack is empty, top is the first position.</li><li>If stack contains elements, top is the last index containing an element.</li></ul><h3>Empty stack</h3><pre><code>┌───┬───┬───┬───┐
+│   │   │   │   │
+└───┴───┴───┴───┘
+  0   1   2   3
+  ▲
+ TOP</code></pre><h3>Stack with elements</h3><pre><code>┌────┬────┬────┬───┐
+│ 10 │ 20 │ 30 │   │
+└────┴────┴────┴───┘
+  0    1    2    3
+            ▲
+           TOP</code></pre><p>In stack, we can't insert at middle or start. We can only push at the TOP index position.</p><h2>Pop Operation</h2><p>Pop operation: basically deletion of elements from stack. It also operates at TOP index.</p><p>If stack is:</p><pre><code>┌────┬────┬────┐
+│ 10 │ 20 │ 30 │
+└────┴────┴────┘
+  0    1    2
+            ▲
+           TOP</code></pre><p>Pop removes <code>30</code>. Then:</p><pre><code>┌────┬────┐
+│ 10 │ 20 │
+└────┴────┘
+  0    1
+       ▲
+      TOP</code></pre><p>We can only pop the element from TOP index, no other position.</p><h2>Peek Operation</h2><p>Peek operation basically print or return the TOP index value from stack.</p><p>Example:</p><pre><code>┌────┬────┬────┐
+│ 10 │ 20 │ 30 │
+└────┴────┴────┘
+            ▲
+           TOP</code></pre><pre><code>peek() ► 30</code></pre><blockquote>Last In First Out — the element inserted at last is removed first.</blockquote>` },
       { id: "dsa-06", title: "Stacks", difficulty: "beginner", time: "5 min", desc: "LIFO, implementation, applications.",
         content: `<h1>Stacks</h1><span class="step-badge">Chapter 6</span><p>A stack is a Last In, First Out (LIFO) data structure. The last element added is the first one removed. Think of a stack of plates.</p><h2>Array-based Stack</h2><pre><code>#define MAX 1000
 
