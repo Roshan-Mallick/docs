@@ -1884,59 +1884,19 @@ arr[1] ► 1004
 arr[2] ► 1008</code></pre><p>From the base address to <code>arr[size-1]</code>, each element's address increases by <code>4 bytes</code> for an <code>int</code> array.</p><p><strong>Assuming <code>char</code> occupies 1 byte</strong></p><pre><code>arr[0] ► 1000
 arr[1] ► 1001
 arr[2] ► 1002</code></pre><p>From the base address to <code>arr[size-1]</code>, each element's address increases by <code>1 byte</code> for a <code>char</code> array.</p><blockquote>Because array elements are stored in contiguous memory locations, they can be accessed directly using an index.</blockquote>` },
-      { id: "dsa-02", title: "Time & Space Complexity", difficulty: "beginner", time: "5 min", desc: "Big-O notation, best/worst case.",
-        content: `<h1>Time &amp; Space Complexity</h1><span class="step-badge">Chapter 2</span><p>Complexity analysis gives us a mathematical way to compare algorithms before we even run them. We use Big-O notation to describe how performance grows as input size n increases.</p><h2>Big-O Notation</h2><pre><code>// O(1) — Constant
-int get_first(int arr[]) {
-    return arr[0];  // always one step
-}
-
-// O(n) — Linear
-int find_max(int arr[], int n) {
-    int max = arr[0];
-    for (int i = 1; i &lt; n; i++)
-        if (arr[i] &gt; max) max = arr[i];
-    return max;
-}
-
-// O(n²) — Quadratic
-void bubble_sort(int arr[], int n) {
-    for (int i = 0; i &lt; n; i++)
-        for (int j = 0; j &lt; n-i-1; j++)
-            if (arr[j] &gt; arr[j+1])
-                swap(arr[j], arr[j+1]);
-}
-
-// O(log n) — Logarithmic
-int binary_search(int arr[], int n, int target) {
-    int lo = 0, hi = n - 1;
-    while (lo &lt;= hi) {
-        int mid = (lo + hi) / 2;
-        if (arr[mid] == target) return mid;
-        else if (arr[mid] &lt; target) lo = mid + 1;
-        else hi = mid - 1;
-    }
-    return -1;
-}</code></pre><h2>Complexity Rankings</h2><p>O(1) &lt; O(log n) &lt; O(n) &lt; O(n log n) &lt; O(n²) &lt; O(2^n) — lower is always better.</p><h2>Big-O Rules</h2><ul><li>Drop constants: O(2n) = O(n)</li><li>Drop lower-order terms: O(n² + n) = O(n²)</li><li>Sequential code ADDS complexity. Nested code MULTIPLIES.</li></ul><h2>Space Complexity</h2><pre><code>// O(1) space — only a few variables
-int sum_array(int arr[], int n) {
-    int total = 0;
-    for (int i = 0; i &lt; n; i++)
-        total += arr[i];
-    return total;
-}
-
-// O(n) space — creates a new array
-int* double_array(int arr[], int n) {
-    int *result = malloc(n * sizeof(int));
-    for (int i = 0; i &lt; n; i++)
-        result[i] = arr[i] * 2;
-    return result;
-}
-
-// O(n) space via recursion call stack
-int factorial(int n) {
-    if (n &lt;= 1) return 1;
-    return n * factorial(n - 1);  // n stack frames!
-}</code></pre><blockquote>Time-space trade-off: use more memory to gain speed (memoisation, hash sets).</blockquote>` },
+      { id: "dsa-02", title: "1-D Array Address Calculation", difficulty: "beginner", time: "5 min", desc: "Formula and solved examples with base address.",
+        content: `<h1>1-D Array Address Calculation</h1><span class="step-badge">Chapter 2</span><h2>Formula</h2><pre><code>A[i] = Base Address + (i × size of each element)</code></pre><h2>Example</h2><p>If:</p><pre><code>Base address = 1000
+size of int = 4 bytes
+size of char = 1 byte</code></pre><p>Find address of <code>A[5]</code>.</p><p><strong>For <code>int</code>:</strong></p><pre><code>A[5] = 1000 + (5 × 4)
+     = 1020</code></pre><p><strong>For <code>char</code>:</strong></p><pre><code>A[5] = 1000 + (5 × 1)
+     = 1005</code></pre><h2>Question 1</h2><p>An integer array <code>A[10]</code> is stored in contiguous memory. The base address is <code>1000</code> and each integer occupies <code>4 bytes</code>. Find address of <code>A[7]</code>.</p><pre><code>A[7] = 1000 + (7 × 4)
+     = 1000 + 28
+     = 1028</code></pre><p><strong>Answer: <code>1028</code></strong></p><h2>Question 2</h2><pre><code>B[20]
+Base address = 5000
+Each element occupies 2 bytes
+Calculate B[13]'s address.</code></pre><pre><code>B[13] = 5000 + (13 × 2)
+      = 5000 + 26
+      = 5026</code></pre><p><strong>Answer: <code>5026</code></strong></p><blockquote><code>A[i] = Base Address + (i × size of each element)</code> — the size depends on the data type (int = 4 bytes, char = 1 byte).</blockquote>` },
       { id: "dsa-03", title: "Arrays", difficulty: "beginner", time: "5 min", desc: "Memory layout, operations, patterns.",
         content: `<h1>Arrays</h1><span class="step-badge">Chapter 3</span><p>An array is the simplest and most widely used data structure. It stores elements of the same type in contiguous memory, allowing O(1) random access by index.</p><h2>Array Operations</h2><pre><code>// ACCESS — O(1): direct address calculation
 int val = arr[i];
