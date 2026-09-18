@@ -1941,65 +1941,42 @@ C[3][2]
 = 5000 + 14 × 8
 = 5000 + 112
 = 5112</code></pre><p><strong>Answer: <code>5112</code></strong></p><blockquote>Row-major: <code>Address of A[i][j] = Base + ((i × No. of columns) + j) × size of element</code>.</blockquote>` },
-      { id: "dsa-04", title: "Strings", difficulty: "beginner", time: "5 min", desc: "String operations, pattern matching, KMP.",
-        content: `<h1>Strings</h1><span class="step-badge">Chapter 4</span><p>In C, a string is an array of char values ending with <code>'\\0'</code>. Understanding string memory is critical for writing efficient code.</p><h2>Common String Operations</h2><pre><code>#include &lt;string.h&gt;
+      { id: "dsa-04", title: "Sparse Matrix & Polynomial", difficulty: "beginner", time: "4 min", desc: "Triplet representation and 2-D array polynomial storage.",
+        content: `<h1>Sparse Matrix &amp; Polynomial</h1><span class="step-badge">Chapter 4</span><h2>3-Tuple Form — Sparse Matrix Representation</h2><h3>Triplet Representation</h3><p>Triplet form represents a sparse matrix using:</p><pre><code>(row, column, value)</code></pre><p>Example matrix:</p><pre><code>        columns
+        0  1  2  3
+row 0   0  0  0  5
+row 1   0  8  0  0
+row 2   0  0  0  0
+row 3   3  0  0  9
+row 4   0  0  0  6</code></pre><p>Triplet representation:</p><pre><code>Row   Column   Value
+----- -------- -------
+0        3       5
+1        1       8
+3        0       3
+3        3       9
+4        3       6</code></pre><h2>Polynomial Expression</h2><p>Represent the polynomial using a 2-D array where each row stores coefficient and exponent.</p><p>Given:</p><pre><code>P(x) = 6x⁵ − 4x³ + 7x² − 9x + 2</code></pre><p>Representation:</p><pre><code>Coefficient     Exponent
 
-char s[] = "Hello World";
-int n = strlen(s);  // O(n) — scans to find \\0
+6               5
+4               3
+7               2
+9               1
+2               0</code></pre><p>2-D array representation:</p><pre><code>[6  5]
+[4  3]
+[7  2]
+[9  1]
+[2  0]</code></pre><p>The notebook also shows the positions:</p><pre><code>6 ► [0,0]       5 ► [0,1]
+4 ► [1,0]       3 ► [1,1]
+7 ► [2,0]       2 ► [2,1]
+9 ► [3,0]       1 ► [3,1]
+2 ► [4,0]       0 ► [4,1]</code></pre><h2>Sparse Matrix Representation of the Polynomial Example</h2><p>The notebook shows:</p><pre><code>0 0 0 8
+0 3 0 0
+5 0 0 0
+0 0 6 0</code></pre><p>Triplet form shown:</p><pre><code>row   column   value
 
-// Traverse character by character — O(n)
-for (int i = 0; i &lt; n; i++)
-    printf("%c ", s[i]);
-
-// Compare — O(min(len1, len2))
-strcmp("abc", "abc");  // 0 = equal
-
-// Copy — O(n) — ALWAYS use n limit:
-char dest[50];
-strncpy(dest, s, 49);
-dest[49] = '\\0';  // manual null-termination!
-
-// Reverse in-place — O(n), O(1) space
-void reverse_str(char *s, int n) {
-    int l = 0, r = n - 1;
-    while (l &lt; r) {
-        char tmp = s[l]; s[l] = s[r]; s[r] = tmp;
-        l++; r--;
-    }
-}</code></pre><h2>Palindrome Check — Two Pointers</h2><pre><code>int is_palindrome(char *s, int n) {
-    int l = 0, r = n - 1;
-    while (l &lt; r) {
-        if (s[l] != s[r]) return 0;
-        l++; r--;
-    }
-    return 1;
-}</code></pre><h2>Pattern Matching — Naive vs KMP</h2><pre><code>// Naive — O(n*m)
-int naive_search(char *t, int n, char *p, int m) {
-    for (int i = 0; i &lt;= n - m; i++) {
-        int j = 0;
-        while (j &lt; m &amp;&amp; t[i+j] == p[j]) j++;
-        if (j == m) return i;
-    }
-    return -1;
-}
-
-// KMP — O(n+m) using failure function
-// Never backtracks in the text!</code></pre><h2>Frequency Counting</h2><pre><code>// Count frequency of each character — O(n), O(1) space
-void char_freq(char *s, int freq[26]) {
-    memset(freq, 0, 26 * sizeof(int));
-    for (int i = 0; s[i]; i++)
-        freq[tolower(s[i]) - 'a']++;
-}
-
-// Check if two strings are anagrams — O(n)
-int is_anagram(char *a, char *b) {
-    if (strlen(a) != strlen(b)) return 0;
-    int freq[26] = {0};
-    for (int i = 0; a[i]; i++) freq[tolower(a[i])-'a']++;
-    for (int i = 0; b[i]; i++) freq[tolower(b[i])-'a']--;
-    for (int i = 0; i &lt; 26; i++) if (freq[i]) return 0;
-    return 1;
-}</code></pre><blockquote>KMP is a classic example of precomputation reducing time complexity from O(n×m) to O(n+m).</blockquote>` },
+0       3        8
+1       1        3
+2       0        5
+3       2        6</code></pre><blockquote>Triplet representation stores only <code>(row, column, value)</code> for non-zero entries — it saves memory for sparse matrices.</blockquote>` },
       { id: "dsa-05", title: "Linked Lists", difficulty: "beginner", time: "5 min", desc: "Singly, doubly, operations, cycle detection.",
         content: `<h1>Linked Lists</h1><span class="step-badge">Chapter 5</span><p>A linked list is a sequence of nodes where each node stores a value and a pointer to the next node. Unlike arrays, nodes are scattered in memory and connected by pointers.</p><h2>Implementation</h2><pre><code>#include &lt;stdio.h&gt;
 #include &lt;stdlib.h&gt;
