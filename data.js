@@ -2040,59 +2040,31 @@ TOP                BOTTOM</code></pre><p>Notebook code:</p><pre><code>int displa
 └────┴────┴────┘
             ▲
            TOP</code></pre><pre><code>peek() ► 30</code></pre><blockquote>Last In First Out — the element inserted at last is removed first.</blockquote>` },
-      { id: "dsa-06", title: "Stacks", difficulty: "beginner", time: "5 min", desc: "LIFO, implementation, applications.",
-        content: `<h1>Stacks</h1><span class="step-badge">Chapter 6</span><p>A stack is a Last In, First Out (LIFO) data structure. The last element added is the first one removed. Think of a stack of plates.</p><h2>Array-based Stack</h2><pre><code>#define MAX 1000
+      { id: "dsa-06", title: "Queues", difficulty: "beginner", time: "5 min", desc: "FIFO, linear queue, initial values, dequeue cases.",
+        content: `<h1>Queues</h1><span class="step-badge">Chapter 6</span><h2>Linear Data Structure</h2><p>Elements are arranged sequentially, one after another.</p><h2>Queue</h2><p>Queue is a data structure that follows FIFO principle:</p><pre><code>First In First Out</code></pre><p>where elements are inserted at the rear and removed from the front.</p><h3>Three types of queue</h3><ol><li>Linear Queue</li><li>Circular Queue</li><li>Priority Queue</li></ol><h2>Linear Queue</h2><p>A linear queue is a queue where elements are inserted at the rear and removed from front, following the FIFO principle.</p><p>Example:</p><pre><code>FRONT          REAR
+  ▼              ▼
+┌────┬────┬────┬────┐
+│ 10 │ 20 │ 30 │ 40 │
+└────┴────┴────┴────┘
+  0    1    2    3</code></pre><ul><li>Element at the first is the front.</li><li>Last inserted element is considered rear.</li><li>Rear and front point to the index, not the element.</li></ul><p>After deleting <code>10</code>:</p><pre><code>FRONT     REAR
+  ▼         ▼
+┌────┬────┬────┐
+│ 20 │ 30 │ 40 │
+└────┴────┴────┘
+  1    2    3</code></pre><ul><li>Rear will increase when new element is inserted.</li><li>Direction will be from left to right.</li><li>When a value is dequeued (deleted), front increments to the next index, if available index.</li></ul><h2>Linear Queue — Initial Values</h2><pre><code>int front = -1;
+int rear = -1;</code></pre><p>This is the initial value when queue is empty.</p><p>Example:</p><pre><code>int queue[5];
+enqueue(50);</code></pre><p>When we insert an element into queue in empty state, element goes to <code>0</code> index. Therefore:</p><pre><code>rear = 0
+front = 0</code></pre><p>Initially both are <code>-1</code>, and after inserting the first element both change to <code>0</code>.</p><h2>Linear Queue Enqueue</h2><pre><code>queue[rear] = value;</code></pre><p>When queue is empty:</p><pre><code>front = 0</code></pre><p>Then:</p><pre><code>queue[++rear] = value;</code></pre><p>The notebook notes that when we want to dequeue an element, we cannot dequeue the front directly; we increment the front to <code>0</code>.</p><p>Example:</p><pre><code>enqueue(50)
 
-typedef struct {
-    int data[MAX];
-    int top;
-} Stack;
+queue = [50]
+index   0 1 2 3 4
+front = 0
+rear  = 0</code></pre><p>Then:</p><pre><code>enqueue(40)
 
-void init(Stack *s) { s->top = -1; }
-int is_empty(Stack *s) { return s->top == -1; }
-int is_full(Stack *s) { return s->top == MAX - 1; }
-
-// Push — O(1)
-void push(Stack *s, int val) {
-    if (is_full(s)) { printf("Overflow!\\n"); return; }
-    s->data[++s->top] = val;
-}
-
-// Pop — O(1)
-int pop(Stack *s) {
-    if (is_empty(s)) { printf("Underflow!\\n"); return -1; }
-    return s->data[s->top--];
-}
-
-// Peek — O(1)
-int peek(Stack *s) {
-    if (is_empty(s)) return -1;
-    return s->data[s->top];
-}</code></pre><h2>Balanced Parentheses Checker</h2><pre><code>int is_balanced(char *expr) {
-    Stack s; init(&amp;s);
-    for (int i = 0; expr[i]; i++) {
-        char c = expr[i];
-        if (c=='(' || c=='[' || c=='{') { push(&amp;s, c); }
-        else if (c==')' || c==']' || c=='}') {
-            if (is_empty(&amp;s)) return 0;
-            char top = pop(&amp;s);
-            if ((c==')' &amp;&amp; top!='(') ||
-                (c==']' &amp;&amp; top!='[') ||
-                (c=='}' &amp;&amp; top!='{')) return 0;
-        }
-    }
-    return is_empty(&amp;s);
-}</code></pre><h2>Next Greater Element — O(n)</h2><pre><code>void next_greater(int arr[], int n) {
-    Stack s; init(&amp;s);
-    int result[n];
-    for (int i = 0; i &lt; n; i++) result[i] = -1;
-
-    for (int i = 0; i &lt; n; i++) {
-        while (!is_empty(&amp;s) &amp;&amp; arr[peek(&amp;s)] &lt; arr[i])
-            result[pop(&amp;s)] = arr[i];
-        push(&amp;s, i);
-    }
-}</code></pre><blockquote>The monotonic stack pattern maintains sorted order in stack to solve 'next greater/smaller' problems in O(n) instead of O(n²).</blockquote>` },
+queue = [50, 40]
+index   0   1  2  3  4</code></pre><h2>Basic Queue Operations and Conditions</h2><h3>Operations</h3><ol><li><strong>Enqueue</strong> — Same as push, inserting element to rear index.</li><li><strong>Dequeue</strong> — Same as pop, delete element from the front (index front).</li><li><strong>Front</strong> — To view or track the first element in queue.</li><li><strong>Rear</strong> — To view and track the last inserted element in queue.</li></ol><h3>Conditions</h3><ol><li><strong>Is-empty</strong> — Check if queue is empty.</li><li><strong>Is-full</strong> — Check if queue is full.</li></ol><h2>Linear Queue Dequeue Cases</h2><pre><code>Queue = {1, 2, 3}</code></pre><h3>Case 3: Dequeue</h3><p>If we dequeue one element, it will be deleted from the front index.</p><pre><code>dequeued = front</code></pre><p>Means <code>0</code> index value will be deleted and front incremented to next index.</p><pre><code>Queue = {2, 3}
+front ► 1</code></pre><p>Now we check <code>is-empty()</code> condition. It is false as element is present and it is not empty yet.</p><h3>Case 4: Dequeue</h3><p>Value deleted from front index.</p><pre><code>Queue = { }</code></pre><h3>Case 5: Dequeue</h3><p>After deleting the last element:</p><pre><code>rear = -1
+front = -1</code></pre><p>Now <code>is-empty</code> condition will be true because no element is present in queue. It will return underflow due to no element present in queue as we dequeue.</p><blockquote>Queue follows FIFO — First In First Out. Elements are inserted at the rear and removed from the front.</blockquote>` },
       { id: "dsa-07", title: "Queues", difficulty: "beginner", time: "4 min", desc: "FIFO, circular queue, BFS.",
         content: `<h1>Queues</h1><span class="step-badge">Chapter 7</span><p>A queue is a First In, First Out (FIFO) data structure. The first element added is the first one removed — like a queue at a ticket counter.</p><h2>Circular Queue Implementation</h2><pre><code>#define MAX 1000
 typedef struct {
