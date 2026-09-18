@@ -2162,42 +2162,41 @@ Memory overhead ► 1 pointer
 Previous node access is not possible.</code></pre><h3>Doubly LL</h3><pre><code>Traversal ► head ► tail &amp; tail ► head
 Memory overhead ► 2 pointers
 Previous node access is possible.</code></pre><blockquote>Singly linked list has one pointer; doubly linked list has two pointers — more memory but allows backward traversal.</blockquote>` },
-      { id: "dsa-11", title: "Hashing", difficulty: "intermediate", time: "5 min", desc: "Hash functions, collisions, applications.",
-        content: `<h1>Hashing</h1><span class="step-badge">Chapter 11</span><p>Hashing converts a key into an index in an array using a hash function. This enables average O(1) insert, delete, and lookup — the holy grail of data structures.</p><h2>Hash Functions</h2><pre><code>// Simple hash for integers
-int hash_int(int key, int size) {
-    return key % size;  // modulo gives index 0..size-1
-}
+      { id: "dsa-11", title: "Circular Linked Lists", difficulty: "beginner", time: "4 min", desc: "Singly and doubly circular linked lists.",
+        content: `<h1>Circular Linked Lists</h1><span class="step-badge">Chapter 11</span><h2>Doubly Circular Linked List</h2><p>A doubly circular linked list is a linked list where:</p><ul><li>Each node has 3 parts: <code>prev</code> ► address of previous node, <code>data</code> ► value, <code>next</code> ► address of next node.</li><li>The last node points back to the first node.</li><li>The first node's <code>prev</code> points to the last node.</li></ul><h3>Visual Representation</h3><pre><code>                 ┌──────────────────────────────┐
+                 │                              ▼
+             ┌─────────┐      ┌─────────┐      ┌─────────┐
+             │ prev    │      │ prev    │      │ prev    │
+        ┌───►│  30     │      │  10     │      │  20     │◄───┐
+        │    │  next ──┼─────►│  next ──┼─────►│  next   │    │
+        │    └─────────┘      └─────────┘      └─────────┘    │
+        │                                                     │
+        └─────────────────────────────────────────────────────┘</code></pre><p>Simplified:</p><pre><code>10 ⇄ 20 ⇄ 30
+▲         ▼
+└─────────┘</code></pre><h3>Node connections</h3><p>For nodes <code>10</code>, <code>20</code>, <code>30</code>:</p><pre><code>10:
+prev ► 30
+next ► 20
 
-// Hash for strings (djb2 — widely used)
-unsigned int hash_str(char *key, int size) {
-    unsigned int hash = 5381;
-    int c;
-    while ((c = *key++))
-        hash = ((hash &lt;&lt; 5) + hash) + c;  // hash * 33 + c
-    return hash % size;
-}</code></pre><h2>Collision Resolution — Chaining</h2><pre><code>// Each bucket holds a linked list
-// Index 3 → [3] → [10] → NULL  (both hash to 3)
-// Worst case: all keys hash to same bucket → O(n)</code></pre><h2>Collision Resolution — Open Addressing</h2><pre><code>// Linear probing: if index i is taken, try i+1, i+2, ...
-int hash_insert(int table[], int size, int key) {
-    int index = key % size;
-    int i = 0;
-    while (i &lt; size) {
-        int probe = (index + i) % size;
-        if (table[probe] == -1) {
-            table[probe] = key;
-            return probe;
-        }
-        i++;
-    }
-    return -1;  // table full
-}</code></pre><h2>Applications</h2><pre><code>// Two Sum in O(n): find indices of two numbers summing to target
-// Hash map: value → index
-// For each arr[i], check if (target - arr[i]) is already in map
-// If yes: found! If no: add arr[i] to map
+20:
+prev ► 10
+next ► 30
 
-// Frequency count in O(n)
-// Detect duplicate elements in O(n)
-// Implement LRU Cache (hash map + doubly linked list)</code></pre><blockquote>Load factor = n/m. Keep below 0.75 by resizing (doubling array and rehashing). Most implementations resize automatically.</blockquote>` },
+30:
+prev ► 20
+next ► 10</code></pre><h2>Singly Circular Linked List</h2><p>A singly circular linked list is a linked list where:</p><ul><li>Each node contains data and a next pointer.</li><li>Each node points to the next node.</li><li>The last node does not point to <code>NULL</code>.</li><li>Instead, the last node points to the first node.</li><li>Therefore, the list forms a circle.</li></ul><h3>Node Structure</h3><pre><code>┌────────┬────────┐
+│  data  │  next  │
+└────────┴────────┘</code></pre><h3>Visual Representation</h3><p>Example with <code>10 ► 20 ► 30</code>. Because it is circular:</p><pre><code>      ┌───────────────────────┐
+      │                       │
+      ▼                       │
+    [10] ► [20] ► [30] ───────┘</code></pre><p>Or:</p><pre><code>    head ► [10] ► [20] ► [30]
+            ▲             ▲
+          first          last</code></pre><h3>Node structure example</h3><pre><code>head
+     ▼
+┌──────────┐      ┌──────────┐      ┌──────────┐
+│ 10 |next │├────►│ 20 |next │├────►│ 30 |next │
+└──────────┘      └──────────┘      └────────┬┘
+     ▲                                   │
+     └───────────────────────────────────┘</code></pre><p>Addresses shown in the notebook:</p><ul><li><code>head</code> ► address 1000</li><li><code>second</code> ► address 2000</li><li><code>tail</code> ► address 3000</li></ul><p>Data: <code>head ► data = 10</code>, <code>head ► next = second</code>.</p><blockquote>The last node points back to the first node, forming a circle.</blockquote>` },
       { id: "dsa-12", title: "Sorting Algorithms", difficulty: "intermediate", time: "5 min", desc: "Bubble, merge, quick sort, comparison.",
         content: `<h1>Sorting Algorithms</h1><span class="step-badge">Chapter 12</span><p>Sorting is one of the most fundamental operations in computer science. Sorted data enables binary search (O(log n) instead of O(n)).</p><h2>Bubble Sort — O(n²)</h2><pre><code>void bubble_sort(int arr[], int n) {
     for (int i = 0; i &lt; n-1; i++) {
