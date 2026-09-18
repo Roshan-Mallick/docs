@@ -2149,73 +2149,19 @@ index:    0   1   2
 └────────┘       └────────┘       └────────┘
 
 1000 ► 5000 ► 8000 ► NULL</code></pre><blockquote>Nodes are stored in separate memory locations and connected using pointers.</blockquote>` },
-      { id: "dsa-10", title: "Graphs", difficulty: "intermediate", time: "5 min", desc: "Representations, BFS, DFS, topological sort.",
-        content: `<h1>Graphs</h1><span class="step-badge">Chapter 10</span><p>A graph is a collection of vertices (nodes) connected by edges. Unlike trees, graphs can have cycles, multiple edges, and disconnected components.</p><h2>Graph Representations</h2><pre><code>// Adjacency Matrix — O(V²) space, O(1) edge check
-int adj[4][4] = {
-    {0, 1, 1, 0},  // vertex 0 connects to 1 and 2
-    {1, 0, 0, 1},  // vertex 1 connects to 0 and 3
-    {1, 0, 0, 1},  // vertex 2 connects to 0 and 3
-    {0, 1, 1, 0}   // vertex 3 connects to 1 and 2
-};
+      { id: "dsa-10", title: "Doubly Linked List", difficulty: "beginner", time: "4 min", desc: "Prev/data/next nodes, memory overhead, vs singly.",
+        content: `<h1>Doubly Linked List</h1><span class="step-badge">Chapter 10</span><h2>Doubly Linked List</h2><p>A doubly linked list (DLL) is a linked list where each node contains three parts:</p><pre><code>previous | data | next</code></pre><h3>Meaning</h3><ul><li><code>previous</code> ► address of previous node</li><li><code>data</code> ► actual data</li><li><code>next</code> ► address of next node</li></ul><p>Example:</p><pre><code>NULL ◄ [10] ⇄ [20] ⇄ [30] ► NULL</code></pre><p>You can move forward and backward.</p><h2>Doubly Linked List Memory Allocation</h2><p>Suppose an <code>int</code> is <code>4 bytes</code> and a pointer is <code>8 bytes</code> on a 64-bit system.</p><h3>Singly node</h3><pre><code>data = 4 bytes
+next = 8 bytes
 
-// Adjacency List — O(V + E) space (preferred for sparse graphs)
-typedef struct {
-    int *neighbors;
-    int degree;
-    int capacity;
-} Vertex;
+Total = 12 bytes</code></pre><h3>Doubly node</h3><pre><code>prev = 8 bytes
+data = 4 bytes
+next = 8 bytes
 
-typedef struct {
-    Vertex *adj;
-    int V;
-} Graph;</code></pre><h2>BFS — Queue-based, Level-by-Level</h2><pre><code>void bfs(Graph *g, int start) {
-    int visited[g->V];
-    memset(visited, 0, sizeof(visited));
-
-    Queue q; init_q(&amp;q);
-    enqueue(&amp;q, start);
-    visited[start] = 1;
-
-    while (!q_empty(&amp;q)) {
-        int v = dequeue(&amp;q);
-        printf("%d ", v);
-
-        for (int i = 0; i &lt; g->adj[v].degree; i++) {
-            int neighbor = g->adj[v].neighbors[i];
-            if (!visited[neighbor]) {
-                visited[neighbor] = 1;
-                enqueue(&amp;q, neighbor);
-            }
-        }
-    }
-}
-// Time: O(V + E). Space: O(V)</code></pre><h2>DFS — Stack/Recursion, Goes Deep First</h2><pre><code>void dfs(Graph *g, int v, int visited[]) {
-    visited[v] = 1;
-    printf("%d ", v);
-
-    for (int i = 0; i &lt; g->adj[v].degree; i++) {
-        int neighbor = g->adj[v].neighbors[i];
-        if (!visited[neighbor])
-            dfs(g, neighbor, visited);
-    }
-}
-
-void dfs_all(Graph *g) {
-    int visited[g->V];
-    memset(visited, 0, sizeof(visited));
-    for (int v = 0; v &lt; g->V; v++)
-        if (!visited[v])
-            dfs(g, v, visited);  // handles disconnected graph!
-}</code></pre><h2>Topological Sort</h2><pre><code>// Topological sort using DFS + stack — O(V + E)
-void topo_dfs(Graph *g, int v, int visited[], Stack *s) {
-    visited[v] = 1;
-    for (int i = 0; i &lt; g->adj[v].degree; i++) {
-        int nb = g->adj[v].neighbors[i];
-        if (!visited[nb])
-            topo_dfs(g, nb, visited, s);
-    }
-    push(s, v);  // push AFTER all neighbours processed
-}</code></pre><blockquote>BFS → uses QUEUE → guarantees shortest path in unweighted graph. DFS → uses STACK (recursion) → good for connectivity, cycles.</blockquote>` },
+Total = 20 bytes</code></pre><h2>Difference Between Singly &amp; Doubly Linked List</h2><table><thead><tr><th>Singly Linked List</th><th>Doubly Linked List</th></tr></thead><tbody><tr><td>Node contains data and next pointer.</td><td>Node contains prev, data, next.</td></tr><tr><td>It has a next pointer which points to the next available node.</td><td>It has prev and next pointers.</td></tr><tr><td>Direction is forward only.</td><td>Direction is backward and forward.</td></tr><tr><td>Singly LL occupies smaller memory due to having single pointer.</td><td>Doubly LL occupies more memory than singly LL due to having double pointer.</td></tr><tr><td>Previous node access is not possible.</td><td>Previous node access is possible.</td></tr><tr><td>Traversal: head ► tail.</td><td>Traversal: head ► tail and tail ► head.</td></tr><tr><td>Memory overhead is smaller.</td><td>Memory overhead is larger.</td></tr></tbody></table><h2>Doubly Linked List — Continued Points</h2><h3>Singly LL</h3><pre><code>Traversal ► head ► tail
+Memory overhead ► 1 pointer
+Previous node access is not possible.</code></pre><h3>Doubly LL</h3><pre><code>Traversal ► head ► tail &amp; tail ► head
+Memory overhead ► 2 pointers
+Previous node access is possible.</code></pre><blockquote>Singly linked list has one pointer; doubly linked list has two pointers — more memory but allows backward traversal.</blockquote>` },
       { id: "dsa-11", title: "Hashing", difficulty: "intermediate", time: "5 min", desc: "Hash functions, collisions, applications.",
         content: `<h1>Hashing</h1><span class="step-badge">Chapter 11</span><p>Hashing converts a key into an index in an array using a hash function. This enables average O(1) insert, delete, and lookup — the holy grail of data structures.</p><h2>Hash Functions</h2><pre><code>// Simple hash for integers
 int hash_int(int key, int size) {
