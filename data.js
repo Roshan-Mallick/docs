@@ -2065,37 +2065,30 @@ queue = [50, 40]
 index   0   1  2  3  4</code></pre><h2>Basic Queue Operations and Conditions</h2><h3>Operations</h3><ol><li><strong>Enqueue</strong> — Same as push, inserting element to rear index.</li><li><strong>Dequeue</strong> — Same as pop, delete element from the front (index front).</li><li><strong>Front</strong> — To view or track the first element in queue.</li><li><strong>Rear</strong> — To view and track the last inserted element in queue.</li></ol><h3>Conditions</h3><ol><li><strong>Is-empty</strong> — Check if queue is empty.</li><li><strong>Is-full</strong> — Check if queue is full.</li></ol><h2>Linear Queue Dequeue Cases</h2><pre><code>Queue = {1, 2, 3}</code></pre><h3>Case 3: Dequeue</h3><p>If we dequeue one element, it will be deleted from the front index.</p><pre><code>dequeued = front</code></pre><p>Means <code>0</code> index value will be deleted and front incremented to next index.</p><pre><code>Queue = {2, 3}
 front ► 1</code></pre><p>Now we check <code>is-empty()</code> condition. It is false as element is present and it is not empty yet.</p><h3>Case 4: Dequeue</h3><p>Value deleted from front index.</p><pre><code>Queue = { }</code></pre><h3>Case 5: Dequeue</h3><p>After deleting the last element:</p><pre><code>rear = -1
 front = -1</code></pre><p>Now <code>is-empty</code> condition will be true because no element is present in queue. It will return underflow due to no element present in queue as we dequeue.</p><blockquote>Queue follows FIFO — First In First Out. Elements are inserted at the rear and removed from the front.</blockquote>` },
-      { id: "dsa-07", title: "Queues", difficulty: "beginner", time: "4 min", desc: "FIFO, circular queue, BFS.",
-        content: `<h1>Queues</h1><span class="step-badge">Chapter 7</span><p>A queue is a First In, First Out (FIFO) data structure. The first element added is the first one removed — like a queue at a ticket counter.</p><h2>Circular Queue Implementation</h2><pre><code>#define MAX 1000
-typedef struct {
-    int data[MAX];
-    int front, rear, size;
-} Queue;
+      { id: "dsa-07", title: "Circular Queue", difficulty: "beginner", time: "5 min", desc: "Wrap-around rear, full/empty conditions, enqueue cases.",
+        content: `<h1>Circular Queue</h1><span class="step-badge">Chapter 7</span><p>Circular queue follows FIFO principle.</p><h2>Circular Queue</h2><p>It is the queue where the last position is connected to the first position.</p><h3>Initial value when circular queue is empty</h3><pre><code>front = -1
+rear  = -1</code></pre><p>because no element is present in circular queue.</p><h2>Circular Queue — Visual Idea</h2><p>For size <code>4</code>:</p><pre><code>              0
+           ┌─────┐
+     3 ┌─┘       └─┐ 1
+         │         │
+       2 └─────────┘</code></pre><p>The last index connects back to the first index.</p><h2>Circular Queue Example</h2><p>Insert 4 elements:</p><pre><code>Queue = {4, 3, 1, 2}
 
-void init_q(Queue *q) { q->front=0; q->rear=-1; q->size=0; }
-int q_empty(Queue *q) { return q->size == 0; }
+Index:
+        0   1   2   3
+       ┌───┬───┬───┬───┐
+       │ 4 │ 3 │ 1 │ 2 │
+       └───┴───┴───┴───┘
+         ▲           ▲
+       FRONT        REAR</code></pre><p>After this:</p><pre><code>front = 0
+rear  = 3</code></pre><h2>Circular Queue Dequeue</h2><p>Perform:</p><pre><code>dequeue(4)</code></pre><p>The value at front is deleted and front is incremented.</p><pre><code>front: 0 ► 1</code></pre><h2>Circular Queue Enqueue</h2><p>Suppose we want to insert <code>10</code>. To insert a new element into queue, first find the next rear position.</p><p>Formula:</p><pre><code>rear = (rear + 1) % size</code></pre><p>Example:</p><pre><code>rear = 3
+size = 4
 
-// Enqueue (add to rear) — O(1)
-void enqueue(Queue *q, int val) {
-    if (q->size == MAX) { printf("Full!\\n"); return; }
-    q->rear = (q->rear + 1) % MAX;  // circular!
-    q->data[q->rear] = val;
-    q->size++;
-}
+rear = (3 + 1) % 4
+     = 4 % 4
+     = 0</code></pre><p>So the next rear position is index <code>0</code>. Now check whether the index position is empty or not.</p><p>Full condition:</p><pre><code>(rear + 1) % size == front</code></pre><p>If the condition is false, we can insert the value because there is space.</p><p>The notebook example says the current front index is <code>1</code> and last index is <code>3</code>; therefore the next rear can wrap around to index <code>0</code>.</p><h2>Circular Queue Is-Full and Is-Empty</h2><h3>Is-full</h3><p>For size <code>4</code>:</p><pre><code>queue = [0, 1, 2, 3]
+index   0  1  2  3
 
-// Dequeue (remove from front) — O(1)
-int dequeue(Queue *q) {
-    if (q_empty(q)) return -1;
-    int val = q->data[q->front];
-    q->front = (q->front + 1) % MAX;  // circular!
-    q->size--;
-    return val;
-}</code></pre><blockquote>Note the (rear+1) % MAX — this is a CIRCULAR queue. Without the modulo, the rear would go past the array end even though the front has freed up space.</blockquote><h2>BFS Uses a Queue</h2><p>BFS traversal of a tree/graph uses a queue to process nodes level by level:</p><pre><code>Level 0: [1]
-Level 1: [2] [3]
-Level 2: [4][5][6][7]
-
-Queue: [1] → dequeue 1 → [2,3] → dequeue 2 → [3,4,5]
-→ dequeue 3 → [4,5,6,7] → ... level by level!</code></pre>` },
+size - 1 = 3</code></pre><p>When the queue is full, no space is available.</p><p>The notebook notes that <code>(rear + 1) % size == front</code> is the condition used to know the queue is full.</p><h3>Is-empty</h3><pre><code>rear == -1</code></pre><p>means the queue is empty in the initial state. If we try to dequeue when it is empty, it will underflow.</p><h2>Circular Queue Enqueue Cases</h2><h3>Case 1: Enqueue</h3><p>If <code>is-full</code> is false, insert element through rear. First check <code>is-empty</code>. If it is true, then front also increases.</p><h3>Case 2: Enqueue</h3><p>Try to insert another element. If full condition is checked and it is false, insert element through rear and also check <code>is-empty</code>. This time it will be false because the queue is not empty.</p><blockquote><code>is-empty</code> will only be true if queue is empty.</blockquote>` },
       { id: "dsa-08", title: "Recursion", difficulty: "intermediate", time: "5 min", desc: "Call stack, three laws, fibonacci, Tower of Hanoi.",
         content: `<h1>Recursion</h1><span class="step-badge">Chapter 8</span><p>Recursion is when a function calls itself to solve a smaller version of the same problem. Every recursive solution has a base case (when to stop) and a recursive case (how to reduce the problem).</p><h2>The Three Laws of Recursion</h2><ol><li><strong>Base Case</strong> — Must have at least one case that does NOT recurse</li><li><strong>Move Toward Base</strong> — Each recursive call must be 'smaller' or 'closer' to base</li><li><strong>Call Itself</strong> — The function must call itself on the smaller problem</li></ol><h2>Factorial</h2><pre><code>int factorial(int n) {
     if (n == 0) return 1;  // BASE CASE
