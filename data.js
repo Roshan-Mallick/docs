@@ -2197,72 +2197,37 @@ next ► 10</code></pre><h2>Singly Circular Linked List</h2><p>A singly circular
 └──────────┘      └──────────┘      └────────┬┘
      ▲                                   │
      └───────────────────────────────────┘</code></pre><p>Addresses shown in the notebook:</p><ul><li><code>head</code> ► address 1000</li><li><code>second</code> ► address 2000</li><li><code>tail</code> ► address 3000</li></ul><p>Data: <code>head ► data = 10</code>, <code>head ► next = second</code>.</p><blockquote>The last node points back to the first node, forming a circle.</blockquote>` },
-      { id: "dsa-12", title: "Sorting Algorithms", difficulty: "intermediate", time: "5 min", desc: "Bubble, merge, quick sort, comparison.",
-        content: `<h1>Sorting Algorithms</h1><span class="step-badge">Chapter 12</span><p>Sorting is one of the most fundamental operations in computer science. Sorted data enables binary search (O(log n) instead of O(n)).</p><h2>Bubble Sort — O(n²)</h2><pre><code>void bubble_sort(int arr[], int n) {
-    for (int i = 0; i &lt; n-1; i++) {
-        int swapped = 0;
-        for (int j = 0; j &lt; n-i-1; j++) {
-            if (arr[j] &gt; arr[j+1]) {
-                int tmp = arr[j]; arr[j] = arr[j+1]; arr[j+1] = tmp;
-                swapped = 1;
-            }
-        }
-        if (!swapped) break;  // already sorted — early exit!
-    }
-}</code></pre><h2>Selection Sort — O(n²)</h2><pre><code>void selection_sort(int arr[], int n) {
-    for (int i = 0; i &lt; n-1; i++) {
-        int min_idx = i;
-        for (int j = i+1; j &lt; n; j++)
-            if (arr[j] &lt; arr[min_idx]) min_idx = j;
-        int tmp = arr[i]; arr[i] = arr[min_idx]; arr[min_idx] = tmp;
-    }
-}</code></pre><h2>Insertion Sort — O(n²), but O(n) best case</h2><pre><code>void insertion_sort(int arr[], int n) {
-    for (int i = 1; i &lt; n; i++) {
-        int key = arr[i];
-        int j = i - 1;
-        while (j &gt;= 0 &amp;&amp; arr[j] &gt; key) {
-            arr[j+1] = arr[j];  // shift right
-            j--;
-        }
-        arr[j+1] = key;  // insert in correct position
-    }
-}</code></pre><h2>Merge Sort — O(n log n) always</h2><pre><code>void merge(int arr[], int l, int m, int r) {
-    int n1=m-l+1, n2=r-m;
-    int L[n1], R[n2];
-    for(int i=0;i&lt;n1;i++) L[i]=arr[l+i];
-    for(int j=0;j&lt;n2;j++) R[j]=arr[m+1+j];
-    int i=0,j=0,k=l;
-    while(i&lt;n1 &amp;&amp; j&lt;n2) arr[k++] = (L[i]&lt;=R[j]) ? L[i++] : R[j++];
-    while(i&lt;n1) arr[k++]=L[i++];
-    while(j&lt;n2) arr[k++]=R[j++];
-}
-
-void merge_sort(int arr[], int l, int r) {
-    if (l &gt;= r) return;
-    int m = l + (r-l)/2;
-    merge_sort(arr, l, m);
-    merge_sort(arr, m+1, r);
-    merge(arr, l, m, r);
-}</code></pre><h2>Quick Sort — O(n log n) average</h2><pre><code>int partition(int arr[], int lo, int hi) {
-    int pivot = arr[hi];
-    int i = lo - 1;
-    for (int j = lo; j &lt; hi; j++) {
-        if (arr[j] &lt;= pivot) {
-            i++;
-            int tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
-        }
-    }
-    int tmp = arr[i+1]; arr[i+1] = arr[hi]; arr[hi] = tmp;
-    return i + 1;
-}
-
-void quick_sort(int arr[], int lo, int hi) {
-    if (lo &lt; hi) {
-        int pi = partition(arr, lo, hi);
-        quick_sort(arr, lo, pi-1);
-        quick_sort(arr, pi+1, hi);
-    }
-}</code></pre><blockquote>Quick Sort is faster than Merge Sort in practice despite same O(n log n) average because of better cache locality. Use randomised pivot to avoid O(n²) worst case.</blockquote>` },
+      { id: "dsa-12", title: "Quick Structure & Key Formulas", difficulty: "beginner", time: "3 min", desc: "Full linear data structure map and key formulas.",
+        content: `<h1>Quick Structure &amp; Key Formulas</h1><span class="step-badge">Chapter 12</span><h2>Linear Data Structure — Quick Structure</h2><pre><code>LINEAR DATA STRUCTURE
+│
+├── ARRAY
+│   ├── 1-D Array
+│   ├── 2-D Array
+│   ├── Address Calculation
+│   └── Sparse Matrix / Triplet Representation
+│
+├── STACK
+│   ├── LIFO
+│   ├── Push
+│   ├── Pop
+│   ├── Peek
+│   ├── Underflow
+│   ├── Overflow
+│   └── Display
+│
+├── QUEUE
+│   ├── FIFO
+│   ├── Linear Queue
+│   ├── Circular Queue
+│   └── Priority Queue
+│
+└── LINKED LIST
+    ├── Singly Linked List
+    ├── Doubly Linked List
+    ├── Singly Circular Linked List
+    └── Doubly Circular Linked List</code></pre><h2>Important Formulas from the Notebook</h2><h3>1-D Array</h3><pre><code>A[i] = Base Address + (i × size of each element)</code></pre><h3>2-D Array — Row Major</h3><pre><code>Address A[i][j]
+= Base Address + ((i × number of columns) + j) × size of element</code></pre><h3>Circular Queue — Next Rear</h3><pre><code>rear = (rear + 1) % size</code></pre><h3>Circular Queue — Full Condition</h3><pre><code>(rear + 1) % size == front</code></pre><h3>Empty Queue / Initial State</h3><pre><code>front = -1
+rear  = -1</code></pre><h3>Stack Empty Condition</h3><pre><code>top == -1</code></pre><h3>Stack Full Condition</h3><pre><code>top == size - 1</code></pre><blockquote>Keep these formulas handy — they appear throughout the notebook.</blockquote>` },
       { id: "dsa-13", title: "Searching Algorithms", difficulty: "intermediate", time: "4 min", desc: "Linear search, binary search deep dive.",
         content: `<h1>Searching Algorithms</h1><span class="step-badge">Chapter 13</span><h2>Linear Search — O(n)</h2><pre><code>int linear_search(int arr[], int n, int target) {
     for (int i = 0; i &lt; n; i++)
