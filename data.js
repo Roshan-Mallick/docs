@@ -1897,66 +1897,50 @@ Each element occupies 2 bytes
 Calculate B[13]'s address.</code></pre><pre><code>B[13] = 5000 + (13 × 2)
       = 5000 + 26
       = 5026</code></pre><p><strong>Answer: <code>5026</code></strong></p><blockquote><code>A[i] = Base Address + (i × size of each element)</code> — the size depends on the data type (int = 4 bytes, char = 1 byte).</blockquote>` },
-      { id: "dsa-03", title: "Arrays", difficulty: "beginner", time: "5 min", desc: "Memory layout, operations, patterns.",
-        content: `<h1>Arrays</h1><span class="step-badge">Chapter 3</span><p>An array is the simplest and most widely used data structure. It stores elements of the same type in contiguous memory, allowing O(1) random access by index.</p><h2>Array Operations</h2><pre><code>// ACCESS — O(1): direct address calculation
-int val = arr[i];
+      { id: "dsa-03", title: "2-D Arrays & Address Calculation", difficulty: "beginner", time: "5 min", desc: "Row-major and column-major formulas with examples.",
+        content: `<h1>2-D Arrays &amp; Address Calculation</h1><span class="step-badge">Chapter 3</span><h2>Example</h2><pre><code>        columns
+          0   1   2
+row 0    10  20  30
+row 1    40  50  60
+row 2    70  80  90</code></pre><p>Declaration:</p><pre><code>int arr[3][3];</code></pre><p>There are:</p><pre><code>3 rows × 3 columns = 9 total elements</code></pre><p>Example:</p><pre><code>printf("%d", arr[1][2]);</code></pre><p>Output:</p><pre><code>60</code></pre><h2>2-D Array Memory Representation</h2><pre><code>        Column
+          0      1      2
 
-// SEARCH (unsorted) — O(n)
-int linear_search(int arr[], int n, int target) {
-    for (int i = 0; i &lt; n; i++)
-        if (arr[i] == target) return i;
-    return -1;
-}
+Row 0    10     20     30
+        1000   1004   1008
 
-// INSERT at end — O(1) amortized
-arr[size++] = new_value;
+Row 1    40     50     60
+        1012   1016   1020
 
-// INSERT at index i — O(n): shift elements right
-void insert_at(int arr[], int *size, int index, int val) {
-    for (int j = *size; j &gt; index; j--)
-        arr[j] = arr[j-1];  // shift right
-    arr[index] = val;
-    (*size)++;
-}
+Row 2    70     80     90
+        1024   1028   1032</code></pre><h2>Formula to find address in 2-D array</h2><p>For row-major order:</p><pre><code>Address of A[i][j]
+= Base address + ((i × number of columns) + j) × size of int</code></pre><p>General form:</p><pre><code>Address of A[i][j]
+= Base address + ((i × No. of columns) + j) × size of element</code></pre><h2>Question: Find A[0][2] address</h2><p>Given:</p><pre><code>Base address = 1000
+i = 0
+number of columns = 3
+j = 2
+size of int = 4</code></pre><pre><code>Address = 1000 + ((0 × 3) + 2) × 4
+        = 1000 + 8
+        = 1008</code></pre><p><strong>Answer: <code>1008</code></strong></p><h2>2-D Array Address Calculation</h2><h3>Question 1</h3><p>A 2-D integer array <code>A[4][5]</code> is stored in row-major order. The base address is <code>1000</code> and each element occupies <code>4 bytes</code>. Find address of <code>A[2][3]</code>.</p><pre><code>= Base address + ((i × no. of columns) + j) × size of integer
 
-// DELETE at index i — O(n): shift elements left
-void delete_at(int arr[], int *size, int index) {
-    for (int j = index; j &lt; *size - 1; j++)
-        arr[j] = arr[j+1];  // shift left
-    (*size)--;
-}</code></pre><h2>Two Pointers Pattern</h2><pre><code>// Reverse array in-place — O(n), O(1) space
-void reverse(int arr[], int n) {
-    int left = 0, right = n - 1;
-    while (left &lt; right) {
-        int temp = arr[left];
-        arr[left] = arr[right];
-        arr[right] = temp;
-        left++;
-        right--;
-    }
-}
+= 1000 + ((2 × 5) + 3) × 4
+= 1000 + (10 + 3) × 4
+= 1000 + 13 × 4
+= 1000 + 52
+= 1052</code></pre><p><strong>Answer: <code>1052</code></strong></p><h3>Column-major example from notebook</h3><pre><code>B[3][6]
+Base address = 2000
+Calculate B[?][4]</code></pre><p>The notebook applies the column-major form:</p><pre><code>2000 + (4 × 3 + 1) × 2
+= 2000 + 28
+= 2028</code></pre><p>The notebook records the result as <code>2028</code>.</p><h3>Row-major order matrix</h3><p>Example:</p><pre><code>C[5][4]
 
-// Check pair sum in sorted array — O(n), O(1) space
-int has_pair_sum(int arr[], int n, int target) {
-    int left = 0, right = n - 1;
-    while (left &lt; right) {
-        int sum = arr[left] + arr[right];
-        if (sum == target) return 1;
-        else if (sum &lt; target) left++;
-        else right--;
-    }
-    return 0;
-}</code></pre><h2>Prefix Sums</h2><pre><code>// O(n) preprocessing → O(1) per range query
-void build_prefix(int arr[], int prefix[], int n) {
-    prefix[0] = arr[0];
-    for (int i = 1; i &lt; n; i++)
-        prefix[i] = prefix[i-1] + arr[i];
-}
+Base Address = 5000
+Size of int = 8 bytes
 
-int range_sum(int prefix[], int l, int r) {
-    if (l == 0) return prefix[r];
-    return prefix[r] - prefix[l-1];  // O(1)!
-}</code></pre><blockquote>Dynamic arrays double capacity on resize → amortised O(1) append. This is how Python lists and C++ vectors work.</blockquote>` },
+C[3][2]
+= 5000 + ((3 × 4) + 2) × 8
+= 5000 + (12 + 2) × 8
+= 5000 + 14 × 8
+= 5000 + 112
+= 5112</code></pre><p><strong>Answer: <code>5112</code></strong></p><blockquote>Row-major: <code>Address of A[i][j] = Base + ((i × No. of columns) + j) × size of element</code>.</blockquote>` },
       { id: "dsa-04", title: "Strings", difficulty: "beginner", time: "5 min", desc: "String operations, pattern matching, KMP.",
         content: `<h1>Strings</h1><span class="step-badge">Chapter 4</span><p>In C, a string is an array of char values ending with <code>'\\0'</code>. Understanding string memory is critical for writing efficient code.</p><h2>Common String Operations</h2><pre><code>#include &lt;string.h&gt;
 
