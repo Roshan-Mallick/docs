@@ -2228,35 +2228,20 @@ next ► 10</code></pre><h2>Singly Circular Linked List</h2><p>A singly circular
     └── Doubly Circular Linked List</code></pre><h2>Important Formulas from the Notebook</h2><h3>1-D Array</h3><pre><code>A[i] = Base Address + (i × size of each element)</code></pre><h3>2-D Array — Row Major</h3><pre><code>Address A[i][j]
 = Base Address + ((i × number of columns) + j) × size of element</code></pre><h3>Circular Queue — Next Rear</h3><pre><code>rear = (rear + 1) % size</code></pre><h3>Circular Queue — Full Condition</h3><pre><code>(rear + 1) % size == front</code></pre><h3>Empty Queue / Initial State</h3><pre><code>front = -1
 rear  = -1</code></pre><h3>Stack Empty Condition</h3><pre><code>top == -1</code></pre><h3>Stack Full Condition</h3><pre><code>top == size - 1</code></pre><blockquote>Keep these formulas handy — they appear throughout the notebook.</blockquote>` },
-      { id: "dsa-13", title: "Searching Algorithms", difficulty: "intermediate", time: "4 min", desc: "Linear search, binary search deep dive.",
-        content: `<h1>Searching Algorithms</h1><span class="step-badge">Chapter 13</span><h2>Linear Search — O(n)</h2><pre><code>int linear_search(int arr[], int n, int target) {
-    for (int i = 0; i &lt; n; i++)
-        if (arr[i] == target) return i;
-    return -1;
-}
-// Best: O(1). Worst: O(n). Works on unsorted arrays.</code></pre><h2>Binary Search — O(log n)</h2><p>Binary search requires a sorted array and halves the search space with each comparison. For n = 1,000,000 elements: binary search takes at most 20 steps while linear search takes up to 1,000,000 steps.</p><pre><code>// Iterative — O(log n) time, O(1) space
-int binary_search(int arr[], int n, int target) {
-    int lo = 0, hi = n - 1;
-    while (lo &lt;= hi) {
-        int mid = lo + (hi - lo) / 2;  // CORRECT: avoids overflow!
-        if (arr[mid] == target) return mid;
-        else if (arr[mid] &lt; target) lo = mid + 1;
-        else hi = mid - 1;
-    }
-    return -1;
-}
+      { id: "dsa-13", title: "Core Differences", difficulty: "beginner", time: "3 min", desc: "Stack vs queue, linear vs circular queue, singly vs doubly.",
+        content: `<h1>Core Differences</h1><span class="step-badge">Chapter 13</span><h2>Stack vs Queue</h2><table><thead><tr><th>Stack</th><th>Queue</th></tr></thead><tbody><tr><td>LIFO</td><td>FIFO</td></tr><tr><td>Insertion at TOP</td><td>Insertion at REAR</td></tr><tr><td>Deletion from TOP</td><td>Deletion from FRONT</td></tr><tr><td>Main operations: Push, Pop, Peek</td><td>Main operations: Enqueue, Dequeue, Front, Rear</td></tr><tr><td>Has overflow and underflow</td><td>Has empty/full conditions</td></tr></tbody></table><h2>Linear Queue vs Circular Queue</h2><table><thead><tr><th>Linear Queue</th><th>Circular Queue</th></tr></thead><tbody><tr><td>Elements move from left to right.</td><td>Last position is connected to first position.</td></tr><tr><td>Rear normally increases forward.</td><td>Rear can wrap around using <code>% size</code>.</td></tr><tr><td>Uses linear positions.</td><td>Reuses positions after deletion.</td></tr><tr><td>Full/empty handling is linear.</td><td>Uses circular full condition.</td></tr></tbody></table><h2>Singly LL vs Doubly LL</h2><pre><code>Singly:
+[data | next]
 
-// Recursive — O(log n) time, O(log n) space (call stack)
-int bs_rec(int arr[], int lo, int hi, int target) {
-    if (lo &gt; hi) return -1;
-    int mid = lo + (hi - lo) / 2;
-    if (arr[mid] == target) return mid;
-    if (arr[mid] &lt; target) return bs_rec(arr, mid+1, hi, target);
-    return bs_rec(arr, lo, mid-1, target);
-}</code></pre><h2>Binary Search Trace</h2><pre><code>// Searching for 7 in: [1, 3, 5, 7, 9, 11, 13]
-// Step 1: lo=0, hi=6, mid=3 → arr[3]=7 → FOUND!
-// For 1,000,000 elements: max 20 steps (log₂(1,000,000) ≈ 20)</code></pre><blockquote>Binary search is THE most important search algorithm. Always use lo + (hi - lo) / 2 to avoid integer overflow, NOT (lo + hi) / 2.</blockquote>` },
-      { id: "dsa-14", title: "Advanced Problem-Solving Patterns", difficulty: "advanced", time: "5 min", desc: "Two pointers, sliding window, DP intro.",
+Doubly:
+[prev | data | next]</code></pre><p>Singly linked list has one pointer.</p><p>Doubly linked list has two pointers.</p><p>Therefore, doubly linked list uses more memory but allows backward traversal.</p><blockquote>Choose the data structure by the operation you need — LIFO (stack), FIFO (queue), priority (priority queue), or free-form links (linked list).</blockquote>` }
+    ]
+  },
+  {
+    id: "two-pointers", label: "Two Pointers Method", icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 6h14"/><path d="M5 12h14"/><path d="M5 18h14"/><path d="M9 3l-2 3 2 3"/><path d="M15 15l-2 3 2 3"/></svg>`,
+    desc: "Solve targeted problems using the Two Pointers pattern.",
+    tags: ["two-pointers", "pointers", "algorithms"],
+    articles: [
+{ id: "dsa-14", title: "Advanced Problem-Solving Patterns", difficulty: "advanced", time: "5 min", desc: "Two pointers, sliding window, DP intro.",
         content: `<h1>Advanced Problem-Solving Patterns</h1><span class="step-badge">Chapter 14</span><h2>Two Pointers</h2><pre><code>// Find pair with given sum in sorted array — O(n), O(1)
 int two_sum_sorted(int arr[], int n, int target) {
     int l = 0, r = n - 1;
