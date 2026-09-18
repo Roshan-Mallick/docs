@@ -2089,45 +2089,48 @@ rear = (3 + 1) % 4
 index   0  1  2  3
 
 size - 1 = 3</code></pre><p>When the queue is full, no space is available.</p><p>The notebook notes that <code>(rear + 1) % size == front</code> is the condition used to know the queue is full.</p><h3>Is-empty</h3><pre><code>rear == -1</code></pre><p>means the queue is empty in the initial state. If we try to dequeue when it is empty, it will underflow.</p><h2>Circular Queue Enqueue Cases</h2><h3>Case 1: Enqueue</h3><p>If <code>is-full</code> is false, insert element through rear. First check <code>is-empty</code>. If it is true, then front also increases.</p><h3>Case 2: Enqueue</h3><p>Try to insert another element. If full condition is checked and it is false, insert element through rear and also check <code>is-empty</code>. This time it will be false because the queue is not empty.</p><blockquote><code>is-empty</code> will only be true if queue is empty.</blockquote>` },
-      { id: "dsa-08", title: "Recursion", difficulty: "intermediate", time: "5 min", desc: "Call stack, three laws, fibonacci, Tower of Hanoi.",
-        content: `<h1>Recursion</h1><span class="step-badge">Chapter 8</span><p>Recursion is when a function calls itself to solve a smaller version of the same problem. Every recursive solution has a base case (when to stop) and a recursive case (how to reduce the problem).</p><h2>The Three Laws of Recursion</h2><ol><li><strong>Base Case</strong> — Must have at least one case that does NOT recurse</li><li><strong>Move Toward Base</strong> — Each recursive call must be 'smaller' or 'closer' to base</li><li><strong>Call Itself</strong> — The function must call itself on the smaller problem</li></ol><h2>Factorial</h2><pre><code>int factorial(int n) {
-    if (n == 0) return 1;  // BASE CASE
-    return n * factorial(n-1);  // RECURSIVE CASE
-}
-// factorial(4) trace: 4*3*2*1 = 24</code></pre><h2>Fibonacci — Naive vs Memoised</h2><pre><code>// NAIVE — O(2^n) exponential
-int fib(int n) {
-    if (n &lt;= 1) return n;
-    return fib(n-1) + fib(n-2);
-}
+      { id: "dsa-08", title: "Priority Queue", difficulty: "beginner", time: "5 min", desc: "Priority-based removal, highest priority element, shifting.",
+        content: `<h1>Priority Queue</h1><span class="step-badge">Chapter 8</span><h2>Priority Queue</h2><p>A priority queue is a special type of queue in which each element is associated with a priority. The element with highest priority is removed first, regardless of insertion order.</p><h2>Main Difference</h2><pre><code>Normal Queue ► follows FIFO
+               (linear / circular queue)
 
-// MEMOISED — O(n) time, O(n) space
-int memo[1000];
-int fib_memo(int n) {
-    if (n &lt;= 1) return n;
-    if (memo[n] != -1) return memo[n];
-    return memo[n] = fib_memo(n-1) + fib_memo(n-2);
-}</code></pre><h2>Tower of Hanoi — O(2^n)</h2><pre><code>void hanoi(int n, char src, char dst, char aux) {
-    if (n == 1) {
-        printf("Move disk 1 from %c to %c\\n", src, dst);
-        return;
+Priority Queue ► follows priority-based removal
+                 rather than simply first-in-first-out</code></pre><h2>Priority Queue Initial Value</h2><pre><code>rear = -1</code></pre><p>In priority queue, we have rear to track if the queue is empty or not. Empty condition:</p><pre><code>rear == -1</code></pre><h2>Priority Queue Enqueue</h2><p>Example:</p><pre><code>Step 1:
+Initial queue:
+
+┌───┬───┬───┬───┐
+│   │   │   │   │
+└───┴───┴───┴───┘
+  0   1   2   3</code></pre><p>Enqueue <code>10</code>:</p><pre><code>queue[++rear] = value;</code></pre><p>Initially <code>rear = -1</code>. After insertion:</p><pre><code>rear = 0
+queue = [10]</code></pre><p>Then enqueue <code>20</code>:</p><pre><code>rear = 1
+
+queue = [10, 20]</code></pre><p>Then enqueue <code>40</code> and <code>30</code>. The notebook gives:</p><pre><code>queue = [10, 20, 40, 30]
+index:    0   1   2   3
+          │   │   │   │
+                      ▲
+                      │
+                     rear</code></pre><h2>Finding Highest Priority Element and Deleting It</h2><p>The notebook uses:</p><pre><code>int let_priority = 0;</code></pre><p>At this index, we are considering the element as having highest priority initially. Then:</p><pre><code>for (int i = 1; i &lt;= rear; i++)
+{
+    if (queue[i] &gt; queue[let_priority])
+    {
+        let_priority = i;
     }
-    hanoi(n-1, src, aux, dst);
-    printf("Move disk %d from %c to %c\\n", n, src, dst);
-    hanoi(n-1, aux, dst, src);
-}
-// hanoi(3, 'A', 'C', 'B') — generates 2^3 - 1 = 7 moves</code></pre><h2>Convert Recursion to Iteration</h2><pre><code>// Recursive factorial — O(n) call stack space
-int fact_recursive(int n) {
-    if (n == 0) return 1;
-    return n * fact_recursive(n-1);
-}
-
-// Iterative factorial — O(1) space!
-int fact_iterative(int n) {
-    int result = 1;
-    for (int i = 2; i &lt;= n; i++)
-        result *= i;
-    return result;
-}</code></pre><blockquote>Any recursive algorithm can be converted to an iterative one by explicitly managing a stack.</blockquote>` },
+}</code></pre><p>Meaning:</p><ul><li>Compare each queue element.</li><li>If a higher-priority element is found, update <code>let_priority</code>.</li><li><code>let_priority</code> stores the index of the highest-priority element.</li></ul><p>After finding the highest-priority element, delete it from that index.</p><h2>Shifting Elements After Deletion</h2><p>After deleting the priority element from the queue, shift elements from right to left to fill the blank space.</p><p>Notebook code:</p><pre><code>for (int i = let_priority; i &lt; rear; i++)
+{
+    queue[i] = queue[i + 1];
+}</code></pre><p>Example:</p><pre><code>Before shift:
+queue = [10, 20, 40, 30]
+index:    0   1   2   3
+          │   │   │   │
+                  ▲
+                  │
+           highest priority</code></pre><p>If <code>40</code> is deleted:</p><pre><code>After shift:
+queue = [10, 20, 30]
+index:    0   1   2
+          │   │   │
+                  ▲
+                  │
+                 rear</code></pre><p>The notebook notes:</p><pre><code>40 ► higher priority
+30 ► rear</code></pre><blockquote>The element with highest priority is removed first, regardless of insertion order.</blockquote>` },
       { id: "dsa-09", title: "Trees", difficulty: "intermediate", time: "5 min", desc: "BST, traversals, height, balance.",
         content: `<h1>Trees</h1><span class="step-badge">Chapter 9</span><p>A tree is a non-linear hierarchical data structure consisting of nodes connected by edges. Trees are everywhere: file systems, HTML DOM, database indexes.</p><h2>Binary Search Tree (BST)</h2><pre><code>typedef struct Node {
     int data;
