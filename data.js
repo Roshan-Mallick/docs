@@ -1868,11 +1868,11 @@ asyncio.run(fetch_all(urls))</code></pre><h2>Learning Roadmap</h2><table><thead>
     ]
   },
   {
-    id: "dsa", label: "DSA", icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>`,
-    desc: "Linear Data Structures in C.",
-    tags: ["arrays", "stacks", "queues", "linked lists", "data structures"],
+    id: "linear-ds", label: "Linear DS", icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/></svg>`,
+    desc: "Linear data structures in C — arrays, stacks, queues and linked lists.",
+    tags: ["arrays", "stacks", "queues", "linked lists", "linear"],
     articles: [
-      { id: "dsa-01", title: "Arrays & Memory Layout", difficulty: "beginner", time: "5 min", desc: "Array basics, indexing, base address, contiguous memory.",
+      { id: "lds-01", title: "Arrays & Memory Layout", difficulty: "beginner", time: "5 min", desc: "Array basics, indexing, base address, contiguous memory.",
         content: `<h1>Arrays &amp; Memory Layout</h1><span class="step-badge">Chapter 1</span><h2>What is an array?</h2><p>A collection of elements of the same data type stored under one name at one location.</p><p>Example:</p><pre><code>int arr[5];</code></pre><pre><code>               size of array
                      ▼
         int   arr   [5]
@@ -1885,7 +1885,7 @@ arr[1] ► 1004
 arr[2] ► 1008</code></pre><p>From the base address to <code>arr[size-1]</code>, each element's address increases by <code>4 bytes</code> for an <code>int</code> array.</p><p><strong>Assuming <code>char</code> occupies 1 byte</strong></p><pre><code>arr[0] ► 1000
 arr[1] ► 1001
 arr[2] ► 1002</code></pre><p>From the base address to <code>arr[size-1]</code>, each element's address increases by <code>1 byte</code> for a <code>char</code> array.</p><blockquote>Because array elements are stored in contiguous memory locations, they can be accessed directly using an index.</blockquote>` },
-      { id: "dsa-02", title: "1-D Array Address Calculation", difficulty: "beginner", time: "5 min", desc: "Formula and solved examples with base address.",
+      { id: "lds-02", title: "1-D Array Address Calculation", difficulty: "beginner", time: "5 min", desc: "Formula and solved examples with base address.",
         content: `<h1>1-D Array Address Calculation</h1><span class="step-badge">Chapter 2</span><h2>Formula</h2><pre><code>A[i] = Base Address + (i × size of each element)</code></pre><h2>Example</h2><p>If:</p><pre><code>Base address = 1000
 size of int = 4 bytes
 size of char = 1 byte</code></pre><p>Find address of <code>A[5]</code>.</p><p><strong>For <code>int</code>:</strong></p><pre><code>A[5] = 1000 + (5 × 4)
@@ -1898,7 +1898,7 @@ Each element occupies 2 bytes
 Calculate B[13]'s address.</code></pre><pre><code>B[13] = 5000 + (13 × 2)
       = 5000 + 26
       = 5026</code></pre><p><strong>Answer: <code>5026</code></strong></p><blockquote><code>A[i] = Base Address + (i × size of each element)</code> — the size depends on the data type (int = 4 bytes, char = 1 byte).</blockquote>` },
-      { id: "dsa-03", title: "2-D Arrays & Address Calculation", difficulty: "beginner", time: "5 min", desc: "Row-major and column-major formulas with examples.",
+      { id: "lds-03", title: "2-D Arrays & Address Calculation", difficulty: "beginner", time: "5 min", desc: "Row-major and column-major formulas with examples.",
         content: `<h1>2-D Arrays &amp; Address Calculation</h1><span class="step-badge">Chapter 3</span><h2>Example</h2><pre><code>        columns
           0   1   2
 row 0    10  20  30
@@ -1942,7 +1942,7 @@ C[3][2]
 = 5000 + 14 × 8
 = 5000 + 112
 = 5112</code></pre><p><strong>Answer: <code>5112</code></strong></p><blockquote>Row-major: <code>Address of A[i][j] = Base + ((i × No. of columns) + j) × size of element</code>.</blockquote>` },
-      { id: "dsa-04", title: "Sparse Matrix & Polynomial", difficulty: "beginner", time: "4 min", desc: "Triplet representation and 2-D array polynomial storage.",
+      { id: "lds-04", title: "Sparse Matrix & Polynomial", difficulty: "beginner", time: "4 min", desc: "Triplet representation and 2-D array polynomial storage.",
         content: `<h1>Sparse Matrix &amp; Polynomial</h1><span class="step-badge">Chapter 4</span><h2>3-Tuple Form — Sparse Matrix Representation</h2><h3>Triplet Representation</h3><p>Triplet form represents a sparse matrix using:</p><pre><code>(row, column, value)</code></pre><p>Example matrix:</p><pre><code>        columns
         0  1  2  3
 row 0   0  0  0  5
@@ -1978,7 +1978,7 @@ row 4   0  0  0  6</code></pre><p>Triplet representation:</p><pre><code>Row   Co
 1       1        3
 2       0        5
 3       2        6</code></pre><blockquote>Triplet representation stores only <code>(row, column, value)</code> for non-zero entries — it saves memory for sparse matrices.</blockquote>` },
-      { id: "dsa-05", title: "Stacks", difficulty: "beginner", time: "5 min", desc: "LIFO, push, pop, peek, underflow, overflow, display.",
+      { id: "lds-05", title: "Stacks", difficulty: "beginner", time: "5 min", desc: "LIFO, push, pop, peek, underflow, overflow, display.",
         content: `<h1>Stacks</h1><span class="step-badge">Chapter 5</span><p>A stack is a linear data structure that follows the:</p><pre><code>LIFO principle
 Last In First Out</code></pre><p>The element inserted at last is removed first.</p><h2>Example</h2><pre><code>        ┌───────┐
 TOP ──→ │ plate3│
@@ -2041,7 +2041,7 @@ TOP                BOTTOM</code></pre><p>Notebook code:</p><pre><code>int displa
 └────┴────┴────┘
             ▲
            TOP</code></pre><pre><code>peek() ► 30</code></pre><blockquote>Last In First Out — the element inserted at last is removed first.</blockquote>` },
-      { id: "dsa-06", title: "Queues", difficulty: "beginner", time: "5 min", desc: "FIFO, linear queue, initial values, dequeue cases.",
+      { id: "lds-06", title: "Queues", difficulty: "beginner", time: "5 min", desc: "FIFO, linear queue, initial values, dequeue cases.",
         content: `<h1>Queues</h1><span class="step-badge">Chapter 6</span><h2>Linear Data Structure</h2><p>Elements are arranged sequentially, one after another.</p><h2>Queue</h2><p>Queue is a data structure that follows FIFO principle:</p><pre><code>First In First Out</code></pre><p>where elements are inserted at the rear and removed from the front.</p><h3>Three types of queue</h3><ol><li>Linear Queue</li><li>Circular Queue</li><li>Priority Queue</li></ol><h2>Linear Queue</h2><p>A linear queue is a queue where elements are inserted at the rear and removed from front, following the FIFO principle.</p><p>Example:</p><pre><code>FRONT          REAR
   ▼              ▼
 ┌────┬────┬────┬────┐
@@ -2066,7 +2066,7 @@ queue = [50, 40]
 index   0   1  2  3  4</code></pre><h2>Basic Queue Operations and Conditions</h2><h3>Operations</h3><ol><li><strong>Enqueue</strong> — Same as push, inserting element to rear index.</li><li><strong>Dequeue</strong> — Same as pop, delete element from the front (index front).</li><li><strong>Front</strong> — To view or track the first element in queue.</li><li><strong>Rear</strong> — To view and track the last inserted element in queue.</li></ol><h3>Conditions</h3><ol><li><strong>Is-empty</strong> — Check if queue is empty.</li><li><strong>Is-full</strong> — Check if queue is full.</li></ol><h2>Linear Queue Dequeue Cases</h2><pre><code>Queue = {1, 2, 3}</code></pre><h3>Case 3: Dequeue</h3><p>If we dequeue one element, it will be deleted from the front index.</p><pre><code>dequeued = front</code></pre><p>Means <code>0</code> index value will be deleted and front incremented to next index.</p><pre><code>Queue = {2, 3}
 front ► 1</code></pre><p>Now we check <code>is-empty()</code> condition. It is false as element is present and it is not empty yet.</p><h3>Case 4: Dequeue</h3><p>Value deleted from front index.</p><pre><code>Queue = { }</code></pre><h3>Case 5: Dequeue</h3><p>After deleting the last element:</p><pre><code>rear = -1
 front = -1</code></pre><p>Now <code>is-empty</code> condition will be true because no element is present in queue. It will return underflow due to no element present in queue as we dequeue.</p><blockquote>Queue follows FIFO — First In First Out. Elements are inserted at the rear and removed from the front.</blockquote>` },
-      { id: "dsa-07", title: "Circular Queue", difficulty: "beginner", time: "5 min", desc: "Wrap-around rear, full/empty conditions, enqueue cases.",
+      { id: "lds-07", title: "Circular Queue", difficulty: "beginner", time: "5 min", desc: "Wrap-around rear, full/empty conditions, enqueue cases.",
         content: `<h1>Circular Queue</h1><span class="step-badge">Chapter 7</span><p>Circular queue follows FIFO principle.</p><h2>Circular Queue</h2><p>It is the queue where the last position is connected to the first position.</p><h3>Initial value when circular queue is empty</h3><pre><code>front = -1
 rear  = -1</code></pre><p>because no element is present in circular queue.</p><h2>Circular Queue — Visual Idea</h2><p>For size <code>4</code>:</p><pre><code>              0
            ┌─────┐
@@ -2090,7 +2090,7 @@ rear = (3 + 1) % 4
 index   0  1  2  3
 
 size - 1 = 3</code></pre><p>When the queue is full, no space is available.</p><p>The notebook notes that <code>(rear + 1) % size == front</code> is the condition used to know the queue is full.</p><h3>Is-empty</h3><pre><code>rear == -1</code></pre><p>means the queue is empty in the initial state. If we try to dequeue when it is empty, it will underflow.</p><h2>Circular Queue Enqueue Cases</h2><h3>Case 1: Enqueue</h3><p>If <code>is-full</code> is false, insert element through rear. First check <code>is-empty</code>. If it is true, then front also increases.</p><h3>Case 2: Enqueue</h3><p>Try to insert another element. If full condition is checked and it is false, insert element through rear and also check <code>is-empty</code>. This time it will be false because the queue is not empty.</p><blockquote><code>is-empty</code> will only be true if queue is empty.</blockquote>` },
-      { id: "dsa-08", title: "Priority Queue", difficulty: "beginner", time: "5 min", desc: "Priority-based removal, highest priority element, shifting.",
+      { id: "lds-08", title: "Priority Queue", difficulty: "beginner", time: "5 min", desc: "Priority-based removal, highest priority element, shifting.",
         content: `<h1>Priority Queue</h1><span class="step-badge">Chapter 8</span><h2>Priority Queue</h2><p>A priority queue is a special type of queue in which each element is associated with a priority. The element with highest priority is removed first, regardless of insertion order.</p><h2>Main Difference</h2><pre><code>Normal Queue ► follows FIFO
                (linear / circular queue)
 
@@ -2132,7 +2132,7 @@ index:    0   1   2
                   │
                  rear</code></pre><p>The notebook notes:</p><pre><code>40 ► higher priority
 30 ► rear</code></pre><blockquote>The element with highest priority is removed first, regardless of insertion order.</blockquote>` },
-      { id: "dsa-09", title: "Linked Lists", difficulty: "beginner", time: "4 min", desc: "Singly linked list, node structure, memory example.",
+      { id: "lds-09", title: "Linked Lists", difficulty: "beginner", time: "4 min", desc: "Singly linked list, node structure, memory example.",
         content: `<h1>Linked Lists</h1><span class="step-badge">Chapter 9</span><h2>Linked List</h2><p>A linked list is a linear data structure where elements are stored in separate memory locations and connected using pointers.</p><pre><code>[data | address] ► [data | address] ► [data | address]</code></pre><p>Each node contains two parts:</p><pre><code>┌────────┬─────────┐
 │  data  │ address │
 └────────┴─────────┘</code></pre><p>The address stores the location of the next node. If no node is left, the next pointer points to <code>NULL</code>.</p><h2>Singly Linked List</h2><p>A singly linked list contains:</p><pre><code>[data | next] ► [data | next] ► [data | NULL]</code></pre><p>The <code>next</code> pointer stores the address of the next node.</p><h3>Node Structure in C</h3><p>In C, we create a node using <code>struct</code>.</p><pre><code>struct Node
@@ -2150,7 +2150,7 @@ index:    0   1   2
 └────────┘       └────────┘       └────────┘
 
 1000 ► 5000 ► 8000 ► NULL</code></pre><blockquote>Nodes are stored in separate memory locations and connected using pointers.</blockquote>` },
-      { id: "dsa-10", title: "Doubly Linked List", difficulty: "beginner", time: "4 min", desc: "Prev/data/next nodes, memory overhead, vs singly.",
+      { id: "lds-10", title: "Doubly Linked List", difficulty: "beginner", time: "4 min", desc: "Prev/data/next nodes, memory overhead, vs singly.",
         content: `<h1>Doubly Linked List</h1><span class="step-badge">Chapter 10</span><h2>Doubly Linked List</h2><p>A doubly linked list (DLL) is a linked list where each node contains three parts:</p><pre><code>previous | data | next</code></pre><h3>Meaning</h3><ul><li><code>previous</code> ► address of previous node</li><li><code>data</code> ► actual data</li><li><code>next</code> ► address of next node</li></ul><p>Example:</p><pre><code>NULL ◄ [10] ⇄ [20] ⇄ [30] ► NULL</code></pre><p>You can move forward and backward.</p><h2>Doubly Linked List Memory Allocation</h2><p>Suppose an <code>int</code> is <code>4 bytes</code> and a pointer is <code>8 bytes</code> on a 64-bit system.</p><h3>Singly node</h3><pre><code>data = 4 bytes
 next = 8 bytes
 
@@ -2163,7 +2163,7 @@ Memory overhead ► 1 pointer
 Previous node access is not possible.</code></pre><h3>Doubly LL</h3><pre><code>Traversal ► head ► tail &amp; tail ► head
 Memory overhead ► 2 pointers
 Previous node access is possible.</code></pre><blockquote>Singly linked list has one pointer; doubly linked list has two pointers — more memory but allows backward traversal.</blockquote>` },
-      { id: "dsa-11", title: "Circular Linked Lists", difficulty: "beginner", time: "4 min", desc: "Singly and doubly circular linked lists.",
+      { id: "lds-11", title: "Circular Linked Lists", difficulty: "beginner", time: "4 min", desc: "Singly and doubly circular linked lists.",
         content: `<h1>Circular Linked Lists</h1><span class="step-badge">Chapter 11</span><h2>Doubly Circular Linked List</h2><p>A doubly circular linked list is a linked list where:</p><ul><li>Each node has 3 parts: <code>prev</code> ► address of previous node, <code>data</code> ► value, <code>next</code> ► address of next node.</li><li>The last node points back to the first node.</li><li>The first node's <code>prev</code> points to the last node.</li></ul><h3>Visual Representation</h3><pre><code>                 ┌──────────────────────────────┐
                  │                              ▼
              ┌─────────┐      ┌─────────┐      ┌─────────┐
@@ -2198,7 +2198,7 @@ next ► 10</code></pre><h2>Singly Circular Linked List</h2><p>A singly circular
 └──────────┘      └──────────┘      └────────┬┘
      ▲                                   │
      └───────────────────────────────────┘</code></pre><p>Addresses shown in the notebook:</p><ul><li><code>head</code> ► address 1000</li><li><code>second</code> ► address 2000</li><li><code>tail</code> ► address 3000</li></ul><p>Data: <code>head ► data = 10</code>, <code>head ► next = second</code>.</p><blockquote>The last node points back to the first node, forming a circle.</blockquote>` },
-      { id: "dsa-12", title: "Quick Structure & Key Formulas", difficulty: "beginner", time: "3 min", desc: "Full linear data structure map and key formulas.",
+      { id: "lds-12", title: "Quick Structure & Key Formulas", difficulty: "beginner", time: "3 min", desc: "Full linear data structure map and key formulas.",
         content: `<h1>Quick Structure &amp; Key Formulas</h1><span class="step-badge">Chapter 12</span><h2>Linear Data Structure — Quick Structure</h2><pre><code>LINEAR DATA STRUCTURE
 │
 ├── ARRAY
@@ -2229,12 +2229,1059 @@ next ► 10</code></pre><h2>Singly Circular Linked List</h2><p>A singly circular
     └── Doubly Circular Linked List</code></pre><h2>Important Formulas from the Notebook</h2><h3>1-D Array</h3><pre><code>A[i] = Base Address + (i × size of each element)</code></pre><h3>2-D Array — Row Major</h3><pre><code>Address A[i][j]
 = Base Address + ((i × number of columns) + j) × size of element</code></pre><h3>Circular Queue — Next Rear</h3><pre><code>rear = (rear + 1) % size</code></pre><h3>Circular Queue — Full Condition</h3><pre><code>(rear + 1) % size == front</code></pre><h3>Empty Queue / Initial State</h3><pre><code>front = -1
 rear  = -1</code></pre><h3>Stack Empty Condition</h3><pre><code>top == -1</code></pre><h3>Stack Full Condition</h3><pre><code>top == size - 1</code></pre><blockquote>Keep these formulas handy — they appear throughout the notebook.</blockquote>` },
-      { id: "dsa-13", title: "Core Differences", difficulty: "beginner", time: "3 min", desc: "Stack vs queue, linear vs circular queue, singly vs doubly.",
+      { id: "lds-13", title: "Core Differences", difficulty: "beginner", time: "3 min", desc: "Stack vs queue, linear vs circular queue, singly vs doubly.",
         content: `<h1>Core Differences</h1><span class="step-badge">Chapter 13</span><h2>Stack vs Queue</h2><table><thead><tr><th>Stack</th><th>Queue</th></tr></thead><tbody><tr><td>LIFO</td><td>FIFO</td></tr><tr><td>Insertion at TOP</td><td>Insertion at REAR</td></tr><tr><td>Deletion from TOP</td><td>Deletion from FRONT</td></tr><tr><td>Main operations: Push, Pop, Peek</td><td>Main operations: Enqueue, Dequeue, Front, Rear</td></tr><tr><td>Has overflow and underflow</td><td>Has empty/full conditions</td></tr></tbody></table><h2>Linear Queue vs Circular Queue</h2><table><thead><tr><th>Linear Queue</th><th>Circular Queue</th></tr></thead><tbody><tr><td>Elements move from left to right.</td><td>Last position is connected to first position.</td></tr><tr><td>Rear normally increases forward.</td><td>Rear can wrap around using <code>% size</code>.</td></tr><tr><td>Uses linear positions.</td><td>Reuses positions after deletion.</td></tr><tr><td>Full/empty handling is linear.</td><td>Uses circular full condition.</td></tr></tbody></table><h2>Singly LL vs Doubly LL</h2><pre><code>Singly:
 [data | next]
 
 Doubly:
 [prev | data | next]</code></pre><p>Singly linked list has one pointer.</p><p>Doubly linked list has two pointers.</p><p>Therefore, doubly linked list uses more memory but allows backward traversal.</p><blockquote>Choose the data structure by the operation you need — LIFO (stack), FIFO (queue), priority (priority queue), or free-form links (linked list).</blockquote>` }
+    ]
+  },
+  {
+    id: "non-linear-ds", label: "Non-Linear DS", icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="5" rx="1"/><rect x="2" y="17" width="6" height="5" rx="1"/><rect x="9" y="17" width="6" height="5" rx="1"/><rect x="16" y="17" width="6" height="5" rx="1"/><path d="M12 7v5"/><path d="M5 17v-2a3 3 0 0 1 3-3h8a3 3 0 0 1 3 3v2"/></svg>`,
+    desc: "Non-linear data structures in C — trees, BSTs and graphs.",
+    tags: ["trees", "bst", "graphs", "bfs", "dfs", "data structures"],
+    articles: [
+      { id: "nlds-01", title: "Introduction to Non-Linear DS", difficulty: "beginner", time: "4 min", desc: "Linear vs non-linear, and where each one is used.",
+        content: `<h1>Introduction to Non-Linear DS</h1><span class="step-badge">Chapter 1</span><p>A <strong>linear</strong> data structure stores elements in a <strong>sequence</strong> — one after another, in one level. A <strong>non-linear</strong> data structure stores elements in <strong>multiple levels</strong> or lets elements connect in more than one way.</p><h2>Linear vs Non-Linear</h2><pre><code>LINEAR (one level)            NON-LINEAR (many levels)
+
+[10] - [20] - [30] - [40]          (50)
+                                    /   \\
+                              (30)     (70)
+                              /  \\     /  \\
+                          (20)  (40) (60)  (80)
+
+Traversal order is fixed      No single order
+Stored in arrays or links     Stored with nodes + pointers/edges</code></pre><h2>Types of Non-Linear Data Structures</h2><h3>1. Trees</h3><pre><code>        A              exactly ONE root
+       / \\             a child has exactly ONE parent
+      B   C            NO cycles
+     / \\
+    D   E</code></pre><p>Used in: file systems, databases (B-trees), HTML DOM, compilers, priority queues.</p><h3>2. Graphs</h3><pre><code>   (1) --- (2)       NO root (or many "sources")
+    |   \\   |        a node can have MANY edges
+   (3) -- (4)         cycles are allowed</code></pre><p>Used in: social networks, maps, road networks, dependency graphs.</p><h2>Comparison Table</h2><table><thead><tr><th>Point</th><th>Linear DS</th><th>Non-Linear DS</th></tr></thead><tbody><tr><td>Arrangement</td><td>Sequence</td><td>Hierarchy / connections</td></tr><tr><td>Levels</td><td>One</td><td>Many</td></tr><tr><td>Traversal order</td><td>Fixed (front to back)</td><td>Depends on the structure</td></tr><tr><td>Implementation</td><td>Arrays, linked lists</td><td>Nodes with pointers/edges</td></tr><tr><td>Examples</td><td>Array, stack, queue, linked list</td><td>Tree, BST, graph, heap</td></tr><tr><td>Memory use</td><td>Less</td><td>More (extra pointers/edges)</td></tr></tbody></table><h2>Real-World Examples</h2><table><thead><tr><th>Structure</th><th>Real example</th></tr></thead><tbody><tr><td>Tree</td><td>File system: <code>/home/user/docs</code></td></tr><tr><td>Tree</td><td>HTML DOM: <code>&lt;body&gt; &rarr; &lt;div&gt; &rarr; &lt;p&gt;</code></td></tr><tr><td>Graph</td><td>Social network: users are nodes, friendships are edges</td></tr><tr><td>Graph</td><td>Google Maps: cities are nodes, roads are edges</td></tr></tbody></table><blockquote>Linear structures answer "what is next?". Non-linear structures answer "what is connected to this?" — which is why graphs model real networks so well.</blockquote>` },
+      { id: "nlds-02", title: "Trees & Terminology", difficulty: "beginner", time: "5 min", desc: "Root, node, edge, leaf, depth, height, degree and tree types.",
+        content: `<h1>Trees &amp; Terminology</h1><span class="step-badge">Chapter 2</span><p>A <strong>tree</strong> is a non-linear data structure made of <strong>nodes</strong> connected by <strong>edges</strong>, where one node is the <strong>root</strong> and every other node has exactly one parent.</p><h2>Anatomy of a Binary Tree</h2><pre><code>                 (100)   &#8593; level 0
+                /       \\
+             (50)      (150)   &#8593; level 1
+             /   \\      /
+          (30)  (70)  (120)  &#8593; level 2
+
+           root
+          /     \\
+      child   child
+      /  \\      /
+   leaf  leaf  leaf</code></pre><h2>Terms</h2><table><thead><tr><th>Term</th><th>Meaning</th></tr></thead><tbody><tr><td>Root</td><td>The top node, no parent</td></tr><tr><td>Node</td><td>Stores data + links</td></tr><tr><td>Edge</td><td>The connection between two nodes</td></tr><tr><td>Parent</td><td>Node one level above</td></tr><tr><td>Child</td><td>Node one level below</td></tr><tr><td>Leaf</td><td>Node with no children</td></tr><tr><td>Sibling</td><td>Nodes sharing the same parent</td></tr><tr><td>Subtree</td><td>A node plus all its descendants</td></tr><tr><td>Depth</td><td>Distance from the root to the node</td></tr><tr><td>Height</td><td>Longest path from node down to a leaf</td></tr><tr><td>Degree</td><td>Number of children of a node</td></tr></tbody></table><p>In the tree above, <code>(100)</code> is the root, <code>(30)</code> and <code>(70)</code> are siblings, the bottom nodes are leaves, and the degree of <code>(100)</code> is 2.</p><h2>Binary Tree</h2><p>Every node has <strong>at most two</strong> children, called the <strong>left</strong> and <strong>right</strong> child. This limit of two is what makes binary trees useful — it gives us the index maths for arrays.</p><h2>Types of Binary Trees</h2><pre><code>Full tree          every node has 0 or 2 children
+
+        (1)
+       /   \\
+     (2)   (3)
+    /  \\   /
+  (4)  (5) (6)
+
+Complete tree       all levels filled except the last,
+                    filled from left to right
+
+        (1)
+       /   \\
+     (2)   (3)
+    /   \\
+  (4)   (5)   &#9656; 6 would go far left, not right
+
+Perfect tree        every internal node has 2 children
+                    and all leaves are at the same level
+
+        (1)
+       /   \\
+     (2)   (3)
+    /  \\  / \\
+  (4)  (5)(6) (7)
+
+Degenerate tree     every node has only one child
+                    (same as a linked list)
+
+   (1)
+    |
+   (2)
+    |
+   (3)</code></pre><blockquote>Most real trees are a mix of these. A degenerate tree is the worst case — it behaves like a linked list, so the shape of the tree decides how fast it works.</blockquote>` },
+      { id: "nlds-03", title: "Tree Representation in C", difficulty: "beginner", time: "5 min", desc: "Node structure with pointers and the array representation.",
+        content: `<h1>Tree Representation in C</h1><span class="step-badge">Chapter 3</span><p>C has no built-in tree, so a tree is built from <strong>self-referencing structures</strong> — a node that points to nodes of the same type.</p><h2>Node Structure</h2><pre><code>struct Node
+{
+    int data;
+    struct Node *left;
+    struct Node *right;
+};</code></pre><p>A node holds three things: the data, a pointer to the left child and a pointer to the right child.</p><h2>Memory Picture</h2><pre><code>        100                 50                 30
+   +-----------+       +-----------+       +-----------+
+   | data: 100 |       | data:  50 |       | data:  30 |
+   +-----------+       +-----------+       +-----------+
+   | left  ----+--------&gt; | left  ----+--------&gt; | left  NULL |
+   | right ----+        | right ----+       | right NULL |
+   +-----------+       +-----------+       +-----------+
+
+value 8 bytes         value 8 bytes        value 8 bytes</code></pre><h2>Creating a Tree in C</h2><pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+
+struct Node
+{
+    int data;
+    struct Node *left;
+    struct Node *right;
+};
+
+struct Node *newNode(int value)
+{
+    struct Node *node = malloc(sizeof(struct Node));
+
+    node-&gt;data = value;
+    node-&gt;left = NULL;
+    node-&gt;right = NULL;
+
+    return node;
+}
+
+int main()
+{
+    struct Node *root  = newNode(100);
+    root-&gt;left  = newNode(50);
+    root-&gt;right = newNode(150);
+    root-&gt;left-&gt;left  = newNode(30);
+    root-&gt;left-&gt;right = newNode(70);
+
+    return 0;
+}</code></pre><p><code>malloc</code> creates the node on the heap, and <code>NULL</code> marks the end of every branch. Forgetting to set the pointers to <code>NULL</code> is the most common bug.</p><h2>Array Representation</h2><p>A binary tree can also be stored in a plain array. The position of a node decides its children:</p><pre><code>Root at index 0
+
+left child  of index i  = 2 * i + 1
+right child of index i  = 2 * i + 2
+parent       of index i  = (i - 1) / 2
+
+        index:   0    1     2      3     4      5
+        +------+----+-----+-----+------+------+
+        | 100  | 50 | 150 |  30 |  70  | 120  |
+        +------+----+-----+-----+------+------+</code></pre><h2>Pointer vs Array</h2><table><thead><tr><th></th><th>Pointer (linked)</th><th>Array</th></tr></thead><tbody><tr><td>Access node i</td><td>Walk from the root (O(n))</td><td>Direct jump (O(1))</td></tr><tr><td>Missing node</td><td>NULL pointer</td><td>Wastes memory (holes)</td></tr><tr><td>Memory</td><td>Only what is used</td><td>Needs the full size upfront</td></tr><tr><td>Best for</td><td>Sparse trees</td><td>Dense / complete trees</td></tr></tbody></table><blockquote>The index formulas 2i+1, 2i+2 and (i-1)/2 are the same maths behind a heap, a segment tree and a binary search tree stored in an array.</blockquote>` },
+      { id: "nlds-04", title: "Binary Search Tree", difficulty: "beginner", time: "5 min", desc: "The BST property, insertion order and why inorder gives sorted output.",
+        content: `<h1>Binary Search Tree</h1><span class="step-badge">Chapter 4</span><p>A <strong>binary search tree (BST)</strong> is a binary tree with one extra rule at every node:</p><pre><code>Left subtree  &#8804;  node value  &#8804;  Right subtree
+
+          (50)
+         /    \\
+   (30)      (70)
+   /  \\      /
+(20)  (40)  (60)</code></pre><p>Values smaller than the node go to the <strong>left</strong>, bigger values go to the <strong>right</strong>. This is exactly the same idea as binary search on a sorted array — but the shape is built automatically while inserting.</p><h2>Insertion Step by Step</h2><pre><code>Insert 50:
+      (50)
+
+Insert 30  (30 &lt; 50 &#8594; left):
+      (50)
+      /
+    (30)
+
+Insert 70  (70 &gt; 50 &#8594; right):
+      (50)
+      /   \\
+    (30) (70)
+
+Insert 20  (20 &lt; 50 &#8594; left, 20 &lt; 30 &#8594; left):
+          (50)
+         /    \\
+      (30)    (70)
+      /  \\
+   (20)  (40)
+
+Insert 60:
+            (50)
+           /    \\
+        (30)    (70)
+        /  \\     /
+     (20)  (40) (60)</code></pre><h2>Inorder Gives Sorted Output</h2><pre><code>Inorder traversal  =  Left &#8594; Node &#8594; Right
+
+        (50)
+       /    \\
+    (30)    (70)
+    /  \\     /
+ (20)  (40) (60)
+
+20, 30, 40, 50, 60, 70   &#9656;  sorted ascending</code></pre><p>That is the key property: a BST is a sorted array stored as a tree, so it supports search, insert, delete and finding min/max in O(log n) — but only when the tree stays balanced.</p><h2>Balanced vs Skewed</h2><pre><code>Insert 50, 30, 70, 10, 20, 80, 90
+
+BALANCED (good)              SKEWED (bad)
+
+        (50)                    (10)
+       /    \\                    |
+    (30)    (70)                 (20)
+    /      /                        |
+ (10)    (80)                     (30)
+   \       \                        |
+   (20)     (90)                  (50)
+                                     |
+                                   (70)
+                                    /  \
+                                 (80) (90)
+
+O(log n) search              looks like a linked list
+                             O(n) search</code></pre><p>Inserting already-sorted values always produces a skewed tree, so self-balancing trees (AVL, Red-Black) exist to fix that.</p><blockquote>A BST is only as fast as its shape. Balanced = O(log n), skewed = O(n) — the same complexity as no data structure at all.</blockquote>` },
+      { id: "nlds-05", title: "BST Operations", difficulty: "intermediate", time: "6 min", desc: "Search, insert and delete with the three deletion cases.",
+        content: `<h1>BST Operations</h1><span class="step-badge">Chapter 5</span><h2>Search</h2><pre><code>struct Node *search(struct Node *root, int key)
+{
+    if (root == NULL || root-&gt;data == key)
+        return root;
+
+    if (key &lt; root-&gt;data)
+        return search(root-&gt;left, key);
+
+    return search(root-&gt;right, key);
+}</code></pre><p>At each node only <strong>one</strong> branch is followed, so the search walks down a single path instead of scanning everything.</p><h2>Insert</h2><pre><code>struct Node *insert(struct Node *root, int key)
+{
+    if (root == NULL)
+        return newNode(key);
+
+    if (key &lt; root-&gt;data)
+        root-&gt;left  = insert(root-&gt;left, key);
+    else if (key &gt; root-&gt;data)
+        root-&gt;right = insert(root-&gt;right, key);
+
+    return root;
+}</code></pre><p>Insertion always ends at a <code>NULL</code> pointer, which becomes the new leaf. The returned root matters because <code>root-&gt;left = ...</code> attaches the new subtree.</p><h2>Delete — Three Cases</h2><pre><code>Case 1: node is a LEAF  &#8594;  just remove it
+
+   (20)              (20) is deleted
+     \
+     (30)  &#8594;  30's right child becomes NULL
+
+Case 2: node has ONE CHILD  &#8594;  replace it with its child
+
+     (20)                (40)
+    /                     /
+  (10)       &#8594;       (10)
+    \
+    (30)
+
+Case 3: node has TWO CHILDREN  &#8594;  replace its value with the
+                                 INORDER SUCCESSOR (the smallest
+                                 value in the right subtree)
+
+        (50)                 (50)
+       /    \\               /    \\
+    (30)    (70)    &#8594;   (30)    (70)
+    /  \\    /                 /  \\     /
+ (20)  (40) (60)            (20)  (40) (60)
+                             deleted node 70 is replaced
+                             by 60, then 60's old spot is
+                             deleted with case 1 or 2</code></pre><h2>C Code</h2><pre><code>struct Node *deleteNode(struct Node *root, int key)
+{
+    if (root == NULL)
+        return NULL;
+
+    if (key &lt; root-&gt;data)
+        root-&gt;left  = deleteNode(root-&gt;left, key);
+    else if (key &gt; root-&gt;data)
+        root-&gt;right = deleteNode(root-&gt;right, key);
+    else
+    {
+        if (root-&gt;left == NULL)
+            return root-&gt;right;
+
+        if (root-&gt;right == NULL)
+            return root-&gt;left;
+
+        struct Node *temp = root-&gt;right;
+
+        while (temp-&gt;left != NULL)
+            temp = temp-&gt;left;
+
+        root-&gt;data = temp-&gt;data;
+        root-&gt;right = deleteNode(root-&gt;right, temp-&gt;data);
+    }
+
+    return root;
+}</code></pre><h2>Min and Max</h2><pre><code>int minValue(struct Node *root)
+{
+    while (root-&gt;left != NULL)
+        root = root-&gt;left;
+
+    return root-&gt;data;
+}</code></pre><h2>Complexity</h2><p>All three operations cost <strong>O(h)</strong>, where <code>h</code> is the height of the tree.</p><table><thead><tr><th>Case</th><th>Height</th><th>Search / Insert / Delete</th></tr></thead><tbody><tr><td>Balanced tree</td><td>log2(n)</td><td>O(log n)</td></tr><tr><td>Skewed tree</td><td>n - 1</td><td>O(n)</td></tr></tbody></table><p>Space: <strong>O(h)</strong> for recursion. New nodes need <code>malloc</code>, deleted nodes should be freed with <code>free()</code>.</p><blockquote>Replacing the deleted value with the inorder successor keeps the BST property intact — that is why case 3 is solved in two steps.</blockquote>` },
+      { id: "nlds-06", title: "Tree Traversals", difficulty: "intermediate", time: "6 min", desc: "Inorder, preorder, postorder and level order with their orders and uses.",
+        content: `<h1>Tree Traversals</h1><span class="step-badge">Chapter 6</span><p>Traversing means visiting every node once. Trees have no single "next" element, so the order must be defined by the algorithm: either go <strong>depth-first</strong> (DFS) or <strong>breadth-first</strong> (BFS).</p><h2>DFS — Three Orders</h2><pre><code>            (50)
+           /    \\
+        (30)    (70)
+        /  \\     /
+     (20)  (40) (60)
+
+Preorder  (Node, Left, Right)   &#9656;  50 30 20 40 70 60
+Inorder   (Left, Node, Right)   &#9656;  20 30 40 50 60 70
+Postorder (Left, Right, Node)   &#9656;  20 40 30 60 70 50</code></pre><table><thead><tr><th>Traversal</th><th>Order</th><th>Used for</th></tr></thead><tbody><tr><td>Preorder</td><td>Node, Left, Right</td><td>Copying / cloning a tree, expression trees, prefix (Polish) notation</td></tr><tr><td>Inorder</td><td>Left, Node, Right</td><td>Getting the BST values in sorted order</td></tr><tr><td>Postorder</td><td>Left, Right, Node</td><td>Deleting a tree, freeing memory, postfix notation</td></tr></tbody></table><h2>DFS Code</h2><pre><code>void preorder(struct Node *root)
+{
+    if (root == NULL) return;
+
+    printf("%d ", root-&gt;data);
+    preorder(root-&gt;left);
+    preorder(root-&gt;right);
+}
+
+void inorder(struct Node *root)
+{
+    if (root == NULL) return;
+
+    inorder(root-&gt;left);
+    printf("%d ", root-&gt;data);
+    inorder(root-&gt;right);
+}
+
+void postorder(struct Node *root)
+{
+    if (root == NULL) return;
+
+    postorder(root-&gt;left);
+    postorder(root-&gt;right);
+    printf("%d ", root-&gt;data);
+}</code></pre><p>Each function is identical except for the position of the <code>printf</code> line. That single line decides the traversal order.</p><h2>BFS — Level Order</h2><p>Visit all nodes level by level, using a queue.</p><pre><code>Level 0:   50
+Level 1:   30      70
+Level 2:   20   40  60
+
+Output:  50 30 70 20 40 60</code></pre><pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+
+struct Node { int data; struct Node *left, *right; };
+
+void levelOrder(struct Node *root)
+{
+    if (root == NULL) return;
+
+    struct Node *queue[100];
+    int front = 0, rear = 0;
+
+    queue[rear++] = root;
+
+    while (front &lt; rear)
+    {
+        struct Node *node = queue[front++];
+        printf("%d ", node-&gt;data);
+
+        if (node-&gt;left != NULL)
+            queue[rear++] = node-&gt;left;
+
+        if (node-&gt;right != NULL)
+            queue[rear++] = node-&gt;right;
+    }
+}</code></pre><h2>Complexity</h2><table><thead><tr><th>Traversal</th><th>Time</th><th>Space</th></tr></thead><tbody><tr><td>DFS (recursive)</td><td>O(n)</td><td>O(h) — call stack</td></tr><tr><td>DFS (iterative)</td><td>O(n)</td><td>O(h) — explicit stack</td></tr><tr><td>BFS</td><td>O(n)</td><td>O(w) — queue, w = widest level</td></tr></tbody></table><h2>DFS vs BFS</h2><table><thead><tr><th></th><th>DFS</th><th>BFS</th></tr></thead><tbody><tr><td>Uses</td><td>Recursion / stack</td><td>Queue</td></tr><tr><td>Goes</td><td>As deep as possible</td><td>Level by level</td></tr><tr><td>Shortest path</td><td>No</td><td>Yes (unweighted graph)</td></tr><tr><td>Memory</td><td>O(h)</td><td>O(w)</td></tr></tbody></table><blockquote>Preorder copies a tree, inorder sorts a BST, postorder deletes it, and level order prints it the way you see it in a diagram.</blockquote>` },
+      { id: "nlds-07", title: "Graphs & Terminology", difficulty: "beginner", time: "5 min", desc: "Vertices, edges, directed graphs, degree, path, cycle and graph types.",
+        content: `<h1>Graphs &amp; Terminology</h1><span class="step-badge">Chapter 7</span><p>A <strong>graph</strong> is a collection of <strong>vertices</strong> connected by <strong>edges</strong>. Unlike a tree, a graph has no root, a vertex can have any number of edges, and cycles are allowed.</p><h2>Undirected vs Directed</h2><pre><code>UNDIRECTED                DIRECTED
+edge works both ways    edge works one way only
+
+   (1) --- (2)              (1) &#8594; (2)
+    |   \\   |               |      |
+   (3) -- (4)               (3) &#8594; (4)
+                            &#9656; 1 &#8594; 2 is allowed, 2 &#8594; 1 is not</code></pre><h2>Terms</h2><table><thead><tr><th>Term</th><th>Meaning</th></tr></thead><tbody><tr><td>Vertex (node)</td><td>A single element</td></tr><tr><td>Edge</td><td>Connection between two vertices</td></tr><tr><td>Degree</td><td>Number of edges touching a vertex</td></tr><tr><td>In-degree / Out-degree</td><td>Incoming / outgoing edges (directed graph)</td></tr><tr><td>Path</td><td>Sequence of vertices connected by edges</td></tr><tr><td>Cycle</td><td>A path that starts and ends at the same vertex</td></tr><tr><td>Adjacent</td><td>Two vertices joined by an edge</td></tr><tr><td>Connected</td><td>Every vertex is reachable from every other vertex</td></tr><tr><td>Weighted graph</td><td>Edges carry a value (cost, distance)</td></tr><tr><td>Subgraph</td><td>A smaller graph made from part of the graph</td></tr></tbody></table><p>Example degrees in the undirected graph above:</p><pre><code>(1) &#8594; edges to (2) and (3)   degree 2
+(2) &#8594; edges to (1), (3), (4)  degree 3
+(3) &#8594; edges to (1) and (2)   degree 2
+(4) &#8594; edges to (2) and (3)   degree 2</code></pre><h2>Handshaking Rule</h2><p>In an undirected graph, the sum of all degrees is <strong>twice</strong> the number of edges.</p><pre><code>sum of degrees = 2 * number of edges</code></pre><h2>Types of Graphs</h2><table><thead><tr><th>Type</th><th>Meaning</th></tr></thead><tbody><tr><td>Simple graph</td><td>No loops, no parallel edges</td></tr><tr><td>Complete graph</td><td>Every vertex connected to every other vertex</td></tr><tr><td>Cycle graph</td><td>Vertices arranged in a ring</td></tr><tr><td>Bipartite graph</td><td>Vertices split into two sets with no edges inside a set</td></tr><tr><td>Weighted graph</td><td>Every edge has a cost or distance</td></tr><tr><td>Directed graph (digraph)</td><td>Edges have a direction</td></tr></tbody></table><h2>Tree vs Graph</h2><table><thead><tr><th></th><th>Tree</th><th>Graph</th></tr></thead><tbody><tr><td>Root</td><td>Exactly one</td><td>None</td></tr><tr><td>Cycles</td><td>Not allowed</td><td>Allowed</td></tr><tr><td>Parent</td><td>One per node</td><td>Any number</td></tr><tr><td>Edges</td><td>n - 1</td><td>Any number</td></tr></tbody></table><blockquote>A tree is just a special graph with no cycles and a single root — which is why tree algorithms are simpler than graph algorithms.</blockquote>` },
+      { id: "nlds-08", title: "Graph Representation in C", difficulty: "intermediate", time: "6 min", desc: "Adjacency matrix and adjacency list with code and space comparison.",
+        content: `<h1>Graph Representation in C</h1><span class="step-badge">Chapter 8</span><p>Since C has no graph type, we must store the connections ourselves. There are two standard ways: an <strong>adjacency matrix</strong> and an <strong>adjacency list</strong>.</p><h2>The Example Graph</h2><pre><code>Edges:  0 - 1,  0 - 2,  1 - 2,  1 - 3
+
+    0 --- 1
+    |   / |
+    2 --- 3</code></pre><h2>1. Adjacency Matrix</h2><p>A 2-D array where <code>matrix[i][j] = 1</code> means there is an edge from vertex <code>i</code> to vertex <code>j</code>.</p><pre><code>     0  1  2  3
+  0 [ 0  1  1  0 ]
+  1 [ 1  0  1  1 ]
+  2 [ 1  1  0  0 ]
+  3 [ 0  1  0  0 ]</code></pre><pre><code>#define V 4
+
+int matrix[V][V] = {
+    {0, 1, 1, 0},
+    {1, 0, 1, 1},
+    {1, 1, 0, 0},
+    {0, 1, 0, 0}
+};
+
+for (int i = 0; i &lt; V; i++)
+{
+    for (int j = 0; j &lt; V; j++)
+    {
+        if (matrix[i][j] == 1)
+            printf("Edge %d -> %d\\n", i, j);
+    }
+}</code></pre><p>For a <strong>weighted</strong> graph, store the weight instead of 1, and use a large value like <code>INT_MAX</code> for "no edge".</p><h2>2. Adjacency List</h2><p>An array of linked lists. Each vertex keeps a pointer to its first neighbour.</p><pre><code>0  &#9656; 1 &#9656; 2 &#9656; NULL
+1  &#9656; 0 &#9656; 2 &#9656; 3 &#9656; NULL
+2  &#9656; 0 &#9656; 1 &#9656; NULL
+3  &#9656; 1 &#9656; NULL</code></pre><pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+
+#define V 4
+
+struct Node
+{
+    int vertex;
+    struct Node *next;
+};
+
+struct Node *adjList[V];
+
+void addEdge(int u, int v)
+{
+    struct Node *node = malloc(sizeof(struct Node));
+    node-&gt;vertex = v;
+    node-&gt;next = adjList[u];
+    adjList[u] = node;
+}
+
+void printGraph()
+{
+    for (int i = 0; i &lt; V; i++)
+    {
+        printf("%d &#9656; ", i);
+
+        for (struct Node *temp = adjList[i]; temp; temp = temp-&gt;next)
+            printf("%d ", temp-&gt;vertex);
+
+        printf("\\n");
+    }
+}</code></pre><h2>Which One To Use</h2><table><thead><tr><th></th><th>Adjacency Matrix</th><th>Adjacency List</th></tr></thead><tbody><tr><td>Storage</td><td>V * V</td><td>V + 2E</td></tr><tr><td>Space</td><td>O(V²)</td><td>O(V + E)</td></tr><tr><td>Check edge (u, v)</td><td>O(1)</td><td>O(degree)</td></tr><tr><td>Find all neighbours</td><td>O(V)</td><td>O(degree)</td></tr><tr><td>Best for</td><td>Dense graphs, few vertices</td><td>Sparse graphs and real networks</td></tr></tbody></table><blockquote>Real networks like social graphs are very sparse, so the adjacency list is the normal choice — a matrix for 1 million users would need 10¹² cells.</blockquote>` },
+      { id: "nlds-09", title: "BFS & DFS Traversal", difficulty: "intermediate", time: "6 min", desc: "Breadth-first with a queue, depth-first with recursion, and their uses.",
+        content: `<h1>BFS &amp; DFS Traversal</h1><span class="step-badge">Chapter 9</span><p>Both algorithms visit every vertex of a connected graph. The only difference is the <strong>order</strong>: BFS goes level by level, DFS goes as deep as possible first.</p><h2>BFS — Uses a Queue</h2><pre><code>Graph:   0 --- 1
+         |   / |
+         2 --- 3
+
+Start at 0:
+
+Queue: [0]        visit 0
+   &#9656; neighbours 1, 2 go in the queue
+Queue: [1, 2]     visit 1
+   &#9656; neighbour 3 joins (0 already visited)
+Queue: [2, 3]     visit 2
+   &#9656; no new neighbours
+Queue: [3]        visit 3
+Queue: [ ]
+
+BFS order:  0 1 2 3</code></pre><pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+
+#define V 4
+
+int adjList[V][V] = {
+    {0, 1, 1, 0},
+    {1, 0, 1, 1},
+    {1, 1, 0, 0},
+    {0, 1, 0, 0}
+};
+
+int visited[V] = {0};
+
+void bfs(int start)
+{
+    int queue[V];
+    int front = 0, rear = 0;
+
+    visited[start] = 1;
+    queue[rear++] = start;
+
+    while (front &lt; rear)
+    {
+        int node = queue[front++];
+        printf("%d ", node);
+
+        for (int i = 0; i &lt; V; i++)
+        {
+            if (adjList[node][i] == 1 &amp;&amp; visited[i] == 0)
+            {
+                visited[i] = 1;
+                queue[rear++] = i;
+            }
+        }
+    }
+}</code></pre><p>Marking a vertex as visited <strong>when it enters the queue</strong> (not when it leaves) prevents the same vertex being added twice in cyclic graphs.</p><h2>DFS — Uses Recursion or a Stack</h2><pre><code>Start at 0:
+
+visit 0
+  &#9656; first neighbour 1
+      visit 1
+        &#9656; next neighbour 2
+            visit 2
+              &#9656; no new neighbours
+        &#9656; back to 1
+          &#9656; next neighbour 3
+              visit 3
+            &#9656; no new neighbours
+
+DFS order:  0 1 2 3</code></pre><pre><code>int visited[V] = {0};
+
+void dfs(int node)
+{
+    visited[node] = 1;
+    printf("%d ", node);
+
+    for (int i = 0; i &lt; V; i++)
+    {
+        if (adjList[node][i] == 1 &amp;&amp; visited[i] == 0)
+            dfs(i);
+    }
+}</code></pre><p>The recursive version is the stack — each call is one level of depth. An iterative version can use an explicit array as a stack.</p><h2>Comparison</h2><table><thead><tr><th></th><th>BFS</th><th>DFS</th></tr></thead><tbody><tr><td>Data structure</td><td>Queue</td><td>Stack / recursion</td></tr><tr><td>Order</td><td>Level by level</td><td>Depth first</td></tr><tr><td>Time</td><td>O(V + E)</td><td>O(V + E)</td></tr><tr><td>Space</td><td>O(V)</td><td>O(V)</td></tr><tr><td>Shortest path</td><td>Yes (unweighted)</td><td>No</td></tr></tbody></table><h2>Applications</h2><table><thead><tr><th>BFS</th><th>DFS</th></tr></thead><tbody><tr><td>Shortest path in an unweighted graph</td><td>Cycle detection</td></tr><tr><td>Level order tree traversal</td><td>Path finding, maze solving</td></tr><tr><td>Web crawling by link depth</td><td>Topological sorting</td></tr><tr><td>Social network friend suggestions</td><td>Connected components</td></tr><tr><td>Broadcasting in a network</td><td>Detecting dead ends / backtracking</td></tr></tbody></table><blockquote>BFS finds the fewest steps, DFS finds all possible routes. Both need a visited array, or an infinite graph will loop forever.</blockquote>` },
+      { id: "nlds-10", title: "Non-Linear DS Quick Reference", difficulty: "beginner", time: "4 min", desc: "Linear vs non-linear, complexities, key formulas and when to use which.",
+        content: `<h1>Non-Linear DS Quick Reference</h1><span class="step-badge">Chapter 10</span><h2>Linear vs Non-Linear</h2><table><thead><tr><th>Point</th><th>Linear DS</th><th>Non-Linear DS</th></tr></thead><tbody><tr><td>Shape</td><td>Sequence, one level</td><td>Hierarchy / connections, many levels</td></tr><tr><td>Examples</td><td>Array, stack, queue, linked list</td><td>Tree, BST, heap, graph</td></tr><tr><td>Traversal</td><td>Front to back</td><td>DFS or BFS</td></tr><tr><td>Relation</td><td>One predecessor, one successor</td><td>One or many parents/edges</td></tr><tr><td>Memory</td><td>Low</td><td>Higher (extra pointers/edges)</td></tr><tr><td>Speed</td><td>Simple and predictable</td><td>Much faster when many relationships exist</td></tr></tbody></table><h2>Complexity Cheat Sheet</h2><table><thead><tr><th>Operation</th><th>Balanced / average</th><th>Worst case</th></tr></thead><tbody><tr><td>Tree traversal (any)</td><td>O(n)</td><td>O(n)</td></tr><tr><td>BST search / insert / delete</td><td>O(log n)</td><td>O(n) — skewed</td></tr><tr><td>Graph BFS / DFS</td><td>O(V + E)</td><td>O(V + E)</td></tr><tr><td>Min / max in BST</td><td>O(log n)</td><td>O(n)</td></tr></tbody></table><h2>Formulas To Remember</h2><pre><code>Array representation of a binary tree
+  left child of i   = 2 * i + 1
+  right child of i  = 2 * i + 2
+  parent of i       = (i - 1) / 2
+
+Tree sizes (n nodes)
+  height of a perfect tree  = log2(n)
+  n - 1                    = edges in a tree
+  sum of degrees           = 2 * edges
+  n * (n - 1) / 2          = edges in a complete graph</code></pre><h2>Which Structure To Use</h2><table><thead><tr><th>Need</th><th>Use</th></tr></thead><tbody><tr><td>Fast search with sorted order</td><td>BST / balanced tree</td></tr><tr><td>Fast min and max</td><td>Heap</td></tr><tr><td>Parent-child hierarchy</td><td>Tree</td></tr><tr><td>Many-to-many connections</td><td>Graph</td></tr><tr><td>Shortest route</td><td>BFS or Dijkstra</td></tr><tr><td>Only sequential processing</td><td>Linear DS is enough</td></tr></tbody></table><h2>When to Go Non-Linear</h2><p>Stay with a linear structure while the data is a simple list. Move to a tree or graph only when you need <strong>relationships</strong> — hierarchy, ordering, many-to-many links or fast lookup beyond a sorted array.</p><blockquote>Linear data structures store data; non-linear data structures store relationships. That single idea separates the two families.</blockquote>` }
+    ]
+  },
+  {
+    id: "sorting", label: "Sorting", icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5h10"/><path d="M11 9h7"/><path d="M11 13h4"/><path d="M3 17l3 3 3-3"/><path d="M6 4v16"/></svg>`,
+    desc: "Sorting algorithms in C — bubble, selection, insertion, quick and merge sort.",
+    tags: ["bubble sort", "quick sort", "merge sort", "algorithms"],
+    articles: [
+      { id: "sort-01", title: "Introduction to Sorting", difficulty: "beginner", time: "4 min", desc: "What is sorting, key, orders, stability and classifications.",
+        content: `<h1>Introduction to Sorting</h1><span class="step-badge">Chapter 1</span><p><strong>Sorting</strong> means arranging the elements of a collection in a particular order so the data becomes easy to search and process.</p><h2>Unsorted vs Sorted</h2><pre><code>Unsorted:   40  10  70  20  60
+
+Ascending:  10  20  40  60  70
+            small &#8594; big
+
+Descending: 70  60  40  20  10
+            big &#8594; small</code></pre><h2>Why Sorting?</h2><ul><li>Binary search works <strong>only</strong> on sorted data.</li><li>Duplicates become easy to count and group.</li><li>Sorting is the first step of many algorithms — searching, merging, grouping.</li></ul><h2>Key Terms</h2><table><thead><tr><th>Term</th><th>Meaning</th></tr></thead><tbody><tr><td>Key</td><td>The value used for comparison.</td></tr><tr><td>Record</td><td>A key plus its other information.</td></tr><tr><td>Collection</td><td>The list (array) of records to sort.</td></tr><tr><td>Internal sort</td><td>All data stays in memory (arrays).</td></tr><tr><td>External sort</td><td>Data is larger than memory, sorted as files.</td></tr></tbody></table><h2>Types of Sorting Algorithms</h2><h3>1. Comparison Based</h3><p>Compare two elements and decide the order.</p><ul><li>Bubble sort</li><li>Selection sort</li><li>Insertion sort</li><li>Quick sort</li><li>Merge sort</li></ul><h3>2. Non-Comparison Based</h3><p>Use the value of the element directly, without comparing two elements.</p><ul><li>Counting sort</li><li>Bucket sort</li><li>Radix sort</li></ul><h2>Other Ways to Classify</h2><table><thead><tr><th>Type</th><th>Meaning</th><th>Examples</th></tr></thead><tbody><tr><td>In-place</td><td>Sorting happens inside the same array, no extra array.</td><td>Bubble, selection, insertion, quick</td></tr><tr><td>Out-of-place</td><td>Needs extra memory (an extra array).</td><td>Merge, counting, radix</td></tr><tr><td>Stable</td><td>Equal keys keep their original relative order.</td><td>Bubble, insertion, merge</td></tr><tr><td>Unstable</td><td>Equal keys may change their relative order.</td><td>Selection, quick</td></tr></tbody></table><h2>What Stability Means</h2><pre><code>Records:  (name, score)
+
+Ana   70
+Bina  70
+Chai  80</code></pre><p>Both <code>Ana</code> and <code>Bina</code> have the same score. A <strong>stable</strong> sort keeps <code>Ana</code> before <code>Bina</code>. An unstable sort may give any order.</p><blockquote>Sorting is only a rearrangement — the number of elements stays the same, only their positions change.</blockquote>` },
+      { id: "sort-02", title: "Bubble Sort", difficulty: "beginner", time: "5 min", desc: "Compare neighbours and swap, largest element bubbles to the end.",
+        content: `<h1>Bubble Sort</h1><span class="step-badge">Chapter 2</span><h2>Code</h2><pre><code>void bubbleSort(int arr[], int size) {
+    for (int i = 0; i &lt; size; i++) {
+        for (int j = 0; j &lt; size - i - 1; j++) {
+            if (arr[j] &gt; arr[j + 1]) {
+                int temp = arr[j];
+                arr[j] = arr[j + 1];
+                arr[j + 1] = temp;
+            }
+        }
+    }
+}</code></pre><blockquote><strong>Note:</strong> some notebooks show the swap as <code>int temp = arr[j+1]; arr[j+1] = arr[j+1]; arr[j] = temp;</code> — as written that assigns the same value twice and never actually swaps. The code above uses the standard correct swap.</blockquote>
+
+<h2>Dry Run</h2><p>Array: <code>[5, 4, 2, 1]</code></p><table><thead><tr><th>Index</th><th>0</th><th>1</th><th>2</th><th>3</th></tr></thead><tbody><tr><td>Value</td><td>5</td><td>4</td><td>2</td><td>1</td></tr></tbody></table>
+
+<h3>Pass 1 (i = 0, j runs [0, 1, 2])</h3><pre><code>j=0:  [ 5,  4,  2,  1]
+        0   1   2   3
+        ↑   ↑
+        swap            5 &gt; 4 → swap
+    → [ 4,  5,  2,  1]
+
+j=1:  [ 4,  5,  2,  1]
+        0   1   2   3
+            ↑   ↑
+            swap        5 &gt; 2 → swap
+    → [ 4,  2,  5,  1]
+
+j=2:  [ 4,  2,  5,  1]
+        0   1   2   3
+                ↑   ↑
+                swap    5 &gt; 1 → swap
+    → [ 4,  2,  1,  5]</code></pre><p>End of Pass 1: <code>[4, 2, 1, 5]</code></p><pre><code>    → [ 4,  2,  1,  5]
+                   ┌─┐
+                   │5│  ← sorted
+                   └─┘</code></pre>
+
+<h3>Pass 2 (i = 1, j runs [0, 1])</h3><pre><code>j=0:  [ 4,  2,  1,  5]
+        0   1   2   3
+        ↑   ↑
+        swap            4 &gt; 2 → swap
+    → [ 2,  4,  1,  5]
+
+j=1:  [ 2,  4,  1,  5]
+        0   1   2   3
+            ↑   ↑
+            swap        4 &gt; 1 → swap
+    → [ 2,  1,  4,  5]</code></pre><p>End of Pass 2: <code>[2, 1, 4, 5]</code></p><pre><code>    → [ 2,  1,  4,  5]
+               ┌─────┐
+               │4,  5│  ← sorted
+               └─────┘</code></pre>
+
+<h3>Pass 3 (i = 2, j runs [0])</h3><pre><code>j=0:  [ 2,  1,  4,  5]
+        0   1   2   3
+        ↑   ↑
+        swap            2 &gt; 1 → swap
+    → [ 1,  2,  4,  5]</code></pre><p>End of Pass 3: <code>[1, 2, 4, 5]</code></p><pre><code>    → [ 1,  2,  4,  5]
+       ┌─────────────┐
+       │1,  2,  4,  5│  ← sorted ✓
+       └─────────────┘</code></pre>
+
+<h3>Pass 4 (i = 3)</h3><p>The inner loop condition <code>j &lt; size - i - 1</code> becomes <code>j &lt; 0</code>, so it never runs. The array is already fully sorted.</p><ul><li>Outer loop: <code>for (i = 0; i &lt; size; i++)</code></li><li>Inner loop: <code>for (j = 0; j &lt; size - i - 1; j++)</code> — when <code>i = 0</code>: <code>j &lt; 4 - 0 - 1</code> → <code>j &lt; 3</code>, so <code>j</code> runs through <code>[0, 1, 2]</code></li></ul><p>Each inner-loop pass compares <code>arr[j]</code> with <code>arr[j + 1]</code> and swaps them if <code>arr[j] &gt; arr[j + 1]</code>. Then <code>i</code> increases, and the inner loop runs over a slightly smaller range each time.</p>
+
+<h2>Why It Works</h2><ul><li>On every full inner-loop pass, the largest remaining element "bubbles" up to the last unsorted position.</li><li>So the biggest element gets sorted into the last position, and the same loops run until all array elements are sorted.</li></ul>` },
+      { id: "sort-03", title: "Selection Sort", difficulty: "beginner", time: "5 min", desc: "Find the minimum element and place it at the front, one swap per pass.",
+        content: `<h1>Selection Sort</h1><span class="step-badge">Chapter 3</span><p>Selection sort divides the array into a <strong>sorted</strong> part and an <strong>unsorted</strong> part. In every pass it finds the smallest element of the unsorted part and swaps it into the first unsorted position.</p><h2>Core Idea</h2><pre><code>sorted part  |  unsorted part
+[ 1 3 5 8 ]  |  [ 2 ]
+
+Pass 1: find the minimum of the unsorted part, place it at index 0.
+Pass 2: find the minimum of the remaining part, place it at index 1.
+...and so on.</code></pre><h2>Pass By Pass</h2><pre><code>Array:  5   3   8   1   2
+
+Pass 1: minimum of whole array is 1 (index 3)
+ 5   3   8   1   2
+ 1   3   8   5   2   &#8594; swap(0, 3)
+
+Pass 2: minimum of [3 8 5 2] is 2 (index 4)
+ 1   3   8   5   2
+ 1   2   8   5   3   &#8594; swap(1, 4)
+
+Pass 3: minimum of [8 5 3] is 3 (index 4)
+ 1   2   8   5   3
+ 1   2   3   5   8   &#8594; swap(2, 4)
+
+Pass 4: minimum of [5 8] is 5, already in place
+ 1   2   3   5   8</code></pre><h2>C Code</h2><pre><code>void selectionSort(int arr[], int n)
+{
+    for (int i = 0; i &lt; n - 1; i++)
+    {
+        int minIndex = i;
+
+        for (int j = i + 1; j &lt; n; j++)
+        {
+            if (arr[j] &lt; arr[minIndex])
+                minIndex = j;
+        }
+
+        if (minIndex != i)
+        {
+            int temp = arr[i];
+            arr[i] = arr[minIndex];
+            arr[minIndex] = temp;
+        }
+    }
+}</code></pre><p>The <code>minIndex != i</code> check avoids swapping an element with itself, so selection sort performs at most <code>n - 1</code> swaps.</p><h2>Complexity</h2><table><thead><tr><th>Case</th><th>Time</th></tr></thead><tbody><tr><td>Best</td><td>O(n²)</td></tr><tr><td>Average</td><td>O(n²)</td></tr><tr><td>Worst</td><td>O(n²)</td></tr></tbody></table><p>Space: <strong>O(1)</strong> — in place. Stable: <strong>No</strong>. Comparisons: <code>n(n-1)/2</code> — the same for every input, but swaps are much fewer than bubble sort.</p><h2>Bubble vs Selection</h2><table><thead><tr><th></th><th>Bubble Sort</th><th>Selection Sort</th></tr></thead><tbody><tr><td>Compares</td><td>Adjacent elements</td><td>All elements of unsorted part</td></tr><tr><td>Swaps</td><td>Many</td><td>At most n - 1</td></tr><tr><td>Best case</td><td>O(n) with flag</td><td>Always O(n²)</td></tr><tr><td>Stable</td><td>Yes</td><td>No</td></tr></tbody></table><blockquote>Use selection sort when swaps are expensive (large records) but comparisons are cheap.</blockquote>` },
+      { id: "sort-04", title: "Insertion Sort", difficulty: "beginner", time: "5 min", desc: "Take the current element as key and shift all larger elements one step right.",
+        content: `<h1>Insertion Sort</h1><span class="step-badge">Chapter 4</span><p>Insertion sort works like sorting playing cards in your hand. You take the next card (the <strong>key</strong>), slide every bigger card to the right, and drop the key into the gap it creates.</p><h2>Core Idea</h2><pre><code>1. Take arr[i] as the key.
+2. Compare the key with the sorted part on its left.
+3. While the left element is bigger than the key, shift it one step right.
+4. Insert the key into the free position.</code></pre><h2>Step By Step</h2><pre><code>Array:  5   3   8   1   2
+
+i = 1, key = 3:
+ 5 &gt; 3  &#8594; shift 5 right
+ 5   5   8   1   2
+ 3   5   8   1   2
+
+i = 2, key = 8:
+ 5 &lt; 8  &#8594; already in place
+ 3   5   8   1   2
+
+i = 3, key = 1:
+ 8 &gt; 1  &#8594; shift 8 right
+ 3   5   8   8   2
+ 5 &gt; 1  &#8594; shift 5 right
+ 3   5   5   8   2
+ 3 &gt; 1  &#8594; shift 3 right
+ 3   3   5   8   2
+ 1   3   5   8   2
+
+i = 4, key = 2:
+ 8 &gt; 2, 5 &gt; 2, 3 &gt; 2  &#8594; shift all
+ 1   2   3   5   8</code></pre><h2>C Code</h2><pre><code>void insertionSort(int arr[], int n)
+{
+    for (int i = 1; i &lt; n; i++)
+    {
+        int key = arr[i];
+        int j = i - 1;
+
+        while (j &gt;= 0 &amp;&amp; arr[j] &gt; key)
+        {
+            arr[j + 1] = arr[j];
+            j--;
+        }
+
+        arr[j + 1] = key;
+    }
+}</code></pre><h2>Complexity</h2><table><thead><tr><th>Case</th><th>Time</th><th>When</th></tr></thead><tbody><tr><td>Best</td><td>O(n)</td><td>Already sorted — the while loop never runs</td></tr><tr><td>Average</td><td>O(n²)</td><td>Random data</td></tr><tr><td>Worst</td><td>O(n²)</td><td>Reverse sorted</td></tr></tbody></table><p>Space: <strong>O(1)</strong> — in place. Stable: <strong>Yes</strong>. The number of comparisons equals the number of <strong>inversions</strong> plus one per key.</p><h2>When Insertion Sort Shines</h2><ul><li>Small arrays (under ~10 elements) — many real libraries use it inside quicksort.</li><li>Nearly sorted data, where it behaves almost like O(n).</li><li>Inserting one element into an already sorted list — no need to sort everything again.</li></ul><blockquote>Insertion sort is the fastest simple sort when the data is small or almost sorted, and it is the only simple sort that handles linked lists naturally.</blockquote>` },
+      { id: "sort-05", title: "Quick Sort", difficulty: "intermediate", time: "6 min", desc: "Divide and conquer with a pivot, partition step and recursion.",
+        content: `<h1>Quick Sort</h1><span class="step-badge">Chapter 5</span><p>Quick sort picks one element as the <strong>pivot</strong>, arranges the array so that smaller values are on the left and bigger values on the right, and then repeats the same work on the two parts.</p><h2>The Three Steps</h2><pre><code>1. PIVOT     — choose an element (here: the last element).
+2. PARTITION — smaller values to the left, bigger to the right.
+3. RECURSE   — apply quick sort on the left part and the right part.</code></pre><h2>Partition (Lomuto scheme)</h2><pre><code>Array:  5   3   8   1   2
+pivot = arr[high] = 2
+i is the boundary of the "smaller than pivot" region
+
+j=0: 5 &gt; 2  &#8594;  i++        i = 1
+j=1: 3 &gt; 2  &#8594;  i++        i = 2
+j=2: 8 &gt; 2  &#8594;  i++        i = 3
+j=3: 1 &gt; 2 ? no
+
+swap(arr[3], arr[3])   &#8594;   5   3   8   1   2
+swap(arr[3], arr[4])   &#8594;   5   3   8   2   1
+                         &#9656;  pivot 2 is now at its final index 3
+                         5   3   8   |   1
+                         \_________/
+                          now sort these two parts</code></pre><h2>C Code</h2><pre><code>int partition(int arr[], int low, int high)
+{
+    int pivot = arr[high];
+    int i = low - 1;
+
+    for (int j = low; j &lt; high; j++)
+    {
+        if (arr[j] &lt; pivot)
+        {
+            i++;
+            int temp = arr[i];
+            arr[i] = arr[j];
+            arr[j] = temp;
+        }
+    }
+
+    int pivotIndex = i + 1;
+    int temp = arr[pivotIndex];
+    arr[pivotIndex] = arr[high];
+    arr[high] = temp;
+
+    return pivotIndex;
+}
+
+void quickSort(int arr[], int low, int high)
+{
+    if (low &gt;= high)
+        return;
+
+    int pi = partition(arr, low, high);
+
+    quickSort(arr, low, pi - 1);
+    quickSort(arr, pi + 1, high);
+}</code></pre><h2>Recursion Trace</h2><pre><code>quickSort(5 3 8 1 2, 0, 4)
+   pivot 2 fixed at index 3
+   |
+   +-- quickSort(5 3 8, 0, 2)
+   |      pivot 8 fixed at index 2
+   |      |
+   |      +-- quickSort(5 3, 0, 1)
+   |             pivot 3 fixed at index 1
+   |             +-- quickSort(5, 0, 0)  &#8594; already sorted
+   |
+   +-- quickSort(1, 4, 4)  &#8594; already sorted
+
+Result: 1 2 3 5 8</code></pre><h2>Complexity</h2><table><thead><tr><th>Case</th><th>Time</th><th>When</th></tr></thead><tbody><tr><td>Best / Average</td><td>O(n log n)</td><td>Good pivot, balanced partitions</td></tr><tr><td>Worst</td><td>O(n²)</td><td>Already sorted array with last-element pivot</td></tr></tbody></table><p>Space: <strong>O(log n)</strong> for the recursion stack. Stable: <strong>No</strong>. The <code>low &gt;= high</code> base case stops the recursion — without it, the same element would be partitioned forever.</p><blockquote>Quick sort is the fastest general-purpose comparison sort in practice, because it sorts in place and has excellent cache behaviour. Choosing a random or middle pivot removes the O(n²) worst case.</blockquote>` },
+      { id: "sort-06", title: "Merge Sort", difficulty: "intermediate", time: "6 min", desc: "Split into halves, sort each half, then merge them back in order.",
+        content: `<h1>Merge Sort</h1><span class="step-badge">Chapter 6</span><p>Merge sort is a pure <strong>divide and conquer</strong> algorithm. It splits the array into two halves, sorts each half recursively, and then <em>merges</em> the two sorted halves into one sorted array.</p><h2>Divide and Merge</h2><pre><code>Divide:                 Merge:
+ 5  3  8  1              3  5  1  8
+ /        \              / \  / \
+5 3      8 1           3 5   1 8
+/  \     /  \          /       /
+5   3   8   1         1  3  5  8</code></pre><h2>The Merge Step</h2><p>To merge two sorted halves, keep one pointer in each half. Always take the smaller of the two pointed elements and move that pointer forward.</p><pre><code>Left:  1   3   5        i
+Right: 2   8   9        j
+        ^       ^
+        i       j
+
+Left 1 &lt; Right 2  &#8594; take 1   i++
+Left 3 &gt; Right 2  &#8594; take 2   j++
+Left 3 &lt; Right 8  &#8594; take 3   i++
+Left 5 &lt; Right 8  &#8594; take 5   i++
+Left finished       &#8594; copy rest of right: 8, 9
+
+Merged:  1  2  3  5  8  9</code></pre><h2>C Code</h2><pre><code>void merge(int arr[], int left, int mid, int right)
+{
+    int n1 = mid - left + 1;
+    int n2 = right - mid;
+
+    int L[n1], R[n2];
+
+    for (int i = 0; i &lt; n1; i++)
+        L[i] = arr[left + i];
+
+    for (int j = 0; j &lt; n2; j++)
+        R[j] = arr[mid + 1 + j];
+
+    int i = 0, j = 0, k = left;
+
+    while (i &lt; n1 &amp;&amp; j &lt; n2)
+    {
+        if (L[i] &lt;= R[j])
+            arr[k++] = L[i++];
+        else
+            arr[k++] = R[j++];
+    }
+
+    while (i &lt; n1)
+        arr[k++] = L[i++];
+
+    while (j &lt; n2)
+        arr[k++] = R[j++];
+}
+
+void mergeSort(int arr[], int left, int right)
+{
+    if (left &gt;= right)
+        return;
+
+    int mid = left + (right - left) / 2;
+
+    mergeSort(arr, left, mid);
+    mergeSort(arr, mid + 1, right);
+    merge(arr, left, mid, right);
+}</code></pre><p>Two details to remember:</p><ul><li><code>&lt;=</code> in the merge comparison keeps the sort <strong>stable</strong>.</li><li>The two <code>while</code> loops at the end copy whatever is left in the other half.</li></ul><h2>Complexity</h2><table><thead><tr><th>Case</th><th>Time</th></tr></thead><tbody><tr><td>Best</td><td>O(n log n)</td></tr><tr><td>Average</td><td>O(n log n)</td></tr><tr><td>Worst</td><td>O(n log n)</td></tr></tbody></table><p>Space: <strong>O(n)</strong> — it is out-of-place. Stable: <strong>Yes</strong>. The time is always <code>O(n log n)</code> because the array is always split into two equal halves.</p><blockquote>Merge sort never degrades to O(n²) and is stable, which makes it the standard choice for sorting linked lists and large files that are sorted separately and merged later.</blockquote>` },
+      { id: "sort-07", title: "Sorting Quick Reference", difficulty: "beginner", time: "4 min", desc: "All sorting algorithms compared, plus how to choose one.",
+        content: `<h1>Sorting Quick Reference</h1><span class="step-badge">Chapter 7</span><h2>Complexity Table</h2><table><thead><tr><th>Algorithm</th><th>Best</th><th>Average</th><th>Worst</th><th>Space</th><th>Stable</th></tr></thead><tbody><tr><td>Bubble Sort</td><td>O(n)</td><td>O(n²)</td><td>O(n²)</td><td>O(1)</td><td>Yes</td></tr><tr><td>Selection Sort</td><td>O(n²)</td><td>O(n²)</td><td>O(n²)</td><td>O(1)</td><td>No</td></tr><tr><td>Insertion Sort</td><td>O(n)</td><td>O(n²)</td><td>O(n²)</td><td>O(1)</td><td>Yes</td></tr><tr><td>Quick Sort</td><td>O(n log n)</td><td>O(n log n)</td><td>O(n²)</td><td>O(log n)</td><td>No</td></tr><tr><td>Merge Sort</td><td>O(n log n)</td><td>O(n log n)</td><td>O(n log n)</td><td>O(n)</td><td>Yes</td></tr><tr><td>Counting Sort</td><td>O(n + k)</td><td>O(n + k)</td><td>O(n + k)</td><td>O(k)</td><td>Yes</td></tr></tbody></table><p>where <code>n</code> = number of elements and <code>k</code> = range of values (for counting sort).</p><h2>Which Sort Should You Use?</h2><table><thead><tr><th>Situation</th><th>Use</th></tr></thead><tbody><tr><td>Very small array</td><td>Insertion sort</td></tr><tr><td>Nearly sorted data</td><td>Insertion sort</td></tr><tr><td>Few swaps needed / big records</td><td>Selection sort</td></tr><tr><td>Fastest general purpose, in place</td><td>Quick sort</td></tr><tr><td>Stability required, or linked list</td><td>Merge sort</td></tr><tr><td>Small value range (marks, grades)</td><td>Counting sort</td></tr></tbody></table><h2>Formulas To Remember</h2><ul><li>Comparisons in selection sort: <code>n(n-1)/2</code></li><li>Maximum swaps in selection sort: <code>n - 1</code></li><li>Height of the recursion tree (merge/quick): <code>log2(n)</code></li><li>Levels of merge sort: <code>log2(n)</code>, work per level: <code>O(n)</code>, total: <code>O(n log n)</code></li></ul><h2>Comparison vs Non-Comparison</h2><pre><code>Comparison based  &#8594; compares two elements
+                    bubble, selection, insertion,
+                    quick, merge
+                    lower bound: O(n log n)
+
+Non-comparison    &#8594; uses the value directly
+                    counting, bucket, radix
+                    can be O(n)</code></pre><blockquote>No single algorithm is best for everything — pick based on the size of the data, how sorted it already is, whether stability matters, and how much extra memory you can use.</blockquote>` }
+    ]
+  },
+  {
+    id: "searching", label: "Searching", icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>`,
+    desc: "Find elements fast — linear search, binary search and hashing in C.",
+    tags: ["linear search", "binary search", "hashing", "algorithms"],
+    articles: [
+      { id: "sear-01", title: "Introduction to Searching", difficulty: "beginner", time: "4 min", desc: "What is searching, successful vs unsuccessful, types of search.",
+        content: `<h1>Introduction to Searching</h1><span class="step-badge">Chapter 1</span><p><strong>Searching</strong> means finding a given element (the <strong>key</strong>) inside a collection of elements, and returning its position (index).</p><h2>Example</h2><pre><code>Array:  10  20  30  40  50  60  70
+Index:   0   1   2   3   4   5   6
+
+Search for 60  &#8594;  found at index 5
+Search for 99  &#8594;  not found, return -1</code></pre><h2>Two Types of Search Result</h2><ul><li><strong>Successful search</strong> — the key is present in the collection.</li><li><strong>Unsuccessful search</strong> — the key is not present.</li></ul><p>Notebooks usually return the index on success and <code>-1</code> on failure, because <code>-1</code> can never be a valid index.</p><h2>How Fast Is a Search?</h2><p>Two things decide the speed of a search:</p><ol><li><strong>Is the data sorted?</strong> If yes, you can skip half of the array every step.</li><li><strong>Where do you start?</strong> Beginning, middle, or jumping by a fixed step.</li></ol><h2>Types of Searching</h2><table><thead><tr><th>Type</th><th>Idea</th><th>Time</th></tr></thead><tbody><tr><td>Linear (sequential) search</td><td>Check every element one by one.</td><td>O(n)</td></tr><tr><td>Binary search</td><td>Halve the search space each step (needs sorted data).</td><td>O(log n)</td></tr><tr><td>Jump search</td><td>Jump ahead by a fixed block size, then search inside the block.</td><td>O(&#8730;n)</td></tr><tr><td>Interpolation search</td><td>Guess the position using the value itself.</td><td>O(log log n) average</td></tr><tr><td>Hashing</td><td>Compute the index directly with a hash function.</td><td>O(1) average</td></tr></tbody></table><h2>Key Terms</h2><table><thead><tr><th>Term</th><th>Meaning</th></tr></thead><tbody><tr><td>Key</td><td>The value being searched for.</td></tr><tr><td>n</td><td>Number of elements in the collection.</td></tr><tr><td>Comparison</td><td>One check of a key against an element.</td></tr><tr><td>low / high</td><td>First and last index of the current search range.</td></tr></tbody></table><blockquote>Searching is the most common operation on a collection — sorting exists mainly to make searching fast.</blockquote>` },
+      { id: "sear-02", title: "Linear Search", difficulty: "beginner", time: "4 min", desc: "Sequential search — check every element from the start until found.",
+        content: `<h1>Linear Search</h1><span class="step-badge">Chapter 2</span><p>Linear search checks the elements <strong>one by one</strong> from the beginning of the collection until the key is found or the collection ends.</p><h2>Core Idea</h2><pre><code>for (i = 0; i &lt; n; i++)
+{
+    if (arr[i] == key)
+        return i;
+}
+return -1;</code></pre><h2>Dry Run — search 60</h2><pre><code>Array:  10  20  30  40  50  60  70
+Index:   0   1   2   3   4   5   6
+
+i = 0:  arr[0] = 10, 10 == 60 ? no
+i = 1:  arr[1] = 20, 20 == 60 ? no
+i = 2:  arr[2] = 30, 30 == 60 ? no
+i = 3:  arr[3] = 40, 40 == 60 ? no
+i = 4:  arr[4] = 50, 50 == 60 ? no
+i = 5:  arr[5] = 60, 60 == 60 ? yes  &#9656; return 5
+
+Search for 99:
+every element is compared, loop ends, return -1</code></pre><h2>C Code</h2><pre><code>#include &lt;stdio.h&gt;
+
+int linearSearch(int arr[], int n, int key)
+{
+    for (int i = 0; i &lt; n; i++)
+    {
+        if (arr[i] == key)
+            return i;
+    }
+
+    return -1;
+}
+
+int main()
+{
+    int arr[7] = {10, 20, 30, 40, 50, 60, 70};
+    int index = linearSearch(arr, 7, 60);
+
+    if (index == -1)
+        printf("Element not found\\n");
+    else
+        printf("Element found at index %d\\n", index);
+
+    return 0;
+}</code></pre><h2>Complexity</h2><table><thead><tr><th>Case</th><th>Time</th><th>Comparisons</th></tr></thead><tbody><tr><td>Best</td><td>O(1)</td><td>1 — key is the first element</td></tr><tr><td>Average</td><td>O(n)</td><td>About n / 2</td></tr><tr><td>Worst</td><td>O(n)</td><td>n</td></tr></tbody></table><p>Space: <strong>O(1)</strong>. Linear search works on <strong>unsorted</strong> data, which is its main advantage.</p><h2>Sentinel Search — a Faster Variant</h2><p>Temporarily place the key at the last position. Then the loop no longer needs a bounds check, which makes it about twice as fast in practice.</p><pre><code>int sentinelSearch(int arr[], int n, int key)
+{
+    int last = arr[n - 1];
+    arr[n - 1] = key;
+
+    int i = 0;
+    while (arr[i] != key)
+        i++;
+
+    arr[n - 1] = last;
+
+    return (i == n - 1) ? -1 : i;
+}</code></pre><h2>When to Use Linear Search</h2><ul><li>The array is <strong>not sorted</strong>.</li><li>The data is in a <strong>linked list</strong> (no random access).</li><li>The array is small, or you only need a single one-time search.</li></ul><blockquote>Linear search is the slowest search, but the only one that works on unsorted data. Always ask "is the array sorted?" first — if it is, use binary search.</blockquote>` },
+      { id: "sear-03", title: "Binary Search", difficulty: "beginner", time: "5 min", desc: "Halve the search space every step on a sorted array.",
+        content: `<h1>Binary Search</h1><span class="step-badge">Chapter 3</span><p>Binary search works on a <strong>sorted array</strong>. It compares the key with the middle element and throws away half of the remaining array, again and again, until the key is found or the range becomes empty.</p><h2>Prerequisite</h2><blockquote>Sorted array (ascending). Binary search gives wrong answers on unsorted data.</blockquote><h2>Core Idea</h2><pre><code>low  = 0
+high = n - 1
+
+while (low &lt;= high)
+{
+    mid = low + (high - low) / 2;
+
+    if (arr[mid] == key)  return mid;
+    if (arr[mid] &lt; key)   low  = mid + 1;
+    else                   high = mid - 1;
+}
+
+return -1;</code></pre><p>Each step removes half of the elements:</p><pre><code>100 &#8594; 50 &#8594; 25 &#8594; 12 &#8594; 6 &#8594; 3 &#8594; 1
+
+so about log2(n) comparisons</code></pre><h2>Dry Run — search 60 in 10 20 30 40 50 60 70</h2><pre><code>low 0, high 6  &#8594;  mid = 3  &#8594; arr[3] = 40  (60 &gt; 40)  low = 4
+
+low 4, high 6  &#8594;  mid = 5  &#8594; arr[5] = 60  (60 == 60) &#9656; return 5</code></pre><h2>C Code — Iterative</h2><pre><code>int binarySearch(int arr[], int n, int key)
+{
+    int low = 0;
+    int high = n - 1;
+
+    while (low &lt;= high)
+    {
+        int mid = low + (high - low) / 2;
+
+        if (arr[mid] == key)
+            return mid;
+        else if (arr[mid] &lt; key)
+            low = mid + 1;
+        else
+            high = mid - 1;
+    }
+
+    return -1;
+}</code></pre><h2>C Code — Recursive</h2><pre><code>int binarySearchRecursive(int arr[], int low, int high, int key)
+{
+    if (low &gt; high)
+        return -1;
+
+    int mid = low + (high - low) / 2;
+
+    if (arr[mid] == key)
+        return mid;
+
+    if (arr[mid] &lt; key)
+        return binarySearchRecursive(arr, mid + 1, high, key);
+
+    return binarySearchRecursive(arr, low, mid - 1, key);
+}</code></pre><h2>Overflow-Safe Mid</h2><pre><code>mid = (low + high) / 2        &#8594; can overflow for large arrays
+mid = low + (high - low) / 2  &#8594; always safe, use this</code></pre><h2>Complexity</h2><table><thead><tr><th>Case</th><th>Time</th><th>Position of key</th></tr></thead><tbody><tr><td>Best</td><td>O(1)</td><td>Exactly the middle element</td></tr><tr><td>Average</td><td>O(log n)</td><td>Any position</td></tr><tr><td>Worst</td><td>O(log n)</td><td>First or last element</td></tr></tbody></table><p>Space: <strong>O(1)</strong> for the iterative version, <strong>O(log n)</strong> for the recursive version (recursion stack).</p><h2>Common Mistakes</h2><ul><li>Using <code>low &lt; high</code> instead of <code>low &lt;= high</code> — the last element becomes unreachable.</li><li>Forgetting to move the boundary: <code>low = mid + 1</code> and <code>high = mid - 1</code>, otherwise the loop never ends.</li><li>Running binary search on unsorted data.</li></ul><blockquote>If the data is sorted, binary search turns an O(n) search into an O(log n) search — 1000 elements need only about 10 comparisons.</blockquote>` },
+      { id: "sear-04", title: "Binary Search Variations", difficulty: "intermediate", time: "6 min", desc: "First and last occurrence, lower bound, count and rotated array search.",
+        content: `<h1>Binary Search Variations</h1><span class="step-badge">Chapter 4</span><p>Once the binary search idea is clear, the same "halve the range" trick solves many other problems.</p><h2>1. Lower Bound — First Index With Value &gt;= Key</h2><p>Returns the first position where the key could be inserted while keeping the array sorted. The loop does <strong>not</strong> stop at an equal value; it keeps moving left.</p><pre><code>int lowerBound(int arr[], int n, int key)
+{
+    int low = 0, high = n;
+
+    while (low &lt; high)
+    {
+        int mid = low + (high - low) / 2;
+
+        if (arr[mid] &lt; key)
+            low = mid + 1;
+        else
+            high = mid;
+    }
+
+    return low;
+}</code></pre><pre><code>arr:  2  4  4  4  7  9
+key:  4
+
+lowerBound(arr, 6, 4)  &#8594;  1   (first 4)</code></pre><h2>2. First Occurrence of a Key</h2><pre><code>int firstOccurrence(int arr[], int n, int key)
+{
+    int index = lowerBound(arr, n, key);
+
+    if (index &lt; n &amp;&amp; arr[index] == key)
+        return index;
+
+    return -1;
+}</code></pre><h2>3. Last Occurrence and Count of Occurrences</h2><p>Upper bound = first index with value <strong>&gt;</strong> the key. Count = upper bound − lower bound.</p><pre><code>int upperBound(int arr[], int n, int key)
+{
+    int low = 0, high = n;
+
+    while (low &lt; high)
+    {
+        int mid = low + (high - low) / 2;
+
+        if (arr[mid] &lt;= key)
+            low = mid + 1;
+        else
+            high = mid;
+    }
+
+    return low;
+}
+
+int countOccurrences(int arr[], int n, int key)
+{
+    return upperBound(arr, n, key) - lowerBound(arr, n, key);
+}</code></pre><pre><code>arr:  2  4  4  4  7  9
+key:  4
+
+lowerBound = 1
+upperBound = 4
+count      = 4 - 1 = 3   &#9656; 4 appears three times</code></pre><h2>4. Search in a Rotated Sorted Array</h2><p>An array is rotated somewhere in the middle, and exactly one half is always sorted. Check which half is sorted, then decide which half contains the key.</p><pre><code>int rotatedSearch(int arr[], int low, int high, int key)
+{
+    while (low &lt;= high)
+    {
+        int mid = low + (high - low) / 2;
+
+        if (arr[mid] == key)
+            return mid;
+
+        if (arr[low] &lt;= arr[mid])
+        {
+            if (arr[low] &lt;= key &amp;&amp; key &lt; arr[mid])
+                high = mid - 1;
+            else
+                low = mid + 1;
+        }
+        else
+        {
+            if (arr[mid] &lt; key &amp;&amp; key &lt;= arr[high])
+                low = mid + 1;
+            else
+                high = mid - 1;
+        }
+    }
+
+    return -1;
+}</code></pre><pre><code>arr:  4  5  6  7  1  2  3
+      \_________/  \___/
+       sorted part   sorted part
+
+search 3  &#8594;  found at index 6</code></pre><h2>Key Point</h2><p>All of these variations keep the same rule: after every comparison, the search range becomes roughly half. That is why they all run in <strong>O(log n)</strong>.</p><blockquote>Learn <code>lowerBound</code> first — first occurrence, last occurrence and count are all built from it.</blockquote>` },
+      { id: "sear-05", title: "Hashing & Hash Tables", difficulty: "intermediate", time: "6 min", desc: "Compute the index directly with a hash function, plus collisions.",
+        content: `<h1>Hashing &amp; Hash Tables</h1><span class="step-badge">Chapter 5</span><p>Instead of comparing the key with every element, hashing <strong>computes</strong> the index where the key should be stored. Search, insert and delete all become almost instant.</p><h2>The Hash Function</h2><pre><code>index = hash(key) % size</code></pre><pre><code>size = 10
+
+key 43  &#8594;  43 % 10 = 3
+key 23  &#8594;  23 % 10 = 3
+key 15  &#8594;  15 % 10 = 5
+key 67  &#8594;  67 % 10 = 7
+
+Table:  0   1   2   3     4   5    6   7    8   9
+              &#9656;     &#9656;
+              43    15   67
+              23
+         both 43 and 23 want index 3
+         this is a COLLISION</code></pre><p>Two keys that map to the same index is called a <strong>collision</strong>. Collisions are normal — the hash function must have a way to handle them.</p><h2>Collision Handling</h2><h3>1. Chaining (separate chaining)</h3><p>Every index holds a <strong>list</strong> of keys. Colliding keys are simply appended to the list. This is the most commonly used method.</p><pre><code>Table:  0   1   2   3      4   5    6   7
+                            43 &#9656; 23</code></pre><h3>2. Open Addressing — Linear Probing</h3><p>If the index is already taken, check the next index, then the next, wrapping around at the end.</p><pre><code>key 23 wants index 3, but 43 is there
+  index 3 &#8594; taken, try index 4
+  index 4 &#8594; free, store 23 here
+
+position = (hash(key) + i) % size</code></pre><h2>C Code — Insert and Search with Linear Probing</h2><pre><code>#define SIZE 10
+
+int hashTable[SIZE];
+
+int hash(int key)
+{
+    return key % SIZE;
+}
+
+int searchHash(int key)
+{
+    int index = hash(key);
+
+    while (hashTable[index] != 0 &amp;&amp; hashTable[index] != key)
+        index = (index + 1) % SIZE;
+
+    if (hashTable[index] == key)
+        return index;
+
+    return -1;
+}
+
+void insertHash(int key)
+{
+    int index = hash(key);
+
+    while (hashTable[index] != 0)
+        index = (index + 1) % SIZE;
+
+    hashTable[index] = key;
+}</code></pre><p>Two rules make this work:</p><ul><li><code>0</code> marks an <strong>empty</strong> slot, so 0 can never be stored as a key.</li><li>The probe stops when an <strong>empty</strong> slot is found, because keys are always placed in the first free slot from their hash position.</li></ul><h2>Complexity</h2><table><thead><tr><th>Operation</th><th>Average</th><th>Worst</th></tr></thead><tbody><tr><td>Search</td><td>O(1)</td><td>O(n)</td></tr><tr><td>Insert</td><td>O(1)</td><td>O(n)</td></tr><tr><td>Delete</td><td>O(1)</td><td>O(n)</td></tr></tbody></table><p>Space: <strong>O(n)</strong> for the table itself.</p><h2>Hashing vs Binary Search</h2><table><thead><tr><th></th><th>Hashing</th><th>Binary Search</th></tr></thead><tbody><tr><td>Prerequisite</td><td>Nothing — no sorting needed</td><td>Sorted data</td></tr><tr><td>Search time</td><td>O(1) average</td><td>O(log n)</td></tr><tr><td>Range queries (min, max)</td><td>Poor — no order preserved</td><td>Good</td></tr><tr><td>Memory</td><td>Extra table needed</td><td>None</td></tr></tbody></table><blockquote>Use hashing when you only need exact-match lookups. If you also need sorted order, ranges and sorting by key, use binary search on sorted data instead.</blockquote>` },
+      { id: "sear-06", title: "Searching Quick Reference", difficulty: "beginner", time: "4 min", desc: "All searching algorithms compared, plus how to choose one.",
+        content: `<h1>Searching Quick Reference</h1><span class="step-badge">Chapter 6</span><h2>Complexity Table</h2><table><thead><tr><th>Algorithm</th><th>Best</th><th>Average</th><th>Worst</th><th>Needs sorted data?</th></tr></thead><tbody><tr><td>Linear Search</td><td>O(1)</td><td>O(n)</td><td>O(n)</td><td>No</td></tr><tr><td>Sentinel Search</td><td>O(1)</td><td>O(n)</td><td>O(n)</td><td>No</td></tr><tr><td>Binary Search</td><td>O(1)</td><td>O(log n)</td><td>O(log n)</td><td>Yes</td></tr><tr><td>Jump Search</td><td>O(&#8730;n)</td><td>O(&#8730;n)</td><td>O(&#8730;n)</td><td>Yes</td></tr><tr><td>Interpolation Search</td><td>O(1)</td><td>O(log log n)</td><td>O(n)</td><td>Yes</td></tr><tr><td>Hashing</td><td>O(1)</td><td>O(1)</td><td>O(n)</td><td>No</td></tr></tbody></table><h2>Which Search Should You Use?</h2><table><thead><tr><th>Situation</th><th>Use</th></tr></thead><tbody><tr><td>Unsorted array or linked list</td><td>Linear search</td></tr><tr><td>Sorted array, single lookup</td><td>Binary search</td></tr><tr><td>Sorted array, many lookups</td><td>Sort once, then binary search</td></tr><tr><td>First / last occurrence or count</td><td>lowerBound / upperBound binary search</td></tr><tr><td>Dictionary, map, cache, database index</td><td>Hashing</td></tr></tbody></table><h2>Formulas To Remember</h2><pre><code>Binary search mid     = low + (high - low) / 2
+Comparisons needed    = log2(n) + 1
+Search space after k  = n / 2^k
+
+Hash index            = key % size
+Probing (linear)      = (hash(key) + i) % size
+
+Linear search average  = n / 2 comparisons
+Jump search block size = sqrt(n)</code></pre><h2>Growth Visual</h2><pre><code>1000 elements
+Linear search    &#8594; up to 1000 comparisons
+Binary search    &#8594; about 10 comparisons
+
+1,000,000 elements
+Linear search    &#8594; up to 1,000,000 comparisons
+Binary search    &#8594; about 20 comparisons</code></pre><blockquote>Searching is fast only when the data is sorted or hashed. The first question in every search problem is always: is the data sorted?</blockquote>` }
     ]
   },
   {
