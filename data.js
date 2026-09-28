@@ -2804,46 +2804,109 @@ j=1:  [ 2,  4,  1,  5]
 
 <h2>Why It Works</h2><ul><li>On every full inner-loop pass, the largest remaining element "bubbles" up to the last unsorted position.</li><li>So the biggest element gets sorted into the last position, and the same loops run until all array elements are sorted.</li></ul>` },
       { id: "sort-03", title: "Selection Sort", difficulty: "beginner", time: "5 min", desc: "Find the minimum element and place it at the front, one swap per pass.",
-        content: `<h1>Selection Sort</h1><span class="step-badge">Chapter 3</span><p>Selection sort divides the array into a <strong>sorted</strong> part and an <strong>unsorted</strong> part. In every pass it finds the smallest element of the unsorted part and swaps it into the first unsorted position.</p><h2>Core Idea</h2><pre><code>sorted part  |  unsorted part
-[ 1 3 5 8 ]  |  [ 2 ]
+        content: `<h1>Selection Sort</h1><span class="step-badge">Chapter 3</span>
 
-Pass 1: find the minimum of the unsorted part, place it at index 0.
-Pass 2: find the minimum of the remaining part, place it at index 1.
-...and so on.</code></pre><h2>Pass By Pass</h2><pre><code>Array:  5   3   8   1   2
+<h2>Algorithm Dry Run</h2><p>Array:</p><pre><code>[13, 46, 24, 52, 20,  9]
+  0   1   2   3   4   5</code></pre>
 
-Pass 1: minimum of whole array is 1 (index 3)
- 5   3   8   1   2
- 1   3   8   5   2   &#8594; swap(0, 3)
+<h3>Step 1</h3><pre><code>[13, 46, 24, 52, 20,  9]
+  0   1   2   3   4   5
+  ↑                   ↑
+  └─────── swap ──────┘</code></pre>
 
-Pass 2: minimum of [3 8 5 2] is 2 (index 4)
- 1   3   8   5   2
- 1   2   8   5   3   &#8594; swap(1, 4)
+<p>9 is the minimum in the array, so it swaps with 13 (index 0) → <code>[9, 46, 24, 52, 20, 13]</code></p>
 
-Pass 3: minimum of [8 5 3] is 3 (index 4)
- 1   2   8   5   3
- 1   2   3   5   8   &#8594; swap(2, 4)
+<p>End of Step 1: <code>[9, 46, 24, 52, 20, 13]</code></p>
 
-Pass 4: minimum of [5 8] is 5, already in place
- 1   2   3   5   8</code></pre><h2>C Code</h2><pre><code>void selectionSort(int arr[], int n)
-{
-    for (int i = 0; i &lt; n - 1; i++)
-    {
-        int minIndex = i;
+<pre><code>[ 9, 46, 24, 52, 20, 13]
+ ┌─┐
+ │9│  ← sorted
+ └─┘</code></pre>
 
-        for (int j = i + 1; j &lt; n; j++)
-        {
-            if (arr[j] &lt; arr[minIndex])
-                minIndex = j;
-        }
+<h3>Step 2</h3><pre><code>[ 9, 46, 24, 52, 20, 13]
+  0   1   2   3   4   5
+      ↑               ↑
+      └───── swap ────┘</code></pre>
 
-        if (minIndex != i)
-        {
-            int temp = arr[i];
-            arr[i] = arr[minIndex];
-            arr[minIndex] = temp;
+<p>13 is the minimum of the remaining unsorted part (index 1-5), so it swaps with 46 (index 1) → <code>[9, 13, 24, 52, 20, 46]</code></p>
+
+<p>End of Step 2: <code>[9, 13, 24, 52, 20, 46]</code></p>
+
+<pre><code>[ 9, 13, 24, 52, 20, 46]
+ ┌─────┐
+ │9, 13│  ← sorted
+ └─────┘</code></pre>
+
+<h3>Step 3</h3><pre><code>[ 9, 13, 24, 52, 20, 46]
+  0   1   2   3   4   5
+          ↑       ↑
+          └─ swap ┘</code></pre>
+
+<p>20 is the minimum of indices 2-5, so it swaps with 24 (index 2) → <code>[9, 13, 20, 52, 24, 46]</code></p>
+
+<p>End of Step 3: <code>[9, 13, 20, 52, 24, 46]</code></p>
+
+<pre><code>[ 9, 13, 20, 52, 24, 46]
+ ┌─────────┐
+ │9, 13, 20│  ← sorted
+ └─────────┘</code></pre>
+
+<h3>Step 4</h3><pre><code>[ 9, 13, 20, 52, 24, 46]
+  0   1   2   3   4   5
+              ↑   ↑
+              └swap┘</code></pre>
+
+<p>24 is the minimum of indices 3-5, so it swaps with 52 (index 3) → <code>[9, 13, 20, 24, 52, 46]</code></p>
+
+<p>End of Step 4: <code>[9, 13, 20, 24, 52, 46]</code></p>
+
+<pre><code>[ 9, 13, 20, 24, 52, 46]
+ ┌─────────────┐
+ │9, 13, 20, 24│  ← sorted
+ └─────────────┘</code></pre>
+
+<h3>Step 5</h3><pre><code>[ 9, 13, 20, 24, 52, 46]
+  0   1   2   3   4   5
+                  ↑   ↑
+                  └swap┘</code></pre>
+
+<p>46 is the minimum of indices 4-5, so it swaps with 52 (index 4) → <code>[9, 13, 20, 24, 46, 52]</code></p>
+
+<p>End of Step 5: <code>[9, 13, 20, 24, 46, 52]</code></p>
+
+<pre><code>[ 9, 13, 20, 24, 46, 52]
+ ┌─────────────────┐
+ │9, 13, 20, 24, 46│  ← sorted ✓
+ └─────────────────┘</code></pre>
+
+<h2>Basic Working → Select minimum &amp; swap</h2><ul><li><strong>1st step</strong> → swap happens at index 0 with the minimum in the array</li><li><strong>2nd step</strong> → swap happens at index 1 with the minimum in the array</li><li><strong>3rd step</strong> → swap happens at index 2 with the minimum in the array</li><li>It continues until the array is sorted.</li></ul>
+
+<h2>Code for Selection Sort</h2><pre><code>for (int i = 0; i &lt; n - 1; i++) {
+    int minIndex = i; // assume current index is the minimum
+
+    for (int j = i + 1; j &lt; n; j++) {
+        if (arr[j] &lt; arr[minIndex]) {
+            minIndex = j;
         }
     }
-}</code></pre><p>The <code>minIndex != i</code> check avoids swapping an element with itself, so selection sort performs at most <code>n - 1</code> swaps.</p><h2>Complexity</h2><table><thead><tr><th>Case</th><th>Time</th></tr></thead><tbody><tr><td>Best</td><td>O(n²)</td></tr><tr><td>Average</td><td>O(n²)</td></tr><tr><td>Worst</td><td>O(n²)</td></tr></tbody></table><p>Space: <strong>O(1)</strong> — in place. Stable: <strong>No</strong>. Comparisons: <code>n(n-1)/2</code> — the same for every input, but swaps are much fewer than bubble sort.</p><h2>Bubble vs Selection</h2><table><thead><tr><th></th><th>Bubble Sort</th><th>Selection Sort</th></tr></thead><tbody><tr><td>Compares</td><td>Adjacent elements</td><td>All elements of unsorted part</td></tr><tr><td>Swaps</td><td>Many</td><td>At most n - 1</td></tr><tr><td>Best case</td><td>O(n) with flag</td><td>Always O(n²)</td></tr><tr><td>Stable</td><td>Yes</td><td>No</td></tr></tbody></table><blockquote>Use selection sort when swaps are expensive (large records) but comparisons are cheap.</blockquote>` },
+
+    swap(arr[minIndex], arr[i]);
+}</code></pre>
+
+<blockquote><strong>Note:</strong> some notebooks show the update line as <code>j = min</code> — read here as <code>minIndex = j</code> (updating the tracked minimum index), since that is the standard pattern and it matches the dry run above.</blockquote>
+
+<h2>Trace of the <code>if</code> check (finding the minimum, Step 1)</h2><pre><code>arr[] = {13, 46, 24, 52, 20, 9}
+
+if (arr[j] &lt; arr[minIndex])
+
+13 &lt; 13   ✗
+46 &lt; 13   ✗
+24 &lt; 13   ✗
+52 &lt; 13   ✗
+20 &lt; 13   ✗
+9  &lt; 13   ✓ → swap 13 with 9</code></pre>
+
+<p>We get: <code>[9, 46, 24, 52, 20, 13]</code></p>` },
       { id: "sort-04", title: "Insertion Sort", difficulty: "beginner", time: "5 min", desc: "Take the current element as key and shift all larger elements one step right.",
         content: `<h1>Insertion Sort</h1><span class="step-badge">Chapter 4</span><p>Insertion sort works like sorting playing cards in your hand. You take the next card (the <strong>key</strong>), slide every bigger card to the right, and drop the key into the gap it creates.</p><h2>Core Idea</h2><pre><code>1. Take arr[i] as the key.
 2. Compare the key with the sorted part on its left.
