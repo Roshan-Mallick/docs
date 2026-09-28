@@ -1969,7 +1969,306 @@ code {
   }
 }
 
+/* ── Shell Sort visualizer ──────────────────────── */
+
+.sh-lane {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 10px 0 4px;
+}
+
+.sh-lane-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.sh-lane-label b {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: 0.7rem;
+  color: var(--accent);
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.sh-track {
+  display: flex;
+  gap: 6px;
+  align-items: flex-start;
+  padding: 6px 4px 10px;
+  min-width: max-content;
+  overflow-x: auto;
+}
+
+.sh-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 2px;
+  border-radius: 8px;
+  transition: all var(--transition);
+}
+
+.sh-cell-val {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 32px;
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: 0.86rem;
+  color: var(--code-text);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  transition: all var(--transition);
+}
+
+.sh-cell-idx {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  color: var(--text-muted);
+}
+
+.sh-cell--in-group .sh-cell-val {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-glow);
+}
+
+.sh-cell--recon .sh-cell-val {
+  border-color: var(--accent);
+  animation: shRecon 0.9s ease infinite alternate;
+}
+
+@keyframes shRecon {
+  from {
+    box-shadow: none;
+  }
+  to {
+    box-shadow: 0 0 0 2px var(--accent-glow);
+  }
+}
+
+.sh-gap-wrap {
+  position: relative;
+  height: 24px;
+  margin: 0 2px;
+}
+
+.sh-bracket {
+  position: absolute;
+  bottom: 0;
+  height: 20px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  border-left: 2px solid var(--accent);
+  border-right: 2px solid var(--accent);
+  border-bottom: 2px solid var(--accent);
+  border-radius: 0 0 8px 8px;
+  font-family: var(--font);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+  background: linear-gradient(var(--accent-glow), transparent);
+  padding-bottom: 1px;
+  white-space: nowrap;
+  transition: left 0.3s var(--transition), width 0.3s var(--transition);
+}
+
+.sh-groups {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  padding: 4px 0;
+}
+
+.sh-group-card {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 132px;
+  padding: 8px 10px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  transition: all var(--transition);
+}
+
+.sh-group-card--muted {
+  opacity: 0.5;
+}
+
+.sh-group-card--active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-glow);
+}
+
+.sh-group-card--sorted {
+  border-color: var(--border-strong);
+  box-shadow: inset 0 -2px 0 var(--accent);
+}
+
+.sh-group-head {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.sh-group-name {
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: 0.78rem;
+  color: var(--text);
+}
+
+.sh-group-idx {
+  font-family: var(--font);
+  font-size: 0.66rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.sh-group-vals {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 34px;
+}
+
+.sh-group-vals .bs-tile {
+  height: 28px;
+  min-width: 38px;
+  padding: 0 7px;
+  font-size: 0.74rem;
+  border-radius: 5px;
+  box-shadow: none;
+}
+
+.sh-arrow {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.sh-mkey {
+  border-color: var(--accent) !important;
+  color: var(--accent) !important;
+  box-shadow: 0 0 0 2px var(--accent-glow);
+  animation: shPulse 0.9s ease infinite alternate;
+}
+
+.sh-mcmp {
+  border-color: var(--text-secondary) !important;
+  color: var(--text-muted) !important;
+  border-style: dashed !important;
+}
+
+.sh-mshift {
+  opacity: 0.7;
+  transform: translateX(3px);
+}
+
+@keyframes shPulse {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-3px);
+  }
+}
+
+.sh-hm {
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* ── Bubble / Selection / Insertion / Quick / Merge sorts ────── */
+
+.sz-region .sh-cell-val {
+  border-color: var(--border-strong);
+  box-shadow: inset 0 -3px 0 var(--accent-glow);
+}
+
+.sz-swap .sh-cell-val {
+  border-color: var(--color-error);
+  color: var(--color-error);
+  background: rgba(220, 38, 38, 0.10);
+  box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.16);
+}
+
+.sz-pivot .sh-cell-val {
+  border-color: var(--color-warning);
+  color: var(--color-warning);
+  background: rgba(217, 119, 6, 0.10);
+  box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.16);
+}
+
+.sz-key .sh-cell-val {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-glow);
+  animation: shPulse 0.9s ease infinite alternate;
+}
+
+.sz-cmp .sh-cell-val {
+  border-style: dashed;
+  border-color: var(--text-secondary);
+  color: var(--text-muted);
+}
+
+.sz-sorted .sh-cell-val {
+  border-color: var(--color-success);
+  color: var(--color-success);
+  background: rgba(22, 163, 74, 0.08);
+}
+
+.sz-left .sh-cell-val {
+  border-color: rgba(250, 110, 9, 0.5);
+  color: var(--accent);
+}
+
+.sz-right .sh-cell-val {
+  border-color: rgba(22, 163, 74, 0.5);
+  color: var(--color-success);
+}
+
+.sz-card--wait {
+  opacity: 0.75;
+}
+
+.sz-card--done {
+  border-color: rgba(22, 163, 74, 0.55);
+  background: rgba(22, 163, 74, 0.05);
+}
+
+.sz-card--done .sh-group-name {
+  color: var(--color-success);
+}
+
+.sz-card--pivot {
+  border-color: rgba(217, 119, 6, 0.6);
+}
+
+.sz-card--pivot .sh-group-name {
+  color: var(--color-warning);
+}
+
 /* ── Tables ────────────────────────────────────── */
+───────────────────────────────────── */
 
 .article-body table {
   width: 100%;

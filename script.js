@@ -281,6 +281,8 @@ function openArticle(topic, article) {
   }
   initBucketViz(articleBody);
   initBucketSortViz(articleBody);
+  initShellSortViz(articleBody);
+  initSimpleSortViz(articleBody);
 
   document.querySelectorAll(".sidebar-item.active, .sidebar-child.active").forEach((el) => el.classList.remove("active"));
   const sidebarTopic = document.querySelector(`.sidebar-item[data-id="${topic.id}"]`);
@@ -1026,6 +1028,985 @@ function initBucketSortViz(root) {
     idx = 0;
     lastDelta = 0;
     render();
+  });
+
+  render();
+}
+// ═══════════════════════════════════════════════════════════
+//  SHELL SORT VISUALIZER (interactive)
+//  ARRAY → GAP → GROUPS → INSERTION SORT INSIDE EACH GROUP →
+//  RECONSTRUCT ARRAY (original indices) → REDUCE GAP → next
+//  pass … → FINAL SORTED ARRAY (gap = 1 pass, then done)
+//  Gap sequence: floor(n/2), floor(gap/2), … , 1
+//  Every beat snapshot is produced by a real Shell Sort run,
+//  so the animation can never disagree with the algorithm.
+// ═══════════════════════════════════════════════════════════
+
+let shPlayTimer = null;
+
+function initShellSortViz(root) {
+  if (shPlayTimer) {
+    clearInterval(shPlayTimer);
+    shPlayTimer = null;
+  }
+  if (!root) return;
+  const wrap = root.querySelector("#shell-wrap");
+  if (!wrap) return;
+  let data;
+  try {
+    data = JSON.parse(wrap.dataset.array);
+  } catch (e) {
+    return;
+  }
+  if (!Array.isArray(data) || data.length === 0) return;
+
+  const PRESETS = [
+    [7, 3, 4, 8, 13, 11, 9, 1],
+    [19, 10, 8, 17, 9, 12, 3, 15, 2, 6],
+    [66, 43, 89, 23, 11, 72, 5, 90, 38, 60, 27, 77],
+    [34, 8, 64, 51, 32, 21],
+    [5, 4, 3, 2, 1]
+  ];
+  const clampNum = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+  const fmt = (a) => "[" + a.join(", ") + "]";
+  const fmtIdx = (a) => a.join("\u2192");
+  const arrEquals = (a, b) => a.length === b.length && a.every((x, i) => x === b[i]);
+  const clone2 = (m) => m.map((r) => r.slice());
+  const tile = (v) => {
+    const t = document.createElement("div");
+    t.className = "bs-tile";
+    t.textContent = v;
+    return t;
+  };
+  const arrayCell = (v, i) =>
+    '<div class="sh-cell" data-i="' + i + '"><div class="sh-cell-val">' + v +
+    '</div><div class="sh-cell-idx">' + i + "</div></div>";
+
+  // ── the real algorithm, one REST snapshot per logical move ──────
+  function buildBeats(d0) {
+    const n = d0.length;
+    const gaps = [];
+    for (let g = Math.floor(n / 2); g >= 1; g = Math.floor(g / 2)) gaps.push(g);
+    const P = gaps.length;
+    const beats = [];
+    let arr = d0.slice();
+
+    beats.push({
+      arr: arr.slice(), groups: [], idxs: [], pass: 0, gap: gaps[0], groupsCount: 0,
+      groupIdx: -1, phase: "ready", meta: { type: "ready" },
+      text: "Shell Sort visualizer \u2014 array ready. Press Play, or Step to begin."
+    });
+
+    gaps.forEach((gap, pi) => {
+      const pass = pi + 1;
+      const gCount = Math.min(gap, n);
+      const idxs = [], groups = [];
+      for (let s = 0; s < gCount; s++) {
+        const gi = [];
+        for (let i = s; i < n; i += gap) gi.push(i);
+        idxs.push(gi);
+        groups.push(gi.map((i) => arr[i]));
+      }
+      const push = (phase, meta, groupIdx, text) =>
+        beats.push({
+          arr: arr.slice(), groups: clone2(groups), idxs: clone2(idxs),
+          pass, gap, groupsCount: gCount, groupIdx, phase, meta, text
+        });
+
+      push("gap", { type: "passStart" }, -1,
+        "Pass " + pass + " of " + P + " \u2014 Gap = " + gap + " creates " + gCount + " groups");
+
+      for (let k = 0; k < gCount; k++) {
+        push("groups", { type: "group" }, k,
+          "Group " + (k + 1) + " \u2014 indices " + fmtIdx(idxs[k]) + "  \u00b7  values " + fmt(groups[k]));
+      }
+
+      for (let k = 0; k < gCount; k++) {
+        const gv = groups[k];
+        if (gv.length <= 1) {
+          push("sort", { type: "gDone1" }, k, "Group " + (k + 1) + " \u2014 single value, nothing to sort");
+          continue;
+        }
+        push("sort", { type: "gSortStart" }, k,
+          "Insertion sort Group " + (k + 1) + " \u2014 " + fmt(gv) + " (gap " + gap + ")");
+        for (let i = 1; i < gv.length; i++) {
+          const key = gv[i];
+          let j = i;
+          push("sort", { type: "key", key, pos: j }, k,
+            "Group " + (k + 1) + ": hold " + key + " \u2014 sorted part " + fmt(gv.slice(0, j)));
+          while (j > 0 && gv[j - 1] > key) {
+            const big = gv[j - 1];
+            push("sort", { type: "cmp", key, pos: j - 1, act: "shift" }, k,
+              "Group " + (k + 1) + ": compare " + key + " with " + big + " \u2014 " + big + " > " + key + " \u2192 shift " + big + " right");
+            gv[j] = gv[j - 1];
+            j--;
+            push("sort", { type: "shift", key, big, from: j, to: j + 1 }, k,
+              "Group " + (k + 1) + ": shift " + big + " right \u2192 " + fmt(gv));
+          }
+          if (j > 0) {
+            push("sort", { type: "cmp", key, pos: j - 1, act: "stop" }, k,
+              "Group " + (k + 1) + ": compare " + key + " with " + gv[j - 1] + " \u2014 " + key + " \u2265 " + gv[j - 1] + " \u2192 stop");
+          }
+          gv[j] = key;
+          push("sort", { type: "place", key, pos: j }, k,
+            "Group " + (k + 1) + ": insert " + key + " at position " + j + " \u2192 " + fmt(gv));
+        }
+        push("sort", { type: "gDone" }, k,
+          "Group " + (k + 1) + " sorted \u2014 " + fmt(gv));
+      }
+
+      for (let k = 0; k < gCount; k++) {
+        const gi = idxs[k], gv = groups[k];
+        gi.forEach((idxIn, m) => { arr[idxIn] = gv[m]; });
+        push("reconstruct", { type: "reconstruct", idxs: gi.slice(), vals: gv.slice() }, k,
+          "Reconstructing array \u2014 write Group " + (k + 1) + " " + fmt(gv) + " back to indices " + fmtIdx(gi));
+      }
+
+      const nextGap = pi === P - 1 ? null : Math.floor(gap / 2);
+      push("reduce", { type: "passDone", nextGap }, -1,
+        nextGap === null
+          ? "Pass " + pass + " complete \u2014 array " + fmt(arr) + " (final gap = 1)"
+          : "Pass " + pass + " complete \u2014 array " + fmt(arr) + "  \u00b7  next gap = " + nextGap);
+    });
+
+    beats.push({
+      arr: arr.slice(), groups: [], idxs: [], pass: P, gap: 1, groupsCount: 0,
+      groupIdx: -1, phase: "done", meta: { type: "done" },
+      text: "Shell Sort Complete \u2014 " + fmt(arr)
+    });
+    return beats;
+  }
+
+  // ── state ────────────────────────────────────────────────────────
+  let beats = buildBeats(data);
+  let idx = 0;
+  let lastDelta = 0;
+
+  const STAGE_MAP = { ready: 0, gap: 1, groups: 2, sort: 3, reconstruct: 4, reduce: 5, done: 6 };
+  const STAGES = ["Array", "Gap", "Groups", "Sort Groups", "Reconstruct", "Reduce Gap", "Sorted"];
+
+  wrap.innerHTML =
+    '<div class="bs-head">' +
+      '<div class="bs-status">' +
+        '<span class="bk-step"></span>' +
+        '<span class="bs-phase"></span>' +
+      "</div>" +
+      '<div class="bs-controls">' +
+        '<button class="bs-btn" data-bs="prev" title="Previous step">\u25c0 Step</button>' +
+        '<button class="bs-btn" data-bs="play" title="Play / Pause">\u25b6 Play</button>' +
+        '<button class="bs-btn" data-bs="next" title="Next step">Step \u25b6</button>' +
+        '<button class="bs-btn" data-bs="reset" title="Reset to start">\u27f2 Reset</button>' +
+      "</div>" +
+    "</div>" +
+    '<div class="bk-bar">' +
+      '<div class="bk-arrays">' +
+        '<span class="bk-bar-label">Array</span>' +
+        '<select class="bk-array" aria-label="Input array">' +
+        PRESETS.map((p, i) =>
+          '<option value="' + i + '"' + (arrEquals(p, data) ? " selected" : "") + ">" + fmt(p) + "</option>"
+        ).join("") +
+        "</select>" +
+      "</div>" +
+    "</div>" +
+    '<div class="bk-params">' +
+      '<span class="bk-params-min"></span><span class="bk-params-max"></span>' +
+      '<span class="bk-params-pass"></span><span class="bk-params-gap"></span>' +
+      '<span class="bk-params-group"></span>' +
+    "</div>" +
+    '<div class="bs-scene">' +
+      '<div class="sh-lane">' +
+        '<div class="sh-lane-label">Array' +
+          '<b class="sh-gap-tag" data-role="gaptag"></b>' +
+        "</div>" +
+        '<div class="sh-track" data-role="track"></div>' +
+        '<div class="sh-gap-wrap" data-role="gapwrap"><div class="sh-bracket" data-role="bracket"></div></div>' +
+      "</div>" +
+      '<div class="bk-focus"></div>' +
+      '<div class="sh-groups" data-role="groups"></div>' +
+    "</div>" +
+    '<div class="bs-pipeline">' +
+    STAGES.map((st, i) => '<span class="bs-pp" data-stage="' + i + '">' + st + "</span>").join('<span class="bs-pp-arrow">\u2192</span>') +
+    "</div>";
+
+  const trackEl = wrap.querySelector('[data-role="track"]');
+  const gapWrap = wrap.querySelector('[data-role="gapwrap"]');
+  const bracketEl = wrap.querySelector('[data-role="bracket"]');
+  const groupsEl = wrap.querySelector('[data-role="groups"]');
+  const focusEl = wrap.querySelector(".bk-focus");
+  const stepEl = wrap.querySelector(".bk-step");
+  const phaseEl = wrap.querySelector(".bs-phase");
+  const gapTag = wrap.querySelector('[data-role="gaptag"]');
+
+  // ── render one beat ──────────────────────────────────────────────
+  function render() {
+    const beat = beats[idx];
+    const meta = beat.meta || {};
+    const fly = lastDelta === 1;
+    trackEl.innerHTML = "";
+    groupsEl.innerHTML = "";
+    focusEl.innerHTML = "";
+
+    // array lane (gap tag + cells)
+    gapTag.textContent = beat.phase === "ready" ? "" : "Gap = " + beat.gap + "  \u00b7  Pass " + beat.pass;
+    const inGroupCells = new Set(
+      beat.phase === "groups" && meta.type === "group" && beat.groupIdx >= 0
+        ? beat.idxs[beat.groupIdx]
+        : []
+    );
+    const reconCells = new Set(meta.type === "reconstruct" ? meta.idxs : []);
+    beat.arr.forEach((v, i) => {
+      const div = document.createElement("div");
+      div.className = "sh-cell";
+      div.innerHTML = '<div class="sh-cell-val">' + v + '</div><div class="sh-cell-idx">' + i + "</div>";
+      if (inGroupCells.has(i)) div.classList.add("sh-cell--in-group");
+      if (reconCells.has(i)) {
+        div.classList.add("sh-cell--recon");
+        if (fly) div.querySelector(".sh-cell-val").classList.add("bs-tile--arrive");
+      }
+      trackEl.appendChild(div);
+    });
+
+    // gap bracket: active group of this formation, or group 0 at pass start
+    let bracketGroup = -1;
+    if (beat.phase === "groups" && meta.type === "group" && beat.groupIdx >= 0) bracketGroup = beat.groupIdx;
+    else if (beat.phase === "gap" && meta.type === "passStart" && beat.groupsCount > 0) bracketGroup = 0;
+    if (bracketGroup >= 0 && beat.idxs.length > 0) {
+      const gi = beat.idxs[bracketGroup];
+      const cells = Array.from(trackEl.querySelectorAll(".sh-cell"));
+      const a = cells[gi[0]], b = cells[gi[gi.length - 1]];
+      if (a && b) {
+        const ar = a.getBoundingClientRect(), br = b.getBoundingClientRect(), wr = gapWrap.getBoundingClientRect();
+        bracketEl.style.left = ar.left - wr.left + "px";
+        bracketEl.style.width = br.right - ar.left + "px";
+        bracketEl.textContent = "gap = " + beat.gap;
+      }
+    } else {
+      bracketEl.style.left = "-9999px";
+    }
+
+    // reconstruct fly distances (group band → array, upward)
+    const gapTop = groupsEl.getBoundingClientRect().top - trackEl.getBoundingClientRect().bottom;
+    trackEl.querySelectorAll(".bs-tile--arrive").forEach((t) => t.style.setProperty("--drop", Math.max(24, gapTop) + "px"));
+
+    // group cards
+    const gc = Math.min(beat.groupsCount, beat.groups.length);
+    for (let k = 0; k < gc; k++) {
+      const card = document.createElement("div");
+      card.className = "sh-group-card";
+      if (beat.groupIdx === k) card.classList.add("sh-group-card--active");
+      else if (beat.groupIdx >= 0 && beat.phase !== "groups") card.classList.add("sh-group-card--muted");
+      if (beat.groupIdx > k) card.classList.add("sh-group-card--sorted");
+
+      const head = document.createElement("div");
+      head.className = "sh-group-head";
+      const name = document.createElement("span");
+      name.className = "sh-group-name";
+      name.textContent = "Group " + (k + 1);
+      const idx = document.createElement("span");
+      idx.className = "sh-group-idx";
+      idx.textContent = "indices " + (beat.idxs[k] ? fmtIdx(beat.idxs[k]) : "");
+      head.appendChild(name);
+      head.appendChild(idx);
+      card.appendChild(head);
+
+      const vals = document.createElement("div");
+      vals.className = "sh-group-vals";
+      beat.groups[k].forEach((gv, m) => {
+        if (m > 0) {
+          const ar = document.createElement("span");
+          ar.className = "sh-arrow";
+          ar.textContent = "\u2192";
+          vals.appendChild(ar);
+        }
+        const t = tile(gv);
+        if (beat.phase === "sort" && beat.groupIdx === k) {
+          const tp = meta.type;
+          if (tp === "key" && meta.pos === m) t.classList.add("sh-mkey");
+          if ((tp === "cmp" || tp === "shift") && meta.pos === m) t.classList.add("sh-mcmp");
+          if (tp === "shift" && (meta.to === m || meta.from === m)) t.classList.add("sh-mshift");
+          if (tp === "place" && meta.pos === m) t.classList.add("sh-mkey");
+        }
+        if (beat.phase === "reconstruct" && beat.groupIdx === k && meta.type === "reconstruct" && fly) {
+          t.classList.add("bs-tile--depart");
+        }
+        vals.appendChild(t);
+      });
+      card.appendChild(vals);
+      groupsEl.appendChild(card);
+    }
+
+    // focus strip — the "what is happening now" line
+    const mk = (cls, txt) => { const s = document.createElement("span"); s.className = cls; s.textContent = txt; return s; };
+    if (beat.phase === "gap" && meta.type === "passStart") {
+      focusEl.appendChild(mk("bk-focus-tag", "PASS " + beat.pass + " / " + beats.filter((x) => x.phase === "gap").length));
+      focusEl.appendChild(mk("bk-focus-calc", "gap = " + beat.gap + "  \u00b7  groups = " + beat.groupsCount));
+      focusEl.appendChild(mk("bk-focus-op", "every " + beat.gap + "th index keeps company"));
+    } else if (beat.phase === "groups") {
+      const gi = beat.idxs[beat.groupIdx];
+      focusEl.appendChild(mk("bk-focus-tag", "GROUP " + (beat.groupIdx + 1)));
+      focusEl.appendChild(mk("bk-focus-calc", "indices " + fmtIdx(gi)));
+      focusEl.appendChild(mk("bk-focus-op", "values " + fmt(beat.groups[beat.groupIdx])));
+    } else if (beat.phase === "sort") {
+      focusEl.appendChild(mk("bk-focus-tag", "GROUP " + (beat.groupIdx + 1)));
+      focusEl.appendChild(mk("bk-focus-op", String(beat.text)));
+    } else if (beat.phase === "reconstruct") {
+      focusEl.appendChild(mk("bk-focus-tag", "RECONSTRUCT"));
+      focusEl.appendChild(mk("bk-focus-calc", "indices " + fmtIdx(meta.idxs)));
+      focusEl.appendChild(mk("bk-focus-op", "\u2190 write values back to original positions"));
+    } else if (beat.phase === "reduce") {
+      focusEl.appendChild(mk("bk-focus-tag", "PASS " + beat.pass + " DONE"));
+      focusEl.appendChild(mk("bk-focus-op", meta.nextGap ? "\u2193 reduce gap \u2192 " + meta.nextGap : "\u2193 gap = 1 was the final pass"));
+    } else if (beat.phase === "done") {
+      focusEl.appendChild(mk("bk-focus-tag", "\u2713 DONE"));
+      focusEl.appendChild(mk("bk-focus-op", "Shell Sort Complete"));
+    } else {
+      focusEl.appendChild(mk("bk-focus-op", beat.text));
+    }
+
+    // status + params + pipeline stage
+    wrap.querySelectorAll(".bs-pp").forEach((el) => {
+      el.classList.toggle("bs-pp--active", Number(el.dataset.stage) === STAGE_MAP[beat.phase]);
+    });
+    stepEl.textContent = "Step " + idx + " / " + (beats.length - 1) + " \u00b7 Pass " + beat.pass + " / " + beats.filter((x) => x.phase === "gap").length;
+    phaseEl.textContent = beat.text;
+
+    wrap.querySelector(".bk-params-min").innerHTML = "n <b>" + beat.arr.length + "</b>";
+    wrap.querySelector(".bk-params-max").innerHTML = "Gap <b>" + beat.gap + "</b>";
+    wrap.querySelector(".bk-params-pass").innerHTML = "Pass <b>" + beat.pass + "</b>";
+    wrap.querySelector(".bk-params-group").innerHTML =
+      beat.groupIdx >= 0 ? "Group <b>" + (beat.groupIdx + 1) + " / " + beat.groupsCount + "</b>" : "Groups <b>" + beat.groupsCount + "</b>";
+
+    wrap.querySelector('[data-bs="prev"]').disabled = idx === 0;
+    wrap.querySelector('[data-bs="next"]').disabled = idx === beats.length - 1;
+  }
+
+  function step(d) {
+    const n2 = Math.min(beats.length - 1, Math.max(0, idx + d));
+    lastDelta = d > 0 ? 1 : d < 0 ? -1 : 0;
+    idx = n2;
+    render();
+  }
+
+  function togglePlay() {
+    const btn = wrap.querySelector('[data-bs="play"]');
+    if (shPlayTimer) {
+      clearInterval(shPlayTimer);
+      shPlayTimer = null;
+      btn.textContent = "\u25b6 Play";
+      return;
+    }
+    if (idx === beats.length - 1) { idx = 0; lastDelta = 0; render(); }
+    btn.textContent = "\u23f8 Pause";
+    shPlayTimer = setInterval(() => {
+      if (!wrap.isConnected) {
+        clearInterval(shPlayTimer);
+        shPlayTimer = null;
+        return;
+      }
+      if (idx >= beats.length - 1) {
+        clearInterval(shPlayTimer);
+        shPlayTimer = null;
+        btn.textContent = "\u25b6 Play";
+        return;
+      }
+      lastDelta = 1;
+      idx++;
+      render();
+    }, 1350);
+  }
+
+  function reset() {
+    clearInterval(shPlayTimer);
+    shPlayTimer = null;
+    wrap.querySelector('[data-bs="play"]').textContent = "\u25b6 Play";
+    idx = 0;
+    lastDelta = 0;
+    render();
+  }
+
+  wrap.querySelector('[data-bs="prev"]').addEventListener("click", () => step(-1));
+  wrap.querySelector('[data-bs="next"]').addEventListener("click", () => step(1));
+  wrap.querySelector('[data-bs="play"]').addEventListener("click", togglePlay);
+  wrap.querySelector('[data-bs="reset"]').addEventListener("click", reset);
+  wrap.querySelector(".bk-array").addEventListener("change", (e) => {
+    const p = PRESETS[Number(e.target.value)];
+    if (!p) return;
+    data = p.slice();
+    wrap.dataset.array = JSON.stringify(data);
+    beats = buildBeats(data);
+    reset();
+  });
+
+  render();
+}
+// ═══════════════════════════════════════════════════════════
+//  SIMPLE SORTS VISUALIZER PACK (interactive)
+//  One engine drives Bubble, Selection, Insertion, Quick and
+//  Merge. Each algorithm is a pure planner that emits one REST
+//  snapshot per logical move, so the animation can never
+//  disagree with the algorithm. Compare/swap/key/pivot/merge
+//  states are emphasized on the array cells and mirrored in the
+//  status cards below the track.
+// ═══════════════════════════════════════════════════════════
+
+let ivPlayTimer = null;
+
+function initSimpleSortViz(root) {
+  if (ivPlayTimer) {
+    clearInterval(ivPlayTimer);
+    ivPlayTimer = null;
+  }
+  if (!root) return;
+  const IDS = ["bubble-wrap", "selection-wrap", "insertion-wrap", "quick-wrap", "merge-wrap"];
+  let id = null;
+  for (let k = 0; k < IDS.length; k++) {
+    if (root.querySelector("#" + IDS[k])) { id = IDS[k]; break; }
+  }
+  if (!id) return;
+  const wrap = root.querySelector("#" + id);
+  if (!wrap) return;
+  let data;
+  try {
+    data = JSON.parse(wrap.dataset.array);
+  } catch (e) {
+    return;
+  }
+  if (!Array.isArray(data) || data.length === 0) return;
+
+  const NAME = {
+    "bubble-wrap": "Bubble Sort",
+    "selection-wrap": "Selection Sort",
+    "insertion-wrap": "Insertion Sort",
+    "quick-wrap": "Quick Sort",
+    "merge-wrap": "Merge Sort"
+  };
+  const A_STAGES = {
+    "bubble-wrap": ["Array", "Compare", "Swap", "Pass", "Sorted"],
+    "selection-wrap": ["Array", "Scan", "Min", "Swap", "Sorted"],
+    "insertion-wrap": ["Array", "Key", "Compare", "Shift", "Sorted"],
+    "quick-wrap": ["Array", "Pivot", "Compare", "Swap", "Sorted"],
+    "merge-wrap": ["Array", "Split", "Merge", "Write", "Sorted"]
+  };
+  const A_PHASE = {
+    "bubble-wrap": { ready: 0, cmp: 1, swap: 2, pass: 3, done: 4 },
+    "selection-wrap": { ready: 0, scan: 1, min: 1, swap: 3, place: 4, done: 4 },
+    "insertion-wrap": { ready: 0, key: 1, cmp: 2, shift: 3, place: 4, done: 4 },
+    "quick-wrap": { ready: 0, pivot: 1, range: 1, cmp: 2, swap: 3, place: 4, done: 4 },
+    "merge-wrap": { ready: 0, split: 1, sort: 1, merge: 2, take: 2, write: 3, done: 4 }
+  };
+  const A_TAG = {
+    "bubble-wrap": { ready: "READY", cmp: "COMPARE", swap: "SWAP", pass: "PASS", done: "DONE" },
+    "selection-wrap": { ready: "READY", scan: "SCAN", min: "MIN", swap: "SWAP", place: "PLACED", done: "DONE" },
+    "insertion-wrap": { ready: "READY", key: "KEY", cmp: "COMPARE", shift: "SHIFT", place: "INSERTED", done: "DONE" },
+    "quick-wrap": { ready: "READY", range: "RANGE", pivot: "PIVOT", cmp: "COMPARE", swap: "SWAP", place: "PLACED", done: "DONE" },
+    "merge-wrap": { ready: "READY", split: "SPLIT", merge: "MERGE", take: "TAKE", write: "WRITE", done: "DONE" }
+  };
+
+  const PRESETS = [
+    [7, 3, 4, 8, 13, 11, 9, 1],
+    [19, 10, 8, 17, 9, 12, 3, 15, 2, 6],
+    [66, 43, 89, 23, 11, 72, 5, 90, 38, 60, 27, 77],
+    [34, 8, 64, 51, 32, 21],
+    [5, 4, 3, 2, 1]
+  ];
+
+  const fmtArr = (a) => "[" + a.join(", ") + "]";
+  const arrEquals = (a, b) => a.length === b.length && a.every((x, i) => x === b[i]);
+  const mkCard = (name, idx, vals, cls) => ({ name: name, idx: idx, vals: vals.slice(), cls: cls || "" });
+  const emptyMarks = () =>
+    ({ key: [], cmp: [], swap: [], pivot: [], place: [], sorted: [], region: [], left: [], right: [] });
+  const setMarks = (m) => {
+    const o = emptyMarks();
+    (m.key || []).forEach((i) => o.key.push(i));
+    (m.cmp || []).forEach((i) => o.cmp.push(i));
+    (m.swap || []).forEach((i) => o.swap.push(i));
+    (m.pivot || []).forEach((i) => o.pivot.push(i));
+    (m.place || []).forEach((i) => o.place.push(i));
+    (m.sorted || []).forEach((i) => o.sorted.push(i));
+    (m.region || []).forEach((i) => o.region.push(i));
+    (m.left || []).forEach((i) => o.left.push(i));
+    (m.right || []).forEach((i) => o.right.push(i));
+    return o;
+  };
+  const rng = (lo, hi) => {
+    const r = [];
+    for (let i = lo; i <= hi; i++) r.push(i);
+    return r;
+  };
+
+  // ── Bubble Sort ──────────────────────────────────────────────
+  function planBubble(d0) {
+    const n = d0.length;
+    const a = d0.slice();
+    const beats = [];
+    let moves = 0;
+    const push = (phase, pass, marks, cards, text) => {
+      beats.push({ arr: a.slice(), phase, pass, marks: setMarks(marks), cards, text, moves });
+    };
+    push("ready", 0, {},
+      [mkCard("Pass 1", "window [0.." + (n - 2) + "]", a.slice(0, n - 1), "")],
+      "Bubble Sort visualizer \u2014 array ready. Press Play or Step to begin.");
+    for (let pass = 0; pass < n - 1; pass++) {
+      const bound = n - 1 - pass;
+      const window = mkCard("Pass " + (pass + 1), "window [0.." + bound + "]", a.slice(0, bound + 1), "");
+      const sorted = mkCard("Sorted", "[" + (bound + 1) + ".." + (n - 1) + "]", a.slice(bound + 1), "card--done");
+      push("pass", pass + 1, { region: rng(0, bound), sorted: rng(bound + 1, n - 1) }, [window, sorted],
+        "Pass " + (pass + 1) + " \u2014 bubble through [0.." + bound + "], the largest value settles at index " + bound);
+      let any = false;
+      for (let j = 0; j < bound; j++) {
+        const l = a[j], r = a[j + 1];
+        push("cmp", pass + 1, { cmp: [j, j + 1], sorted: rng(bound + 1, n - 1) }, [window, sorted],
+          "compare " + l + " and " + r + " at indices " + j + "/" + (j + 1) + " \u2014 " +
+          (l > r ? l + " > " + r + " \u2192 swap" : l + " \u2264 " + r + " \u2192 keep"));
+        if (l > r) {
+          a[j] = r; a[j + 1] = l; moves++; any = true;
+          push("swap", pass + 1, { swap: [j, j + 1], region: rng(j, bound), sorted: rng(bound + 1, n - 1) }, [window, sorted],
+            "swap " + l + " and " + r + " \u2192 " + fmtArr(a));
+        }
+      }
+      push("pass", pass + 1, { region: rng(0, bound), sorted: rng(bound, n - 1) }, [window, sorted],
+        any ? "Pass " + (pass + 1) + " done \u2014 " + fmtArr(a) : "Pass " + (pass + 1) + " \u2014 no swaps, array already sorted");
+      if (!any) break;
+    }
+    push("done", n - 1, { sorted: rng(0, n - 1) },
+      [mkCard("Sorted", "[0.." + (n - 1) + "]", a, "card--done")],
+      "Bubble Sort complete \u2014 " + fmtArr(a));
+    return beats;
+  }
+
+  // ── Selection Sort ───────────────────────────────────────────
+  function planSelection(d0) {
+    const n = d0.length;
+    const a = d0.slice();
+    const beats = [];
+    let moves = 0;
+    const push = (phase, pass, marks, cards, text) => {
+      beats.push({ arr: a.slice(), phase, pass, marks: setMarks(marks), cards, text, moves });
+    };
+    push("ready", 0, {},
+      [mkCard("Scan", "unsorted part", a.slice(0), "")],
+      "Selection Sort visualizer \u2014 array ready. Press Play or Step to begin.");
+    for (let i = 0; i < n - 1; i++) {
+      let minIdx = i;
+      const unsorted = mkCard("Unsorted", "[" + i + ".." + (n - 1) + "]", a.slice(i), "");
+      const sorted = mkCard("Sorted", "[0.." + (i - 1) + "]", a.slice(0, i), "card--done");
+      push("scan", i + 1, { region: rng(i, n - 1), sorted: rng(0, i - 1), key: [i] }, [unsorted, sorted],
+        "Pass " + (i + 1) + " \u2014 find the minimum inside [" + i + ".." + (n - 1) + "], candidate starts at index " + i);
+      for (let j = i + 1; j < n; j++) {
+        push("scan", i + 1, { region: rng(i, n - 1), sorted: rng(0, i - 1), key: [minIdx], cmp: [j] }, [unsorted, sorted],
+          "compare " + a[j] + " (index " + j + ") with current min " + a[minIdx] + " (index " + minIdx + ")");
+        if (a[j] < a[minIdx]) {
+          const oldMin = a[minIdx];
+          minIdx = j;
+          push("min", i + 1, { region: rng(i, n - 1), sorted: rng(0, i - 1), key: [minIdx] }, [unsorted, sorted],
+            a[j] + " < " + oldMin + " \u2014 new minimum " + a[j] + " at index " + minIdx);
+        }
+      }
+      if (minIdx !== i) {
+        const v = a[i], w = a[minIdx];
+        a[i] = w; a[minIdx] = v; moves++;
+        push("swap", i + 1, { swap: [i, minIdx], sorted: rng(0, i - 1) }, [unsorted, sorted],
+          "swap min " + w + " into position " + i + " (swap with " + v + ") \u2192 " + fmtArr(a));
+      } else {
+        push("place", i + 1, { place: [i], sorted: rng(0, i) }, [unsorted, sorted],
+          "the minimum is already at position " + i + " \u2014 no swap this pass");
+      }
+      push("place", i + 1, { place: [i], sorted: rng(0, i) }, [unsorted, sorted],
+        "position " + i + " now holds the smallest remaining value \u2014 locked in place");
+    }
+    push("done", n - 1, { sorted: rng(0, n - 1) },
+      [mkCard("Sorted", "[0.." + (n - 1) + "]", a, "card--done")],
+      "Selection Sort complete \u2014 " + fmtArr(a));
+    return beats;
+  }
+
+  // ── Insertion Sort ───────────────────────────────────────────
+  function planInsertion(d0) {
+    const n = d0.length;
+    const a = d0.slice();
+    const beats = [];
+    let moves = 0;
+    const push = (phase, pass, marks, cards, text) => {
+      beats.push({ arr: a.slice(), phase, pass, marks: setMarks(marks), cards, text, moves });
+    };
+    push("ready", 0, {},
+      [mkCard("Sorted prefix", "[0]", a.slice(0, 1), "card--done"), mkCard("Ahead", "[1.." + (n - 1) + "]", a.slice(1), "")],
+      "Insertion Sort visualizer \u2014 array ready. Press Play or Step to begin.");
+    for (let i = 1; i < n; i++) {
+      const key = a[i];
+      const prefix = mkCard("Sorted prefix", "[0.." + (i - 1) + "]", a.slice(0, i), "card--done");
+      const ahead = mkCard("Ahead", "[" + (i + 1) + ".." + (n - 1) + "]", a.slice(i + 1), "");
+      push("key", i + 1, { key: [i], sorted: rng(0, i - 1) }, [prefix, ahead],
+        "Insert item " + (i + 1) + " of " + n + " \u2014 hold key " + key + " (index " + i + ")");
+      let j = i;
+      while (j > 0 && a[j - 1] > key) {
+        const big = a[j - 1];
+        push("cmp", i + 1, { key: [j], cmp: [j - 1], sorted: rng(0, j - 1) }, [prefix, ahead],
+          "compare " + key + " with " + big + " \u2014 " + big + " > " + key + " \u2192 shift " + big + " right");
+        a[j] = big; moves++;
+        j--;
+        push("shift", i + 1, { key: [j], swap: [j, j + 1], sorted: rng(0, j) }, [prefix, ahead],
+          "shift " + a[j + 1] + " right by one \u2192 " + fmtArr(a));
+      }
+      if (j > 0) {
+        push("cmp", i + 1, { key: [j], cmp: [j - 1], sorted: rng(0, j - 1) }, [prefix, ahead],
+          "compare " + key + " with " + a[j - 1] + " \u2014 " + a[j - 1] + " \u2264 " + key + " \u2192 stop, key belongs here");
+      }
+      a[j] = key;
+      push("place", i + 1, { key: [j], sorted: rng(0, j) }, [prefix, ahead],
+        "insert " + key + " at index " + j + " \u2192 " + fmtArr(a));
+      push("place", i + 1, { sorted: rng(0, i) }, [
+        mkCard("Sorted prefix", "[0.." + i + "]", a.slice(0, i + 1), "card--done"),
+        mkCard("Ahead", "[" + (i + 1) + ".." + (n - 1) + "]", a.slice(i + 1), "")
+      ], "prefix [0.." + i + "] is now sorted");
+    }
+    push("done", n, { sorted: rng(0, n - 1) },
+      [mkCard("Sorted", "[0.." + (n - 1) + "]", a, "card--done")],
+      "Insertion Sort complete \u2014 " + fmtArr(a));
+    return beats;
+  }
+
+  // ── Quick Sort (Lomuto, pivot = last element) ────────────────
+  function planQuick(d0) {
+    const n = d0.length;
+    const a = d0.slice();
+    const beats = [];
+    let moves = 0;
+    const push = (phase, pass, marks, cards, text) => {
+      beats.push({ arr: a.slice(), phase, pass, marks: setMarks(marks), cards, text, moves });
+    };
+    push("ready", 0, {},
+      [mkCard("Range", "[0.." + (n - 1) + "]", a, "")],
+      "Quick Sort visualizer \u2014 array ready. Press Play or Step to begin.");
+    function qsort(lo, hi) {
+      if (lo >= hi) return;
+      const rangeCard = mkCard("Range", "[" + lo + ".." + hi + "]", a.slice(lo, hi + 1), "");
+      const pivotCard = mkCard("Pivot", "index " + hi, a.slice(hi, hi + 1), "card--pivot");
+      push("range", 0, { region: rng(lo, hi) }, [rangeCard],
+        "partition range [" + lo + ".." + hi + "] \u2014 recursion splits the work into these boxes");
+      const piv = a[hi];
+      push("pivot", 0, { region: rng(lo, hi), pivot: [hi] }, [rangeCard, pivotCard],
+        "pick pivot " + piv + " at index " + hi + " (last element of the range)");
+      let i = lo - 1;
+      for (let j = lo; j < hi; j++) {
+        push("cmp", 0, { region: rng(lo, hi), pivot: [hi], cmp: [j] }, [rangeCard, pivotCard],
+          "compare " + a[j] + " (index " + j + ") with pivot " + piv + (a[j] < piv ? " \u2014 smaller, moves left" : " \u2014 bigger, stays right"));
+        if (a[j] < piv) {
+          const v = a[j];
+          i++;
+          const w = a[i];
+          a[j] = w; a[i] = v; moves++;
+          push("swap", 0, { region: rng(lo, hi), pivot: [hi], swap: [i, j] }, [rangeCard, pivotCard],
+            i === j ? v + " is already left of the pivot" : "swap " + w + " and " + v + " \u2014 partition pointer moves to index " + i);
+        }
+      }
+      const w = a[i + 1];
+      a[hi] = w; a[i + 1] = piv; moves++;
+      push("place", 0, { region: rng(lo, hi), place: [i + 1] },
+        [rangeCard, mkCard("Placed", "index " + (i + 1), a.slice(i + 1, i + 2), "card--done")],
+        "pivot " + piv + " in final position " + (i + 1) + " \u2014 smaller values left, bigger values right");
+      qsort(lo, i);
+      qsort(i + 2, hi);
+    }
+    qsort(0, n - 1);
+    push("done", 0, { sorted: rng(0, n - 1) },
+      [mkCard("Sorted", "[0.." + (n - 1) + "]", a, "card--done")],
+      "Quick Sort complete \u2014 " + fmtArr(a));
+    return beats;
+  }
+
+  // ── Merge Sort ───────────────────────────────────────────────
+  function planMerge(d0) {
+    const n = d0.length;
+    const a = d0.slice();
+    const beats = [];
+    let moves = 0;
+    const push = (phase, pass, marks, cards, text) => {
+      beats.push({ arr: a.slice(), phase, pass, marks: setMarks(marks), cards, text, moves });
+    };
+    push("ready", 0, {},
+      [mkCard("Range", "[0.." + (n - 1) + "]", a, "")],
+      "Merge Sort visualizer \u2014 array ready. Press Play or Step to begin.");
+    function go(lo, hi) {
+      if (hi <= lo) return;
+      const mid = (lo + hi) >> 1;
+      const left = mkCard("Left", "[" + lo + ".." + mid + "]", a.slice(lo, mid + 1), "");
+      const right = mkCard("Right", "[" + (mid + 1) + ".." + hi + "]", a.slice(mid + 1, hi + 1), "");
+      const range = mkCard("Range", "[" + lo + ".." + hi + "]", a.slice(lo, hi + 1), "");
+      push("split", 0, { region: rng(lo, hi), left: rng(lo, mid), right: rng(mid + 1, hi) }, [range, left, right],
+        "split range [" + lo + ".." + hi + "] at mid " + mid + " \u2192 left [" + lo + ".." + mid + "], right [" + (mid + 1) + ".." + hi + "]");
+      go(lo, mid);
+      go(mid + 1, hi);
+      const L = a.slice(lo, mid + 1);
+      const R = a.slice(mid + 1, hi + 1);
+      const aux = [];
+      let p = 0, q = 0;
+      const cards = () => [
+        mkCard("Left", "[" + lo + ".." + mid + "]", L.slice(p), "card--wait"),
+        mkCard("Right", "[" + (mid + 1) + ".." + hi + "]", R.slice(q), "card--wait"),
+        mkCard("Aux", "merged", aux, aux.length === (hi - lo + 1) ? "card--done" : "")
+      ];
+      const halfMarks = () => ({ left: rng(lo, mid), right: rng(mid + 1, hi) });
+      push("merge", 0, halfMarks(), cards(),
+        "merge the two sorted halves back into range [" + lo + ".." + hi + "]");
+      while (p < L.length || q < R.length) {
+        if (q >= R.length || (p < L.length && L[p] <= R[q])) {
+          aux.push(L[p]);
+          push("take", 0, Object.assign(halfMarks(), { cmp: [lo + p] }), cards(),
+            "take " + L[p] + " (index " + (lo + p) + ", left) \u2192 Aux " + fmtArr(aux));
+          p++;
+        } else {
+          aux.push(R[q]);
+          push("take", 0, Object.assign(halfMarks(), { cmp: [mid + 1 + q] }), cards(),
+            "take " + R[q] + " (index " + (mid + 1 + q) + ", right) \u2192 Aux " + fmtArr(aux));
+          q++;
+        }
+      }
+      for (let k = lo; k <= hi; k++) a[k] = aux[k - lo];
+      moves++;
+      push("write", 0, { sorted: rng(lo, hi) }, [
+        mkCard("Range", "[" + lo + ".." + hi + "]", aux, "card--done")
+      ], "write merged " + fmtArr(aux) + " back to indices [" + lo + ".." + hi + "] \u2192 " + fmtArr(a));
+    }
+    go(0, n - 1);
+    push("done", 0, { sorted: rng(0, n - 1) },
+      [mkCard("Sorted", "[0.." + (n - 1) + "]", a, "card--done")],
+      "Merge Sort complete \u2014 " + fmtArr(a));
+    return beats;
+  }
+
+  const PLANNERS = {
+    "bubble-wrap": planBubble,
+    "selection-wrap": planSelection,
+    "insertion-wrap": planInsertion,
+    "quick-wrap": planQuick,
+    "merge-wrap": planMerge
+  };
+
+  const STAGES = A_STAGES[id];
+  const PHASE = A_PHASE[id];
+  const TAG = A_TAG[id];
+
+  let beats = PLANNERS[id](data);
+  let idx = 0;
+  let lastDelta = 0;
+
+  const tile = (v) => {
+    const t = document.createElement("div");
+    t.className = "bs-tile";
+    t.textContent = v;
+    return t;
+  };
+
+  wrap.innerHTML =
+    '<div class="bs-head">' +
+      '<div class="bs-status">' +
+        '<span class="bk-step"></span>' +
+        '<span class="bs-phase"></span>' +
+      "</div>" +
+      '<div class="bs-controls">' +
+        '<button class="bs-btn" data-bs="prev" title="Previous step">\u25c0 Step</button>' +
+        '<button class="bs-btn" data-bs="play" title="Play / Pause">\u25b6 Play</button>' +
+        '<button class="bs-btn" data-bs="next" title="Next step">Step \u25b6</button>' +
+        '<button class="bs-btn" data-bs="reset" title="Reset to start">\u27f2 Reset</button>' +
+      "</div>" +
+    "</div>" +
+    '<div class="bk-bar">' +
+      '<div class="bk-arrays">' +
+        '<span class="bk-bar-label">Array</span>' +
+        '<select class="bk-array" aria-label="Input array">' +
+        PRESETS.map((p, i) =>
+          '<option value="' + i + '"' + (arrEquals(p, data) ? " selected" : "") + ">" + fmtArr(p) + "</option>"
+        ).join("") +
+        "</select>" +
+      "</div>" +
+    "</div>" +
+    '<div class="bk-params">' +
+      '<span class="bk-params-min"></span><span class="bk-params-max"></span>' +
+    "</div>" +
+    '<div class="bs-scene">' +
+      '<div class="sh-lane">' +
+        '<div class="sh-lane-label">Array</div>' +
+        '<div class="sh-track" data-role="track"></div>' +
+        '<div class="sh-gap-wrap"><div class="sh-bracket" data-role="rangebracket"></div></div>' +
+      "</div>" +
+      '<div class="bk-focus"></div>' +
+      '<div class="sh-groups" data-role="cards"></div>' +
+    "</div>" +
+    '<div class="bs-pipeline">' +
+    STAGES.map((st, i) => '<span class="bs-pp" data-stage="' + i + '">' + st + "</span>").join('<span class="bs-pp-arrow">\u2192</span>') +
+    "</div>";
+
+  const trackEl = wrap.querySelector('[data-role="track"]');
+  const bracketEl = wrap.querySelector('[data-role="rangebracket"]');
+  const cardsEl = wrap.querySelector('[data-role="cards"]');
+  const focusEl = wrap.querySelector(".bk-focus");
+  const stepEl = wrap.querySelector(".bk-step");
+  const phaseEl = wrap.querySelector(".bs-phase");
+
+  const cellClass = (i, m) => {
+    if (m.swap.indexOf(i) !== -1) return "sz-swap";
+    if (m.pivot.indexOf(i) !== -1) return "sz-pivot";
+    if (m.key.indexOf(i) !== -1) return "sz-key";
+    if (m.cmp.indexOf(i) !== -1) return "sz-cmp";
+    if (m.place.indexOf(i) !== -1) return "sz-key";
+    if (m.sorted.indexOf(i) !== -1) return "sz-sorted";
+    if (m.right.indexOf(i) !== -1) return "sz-right";
+    if (m.left.indexOf(i) !== -1) return "sz-left";
+    if (m.region.indexOf(i) !== -1) return "sz-region";
+    return "";
+  };
+
+  function render() {
+    const beat = beats[idx];
+    trackEl.innerHTML = "";
+    cardsEl.innerHTML = "";
+    focusEl.innerHTML = "";
+    beat.arr.forEach((v, i) => {
+      const div = document.createElement("div");
+      div.className = "sh-cell";
+      div.innerHTML = '<div class="sh-cell-val">' + v + '</div><div class="sh-cell-idx">' + i + "</div>";
+      const c = cellClass(i, beat.marks);
+      if (c) div.classList.add(c);
+      trackEl.appendChild(div);
+    });
+
+    // range bracket (active window / partition / merge range)
+    const bMarks = beat.marks;
+    let bracketLo = -1, bracketHi = -1;
+    if (bMarks.region.length > 0) {
+      bracketLo = Math.min.apply(null, bMarks.region);
+      bracketHi = Math.max.apply(null, bMarks.region);
+    }
+    if (bracketLo >= 0 && bracketLo <= bracketHi && beat.phase !== "done") {
+      const cells = Array.from(trackEl.querySelectorAll(".sh-cell"));
+      const a = cells[bracketLo], b = cells[bracketHi];
+      const gapWrap = trackEl.parentElement.querySelector(".sh-gap-wrap");
+      if (a && b && gapWrap) {
+        const ar = a.getBoundingClientRect(), br = b.getBoundingClientRect(), wr = gapWrap.getBoundingClientRect();
+        bracketEl.style.left = ar.left - wr.left + "px";
+        bracketEl.style.width = br.right - ar.left + "px";
+        let bt = "";
+        if (beat.phase === "pass" || beat.phase === "scan" || beat.phase === "min") bt = "range [" + bracketLo + ".." + bracketHi + "]";
+        else if (beat.phase === "range" || beat.phase === "pivot") bt = "range [" + bracketLo + ".." + bracketHi + "]";
+        else if (beat.phase === "split" || beat.phase === "merge" || beat.phase === "take") bt = "split [" + bracketLo + ".." + bracketHi + "]";
+        else if (beat.phase === "write") bt = "write [" + bracketLo + ".." + bracketHi + "]";
+        bracketEl.textContent = bt;
+      }
+    } else {
+      bracketEl.style.left = "-9999px";
+    }
+
+    // status cards
+    beat.cards.forEach((c) => {
+      const card = document.createElement("div");
+      card.className = "sh-group-card" + (c.cls ? " sz-card--" + c.cls : "");
+      const head = document.createElement("div");
+      head.className = "sh-group-head";
+      const name = document.createElement("span");
+      name.className = "sh-group-name";
+      name.textContent = c.name;
+      const idx = document.createElement("span");
+      idx.className = "sh-group-idx";
+      idx.textContent = c.idx;
+      head.appendChild(name);
+      head.appendChild(idx);
+      card.appendChild(head);
+      const vals = document.createElement("div");
+      vals.className = "sh-group-vals";
+      c.vals.forEach((gv, m) => {
+        if (m > 0) {
+          const ar = document.createElement("span");
+          ar.className = "sh-arrow";
+          ar.textContent = "\u2192";
+          vals.appendChild(ar);
+        }
+        vals.appendChild(tile(gv));
+      });
+      card.appendChild(vals);
+      cardsEl.appendChild(card);
+    });
+
+    // focus strip
+    const mk = (cls, txt) => { const s = document.createElement("span"); s.className = cls; s.textContent = txt; return s; };
+    focusEl.appendChild(mk("bk-focus-tag", (TAG[beat.phase] || "STEP") + (beat.pass ? " #" + beat.pass : "")));
+    const involved = [];
+    beat.marks.cmp.forEach((i) => involved.push("index " + i));
+    beat.marks.swap.forEach((i) => involved.push("index " + i));
+    beat.marks.pivot.forEach((i) => involved.push("pivot " + beat.arr[i]));
+    beat.marks.key.forEach((i) => involved.push("key " + beat.arr[i]));
+    beat.marks.place.forEach((i) => involved.push("placed " + beat.arr[i]));
+    if (involved.length) focusEl.appendChild(mk("bk-focus-calc", involved.join(" \u00b7 ")));
+    focusEl.appendChild(mk("bk-focus-op", beat.text));
+
+    // status + pipeline + params
+    wrap.querySelectorAll(".bs-pp").forEach((el) => {
+      el.classList.toggle("bs-pp--active", Number(el.dataset.stage) === PHASE[beat.phase]);
+    });
+    stepEl.textContent = "Step " + idx + " / " + (beats.length - 1) + " \u00b7 " + NAME[id];
+    phaseEl.textContent = beat.text;
+    wrap.querySelector(".bk-params-min").innerHTML = "n <b>" + beat.arr.length + "</b>";
+    wrap.querySelector(".bk-params-max").innerHTML = "<b>" + NAME[id] + "</b> \u00b7 Moves <b>" + beat.moves + "</b>";
+
+    wrap.querySelector('[data-bs="prev"]').disabled = idx === 0;
+    wrap.querySelector('[data-bs="next"]').disabled = idx === beats.length - 1;
+  }
+
+  function step(d) {
+    const n2 = Math.min(beats.length - 1, Math.max(0, idx + d));
+    lastDelta = d > 0 ? 1 : d < 0 ? -1 : 0;
+    idx = n2;
+    render();
+  }
+
+  function togglePlay() {
+    const btn = wrap.querySelector('[data-bs="play"]');
+    if (ivPlayTimer) {
+      clearInterval(ivPlayTimer);
+      ivPlayTimer = null;
+      btn.textContent = "\u25b6 Play";
+      return;
+    }
+    if (idx === beats.length - 1) { idx = 0; lastDelta = 0; render(); }
+    btn.textContent = "\u23f8 Pause";
+    ivPlayTimer = setInterval(() => {
+      if (!wrap.isConnected) {
+        clearInterval(ivPlayTimer);
+        ivPlayTimer = null;
+        return;
+      }
+      if (idx >= beats.length - 1) {
+        clearInterval(ivPlayTimer);
+        ivPlayTimer = null;
+        btn.textContent = "\u25b6 Play";
+        return;
+      }
+      lastDelta = 1;
+      idx++;
+      render();
+    }, 1350);
+  }
+
+  function reset() {
+    clearInterval(ivPlayTimer);
+    ivPlayTimer = null;
+    wrap.querySelector('[data-bs="play"]').textContent = "\u25b6 Play";
+    idx = 0;
+    lastDelta = 0;
+    render();
+  }
+
+  wrap.querySelector('[data-bs="prev"]').addEventListener("click", () => step(-1));
+  wrap.querySelector('[data-bs="next"]').addEventListener("click", () => step(1));
+  wrap.querySelector('[data-bs="play"]').addEventListener("click", togglePlay);
+  wrap.querySelector('[data-bs="reset"]').addEventListener("click", reset);
+  wrap.querySelector(".bk-array").addEventListener("change", (e) => {
+    const p = PRESETS[Number(e.target.value)];
+    if (!p || !PLANNERS[id]) return;
+    data = p.slice();
+    wrap.dataset.array = JSON.stringify(data);
+    beats = PLANNERS[id](data);
+    reset();
   });
 
   render();
