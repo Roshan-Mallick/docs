@@ -279,6 +279,7 @@ function openArticle(topic, article) {
   if (document.fonts && document.fonts.ready) {
     document.fonts.ready.then(() => normalizeSortTree(articleBody));
   }
+  initBucketViz(articleBody);
 
   document.querySelectorAll(".sidebar-item.active, .sidebar-child.active").forEach((el) => el.classList.remove("active"));
   const sidebarTopic = document.querySelector(`.sidebar-item[data-id="${topic.id}"]`);
@@ -315,6 +316,270 @@ function normalizeSortTree(root) {
       h.style.flex = "0 0 " + w + "px";
     });
   });
+}
+
+// ═══════════════════════════════════════════════════════════
+//  BUCKET SORT VISUALIZER (interactive)
+// ═══════════════════════════════════════════════════════════
+
+let bucketPlayTimer = null;
+
+function initBucketViz(root) {
+  if (bucketPlayTimer) {
+    clearInterval(bucketPlayTimer);
+    bucketPlayTimer = null;
+  }
+  if (!root) return;
+  const wrap = root.querySelector("#bs-wrap");
+  if (!wrap) return;
+  let data;
+  try {
+    data = JSON.parse(wrap.dataset.array);
+  } catch (e) {
+    return;
+  }
+  if (!Array.isArray(data)) return;
+
+  const PASSES = 3;
+  const DIGITS = ["H", "T", "O"];
+  const DIGIT_WORDS = ["hundreds", "tens", "ones"];
+  const digitOf = (v, base) => Math.floor(v / base) % 10;
+  const fmt = (a) => "[" + a.join(", ") + "]";
+  const blankBuckets = () => Array.from({ length: 10 }, () => []);
+  const copyBuckets = (b) => b.map((q) => q.slice());
+  const tile = (v) => {
+    const t = document.createElement("div");
+    t.className = "bs-tile";
+    t.textContent = v;
+    return t;
+  };
+
+  // One snapshot per logical move. Each snapshot is a full REST state
+  // (input cur, the ten queues, output out); navigation replays it. The
+  // `move` field carries the animation info (what just left where).
+  function buildBeats() {
+    const beats = [];
+    let cur = data.slice();
+    let buckets = blankBuckets();
+    let out = [];
+    const push = (o) => beats.push(o);
+    push({ cur: cur.slice(), buckets: copyBuckets(buckets), out: out.slice(),
+           pass: 0, phase: "ready", move: null,
+           text: "Ready — press Play or Step to distribute by the ones digit (O)" });
+    for (let pass = 1; pass <= PASSES; pass++) {
+      const base = Math.pow(10, pass - 1);
+      const demand = cur.slice();
+      for (const v of demand) {
+        const b = digitOf(v, base);
+        cur = cur.filter((x) => x !== v);
+        buckets[b].push(v);
+        push({ cur: cur.slice(), buckets: copyBuckets(buckets), out: out.slice(),
+               pass, phase: "distribute", move: { type: "enter", value: v, bucket: b },
+               text: `${v} \u2192 bucket ${b}  (${DIGIT_WORDS[PASSES - pass]} digit)` });
+      }
+      out = [];
+      for (let b = 0; b < 10; b++) {
+        while (buckets[b].length) {
+          const v = buckets[b].shift();
+          out.push(v);
+          push({ cur: cur.slice(), buckets: copyBuckets(buckets), out: out.slice(),
+                 pass, phase: "collect", move: { type: "leave", value: v, bucket: b },
+                 text: `bucket ${b} \u2192 ${v}  (earliest in leaves first)` });
+        }
+      }
+      cur = out.slice();
+      push({ cur: cur.slice(), buckets: copyBuckets(buckets), out: [],
+             pass, phase: "passEnd", move: null,
+             text: `Pass ${pass} of 3 complete \u2014 ${fmt(cur)}` });
+    }
+    push({ cur: [], buckets: copyBuckets(buckets), out: cur.slice(),
+           pass: PASSES, phase: "done", move: null,
+           text: `Sorted \u2014 ${fmt(cur)}` });
+    return beats;
+  }
+
+  const beats = buildBeats();
+  let idx = 0;
+  let lastDelta = 0;
+
+  wrap.innerHTML = `
+    <div class="bs-head">
+      <div class="bs-status">
+        <span class="bs-pass">Pass 0/3</span>
+        <span class="bs-phase"></span>
+      </div>
+      <div class="bs-controls">
+        <button class="bs-btn" data-bs="prev" title="Previous step">\u25c0 Step</button>
+        <button class="bs-btn" data-bs="play" title="Play / Pause">\u25b6 Play</button>
+        <button class="bs-btn" data-bs="next" title="Next step">Step \u25b6</button>
+        <button class="bs-btn" data-bs="reset" title="Reset to start">\u27f2 Reset</button>
+      </div>
+    </div>
+    <div class="bs-digits">
+      ${DIGITS.map((d) => `<span class="bs-digit" data-d="${d}">${d} <em>${d === "H" ? "hundreds" : d === "T" ? "tens" : "ones"}</em></span>`).join("")}
+    </div>
+    <div class="bs-scene">
+      <div class="bs-lane">
+        <div class="bs-lane-label">Input array</div>
+        <div class="bs-track" data-lane="input"></div>
+      </div>
+      <div class="bs-band">
+        <div class="bs-band-label">Ten buckets 0–9 — each a FIFO queue
+          <span class="bs-fifo">\u21e1 push on top · collect from bottom \u21e2</span>
+        </div>
+        <div class="bs-buckets"></div>
+      </div>
+      <div class="bs-lane">
+        <div class="bs-lane-label">Output array</div>
+        <div class="bs-track" data-lane="output"></div>
+      </div>
+    </div>
+    <div class="bs-pipeline">
+      <span class="bs-pp bs-pp--in">Input</span><span class="bs-pp-arrow">\u2192</span>
+      <span class="bs-pp bs-pp--dist">Bucket Distribution</span><span class="bs-pp-arrow">\u2192</span>
+      <span class="bs-pp bs-pp--coll">FIFO Collection</span><span class="bs-pp-arrow">\u2192</span>
+      <span class="bs-pp bs-pp--out">Output</span>
+    </div>`;
+
+  const inputTrack = wrap.querySelector('[data-lane="input"]');
+  const outTrack = wrap.querySelector('[data-lane="output"]');
+  const bucketsEl = wrap.querySelector(".bs-buckets");
+  const passEl = wrap.querySelector(".bs-pass");
+  const phaseEl = wrap.querySelector(".bs-phase");
+
+  function render() {
+    const beat = beats[idx];
+    const prev = beats[Math.max(0, idx - 1)];
+    const fly = lastDelta === 1;
+    const move = beat.move;
+    bucketsEl.innerHTML = "";
+    inputTrack.innerHTML = "";
+    outTrack.innerHTML = "";
+
+    const showInput = fly && move && move.type === "enter" ? prev.cur : beat.cur;
+    showInput.forEach((v) => {
+      const t = tile(v);
+      if (fly && move && move.type === "enter" && v === move.value) {
+        t.classList.add("bs-tile--depart");
+      }
+      inputTrack.appendChild(t);
+    });
+
+    beat.buckets.forEach((q, b) => {
+      const active = move && move.bucket === b && (beat.phase === "distribute" || beat.phase === "collect");
+      const col = document.createElement("div");
+      col.className = "bs-bucket" + (active ? " bs-bucket--active" : "");
+      col.dataset.b = b;
+      const stack = document.createElement("div");
+      stack.className = "bs-bucket-stack";
+      q.forEach((v) => {
+        const t = tile(v);
+        t.classList.add("bs-tile--bucket");
+        if (fly && move && move.type === "enter" && move.bucket === b && v === move.value) {
+          t.classList.add("bs-tile--arrive");
+        }
+        stack.appendChild(t);
+      });
+      if (fly && move && move.type === "leave" && move.bucket === b) {
+        const d = tile(move.value);
+        d.classList.add("bs-tile--depart", "bs-tile--bucket");
+        stack.insertBefore(d, stack.firstChild);
+      }
+      if (stack.childElementCount === 0) {
+        const ph = document.createElement("div");
+        ph.className = "bs-bucket-empty";
+        ph.textContent = "\u2013";
+        stack.appendChild(ph);
+      }
+      col.appendChild(stack);
+      const num = document.createElement("div");
+      num.className = "bs-bucket-num";
+      num.textContent = b;
+      col.appendChild(num);
+      bucketsEl.appendChild(col);
+    });
+
+    beat.out.forEach((v, i) => {
+      const t = tile(v);
+      if (fly && move && move.type === "leave" && i === beat.out.length - 1) {
+        t.classList.add("bs-tile--arrive");
+      }
+      outTrack.appendChild(t);
+    });
+
+    // drop distances, measured once per render (input band → bucket band,
+    // bucket band → output track)
+    const gapIn = Math.max(24, inputTrack.getBoundingClientRect().bottom - bucketsEl.getBoundingClientRect().top);
+    const gapOut = Math.max(24, bucketsEl.getBoundingClientRect().bottom - outTrack.getBoundingClientRect().top);
+    bucketsEl.querySelectorAll(".bs-tile--arrive").forEach((t) => t.style.setProperty("--drop", "-" + gapIn + "px"));
+    outTrack.querySelectorAll(".bs-tile--arrive").forEach((t) => t.style.setProperty("--drop", "-" + gapOut + "px"));
+
+    // status text, digit highlight, pipeline phase
+    const dn = beat.pass > 0 && (beat.phase === "distribute" || beat.phase === "collect") ? DIGITS[PASSES - beat.pass] : null;
+    wrap.querySelectorAll(".bs-digit").forEach((el) => {
+      el.classList.toggle("bs-digit--active", el.dataset.d === dn);
+    });
+    passEl.textContent = "Pass " + beat.pass + "/" + PASSES + " · step " + idx + "/" + (beats.length - 1);
+    phaseEl.textContent = beat.text;
+    wrap.querySelectorAll(".bs-pp").forEach((el) => el.classList.remove("bs-pp--active"));
+    if (beat.phase === "distribute") { wrap.querySelector(".bs-pp--in").classList.add("bs-pp--active"); wrap.querySelector(".bs-pp--dist").classList.add("bs-pp--active"); }
+    else if (beat.phase === "collect") { wrap.querySelector(".bs-pp--coll").classList.add("bs-pp--active"); }
+    if (beat.out.length) wrap.querySelector(".bs-pp--out").classList.add("bs-pp--active");
+
+    const prevBtn = wrap.querySelector('[data-bs="prev"]');
+    const nextBtn = wrap.querySelector('[data-bs="next"]');
+    prevBtn.disabled = idx === 0;
+    nextBtn.disabled = idx === beats.length - 1;
+  }
+
+  function step(d) {
+    const n = Math.min(beats.length - 1, Math.max(0, idx + d));
+    lastDelta = d > 0 ? 1 : d < 0 ? -1 : 0;
+    idx = n;
+    render();
+  }
+
+  function togglePlay() {
+    const btn = wrap.querySelector('[data-bs="play"]');
+    if (bucketPlayTimer) {
+      clearInterval(bucketPlayTimer);
+      bucketPlayTimer = null;
+      btn.textContent = "\u25b6 Play";
+      return;
+    }
+    if (idx === beats.length - 1) { idx = 0; lastDelta = 0; render(); }
+    btn.textContent = "\u23f8 Pause";
+    bucketPlayTimer = setInterval(() => {
+      if (!wrap.isConnected) {
+        clearInterval(bucketPlayTimer);
+        bucketPlayTimer = null;
+        return;
+      }
+      if (idx >= beats.length - 1) {
+        clearInterval(bucketPlayTimer);
+        bucketPlayTimer = null;
+        btn.textContent = "\u25b6 Play";
+        return;
+      }
+      lastDelta = 1;
+      idx++;
+      render();
+    }, 1350);
+  }
+
+  wrap.querySelector('[data-bs="prev"]').addEventListener("click", () => step(-1));
+  wrap.querySelector('[data-bs="next"]').addEventListener("click", () => step(1));
+  wrap.querySelector('[data-bs="play"]').addEventListener("click", togglePlay);
+  wrap.querySelector('[data-bs="reset"]').addEventListener("click", () => {
+    clearInterval(bucketPlayTimer);
+    bucketPlayTimer = null;
+    wrap.querySelector('[data-bs="play"]').textContent = "\u25b6 Play";
+    idx = 0;
+    lastDelta = 0;
+    render();
+  });
+
+  render();
 }
 
 function buildTOC() {

@@ -3263,63 +3263,201 @@ int partition(int a[], int low, int high)
 
 <blockquote>Quick sort is the fastest comparison sort in practice, and picking the pivot carefully is what keeps the O(n²) worst case away.</blockquote>` },
       { id: "sort-06", title: "Merge Sort", difficulty: "intermediate", time: "6 min", desc: "Split into halves, sort each half, then merge them back in order.",
-        content: `<h1>Merge Sort</h1><span class="step-badge">Chapter 6</span><p>Merge sort is a pure <strong>divide and conquer</strong> algorithm. It splits the array into two halves, sorts each half recursively, and then <em>merges</em> the two sorted halves into one sorted array.</p><h2>Divide and Merge</h2><pre><code>Divide:                 Merge:
- 5  3  8  1              3  5  1  8
- /        \              / \  / \
-5 3      8 1           3 5   1 8
-/  \     /  \          /       /
-5   3   8   1         1  3  5  8</code></pre><h2>The Merge Step</h2><p>To merge two sorted halves, keep one pointer in each half. Always take the smaller of the two pointed elements and move that pointer forward.</p><pre><code>Left:  1   3   5        i
-Right: 2   8   9        j
-        ^       ^
-        i       j
+        content: `<h1>Merge Sort</h1><span class="step-badge">Chapter 6</span>
 
-Left 1 &lt; Right 2  &#8594; take 1   i++
-Left 3 &gt; Right 2  &#8594; take 2   j++
-Left 3 &lt; Right 8  &#8594; take 3   i++
-Left 5 &lt; Right 8  &#8594; take 5   i++
-Left finished       &#8594; copy rest of right: 8, 9
+<p>Merge sort is a pure <strong>divide and conquer</strong> algorithm: split the array into two halves, sort each half recursively, then <strong>merge</strong> the two sorted halves back into one sorted array. Because the halves are always equal in size, every case runs in <strong>O(n log n)</strong>.</p>
 
-Merged:  1  2  3  5  8  9</code></pre><h2>C Code</h2><pre><code>void merge(int arr[], int left, int mid, int right)
-{
-    int n1 = mid - left + 1;
-    int n2 = right - mid;
+<h2>Divide &amp; Merge</h2><p>The recursion splits the range at its middle: halving gives <code>log2(n)</code> levels and each level costs <code>O(n)</code>, so the total is <strong>O(n log n)</strong>. Here is the array:</p><pre><code>[13,  9,  7, 12,  6,  9, 12]
+  0   1   2   3   4   5   6</code></pre>
 
-    int L[n1], R[n2];
+<p>To find the middle we use <code>low + (high - low) / 2</code> — the subtraction keeps the mid safe from integer overflow:</p>
+<pre><code>mid = low + (high - low) / 2
+mid = 0 + (6 - 0) / 2 = 0 + 3 → 3</code></pre>
 
-    for (int i = 0; i &lt; n1; i++)
-        L[i] = arr[left + i];
+<h2>Divide Step</h2><p>First the range splits into a left half and a right half:</p>
+<pre><code>[13, 9, 7, 12]                [6, 9, 12]
+low=0   mid=3             mid+1=4 high=6</code></pre>
+<p>Each half keeps dividing the same way, until every part holds a single element:</p>
+<pre><code>[13, 9]  [7, 12]  [6, 9]  [12]
+[13] [9] [7] [12] [6] [9] [12]</code></pre>
 
-    for (int j = 0; j &lt; n2; j++)
-        R[j] = arr[mid + 1 + j];
+<h2>Merge Step → Working Back Up</h2><p>Now the halves are joined back together, always taking the smaller of the two current elements. Each merge reads two sorted halves and writes one sorted result back into the array:</p>
 
-    int i = 0, j = 0, k = left;
+<h3>Step 1 → merge(0, 0, 1): [13] and [9]</h3>
 
-    while (i &lt; n1 &amp;&amp; j &lt; n2)
-    {
-        if (L[i] &lt;= R[j])
-            arr[k++] = L[i++];
-        else
-            arr[k++] = R[j++];
+<pre><code>left:  [13]             right: [9]
+        ↓                       ↓
+   compare 13 vs 9 → 9 &lt; 13 → take 9 (right)
+   right exhausted → take remaining 13 (left)
+
+temp = [9, 13]</code></pre>
+
+<p>the right side takes its 9 first, then the leftover 13 is copied — the two single elements come back as one sorted pair → <code>[9, 13]</code></p>
+
+<p>End of Step 1: <code>[9, 13, 7, 12, 6, 9, 12]</code></p>
+
+<pre><code>[ 9, 13,  7, 12,  6,  9, 12]
+ ┌─────┐
+ │9, 13│  ← merged region
+ └─────┘</code></pre>
+
+<h3>Step 2 → merge(2, 2, 3): [7] and [12]</h3>
+
+<pre><code>left:  [7]              right: [12]
+        ↓                       ↓
+   compare 7 vs 12 → 7 &lt;= 12 → take 7 (left)
+   left exhausted → take remaining 12 (right)
+
+temp = [7, 12]</code></pre>
+
+<p>7 ≤ 12 sends the left element first, then the leftover 12 is copied — the two single elements come back as one sorted pair → <code>[7, 12]</code></p>
+
+<p>End of Step 2: <code>[9, 13, 7, 12, 6, 9, 12]</code></p>
+
+<pre><code>[ 9, 13,  7, 12,  6,  9, 12]
+         ┌─────┐
+         │7, 12│  ← merged region
+         └─────┘</code></pre>
+
+<h3>Step 3 → merge(0, 1, 3): [9, 13] and [7, 12]</h3>
+
+<pre><code>left:  [9, 13]          right: [7, 12]
+        ↓                       ↓
+   compare 9 vs 7 → 7 &lt; 9 → take 7 (right)
+   compare 9 vs 12 → 9 &lt;= 12 → take 9 (left)
+   compare 13 vs 12 → 12 &lt; 13 → take 12 (right)
+   right exhausted → take remaining 13 (left)
+
+temp = [7, 9, 12, 13]</code></pre>
+
+<p>right 7 leads, then 9 from the left beats 12, then 12 from the right, and 13 is copied last → <code>[7, 9, 12, 13]</code></p>
+
+<p>End of Step 3: <code>[7, 9, 12, 13, 6, 9, 12]</code></p>
+
+<pre><code>[ 7,  9, 12, 13,  6,  9, 12]
+ ┌─────────────┐
+ │7,  9, 12, 13│  ← merged region
+ └─────────────┘</code></pre>
+
+<h3>Step 4 → merge(4, 4, 5): [6] and [9]</h3>
+
+<pre><code>left:  [6]              right: [9]
+        ↓                       ↓
+   compare 6 vs 9 → 6 &lt;= 9 → take 6 (left)
+   left exhausted → take remaining 9 (right)
+
+temp = [6, 9]</code></pre>
+
+<p>6 ≤ 9 sends the left element first, then the leftover 9 is copied — the two single elements come back as one sorted pair → <code>[6, 9]</code></p>
+
+<p>End of Step 4: <code>[7, 9, 12, 13, 6, 9, 12]</code></p>
+
+<pre><code>[ 7,  9, 12, 13,  6,  9, 12]
+                 ┌─────┐
+                 │6,  9│  ← merged region
+                 └─────┘</code></pre>
+
+<h3>Step 5 → merge(4, 5, 6): [6, 9] and [12]</h3>
+
+<pre><code>left:  [6, 9]           right: [12]
+        ↓                       ↓
+   compare 6 vs 12 → 6 &lt;= 12 → take 6 (left)
+   compare 9 vs 12 → 9 &lt;= 12 → take 9 (left)
+   left exhausted → take remaining 12 (right)
+
+temp = [6, 9, 12]</code></pre>
+
+<p>both left elements win, then the leftover 12 from the right is copied → <code>[6, 9, 12]</code></p>
+
+<p>End of Step 5: <code>[7, 9, 12, 13, 6, 9, 12]</code></p>
+
+<pre><code>[ 7,  9, 12, 13,  6,  9, 12]
+                 ┌─────────┐
+                 │6,  9, 12│  ← merged region
+                 └─────────┘</code></pre>
+
+<h3>Step 6 → merge(0, 3, 6): [7, 9, 12, 13] and [6, 9, 12]</h3>
+
+<pre><code>left:  [7, 9, 12, 13]   right: [6, 9, 12]
+        ↓                       ↓
+   compare 7 vs 6 → 6 &lt; 7 → take 6 (right)
+   compare 7 vs 9 → 7 &lt;= 9 → take 7 (left)
+   compare 9 vs 9 → 9 &lt;= 9 → take 9 (left)
+   compare 12 vs 9 → 9 &lt; 12 → take 9 (right)
+   compare 12 vs 12 → 12 &lt;= 12 → take 12 (left)
+   compare 13 vs 12 → 12 &lt; 13 → take 12 (right)
+   right exhausted → take remaining 13 (left)
+
+temp = [6, 7, 9, 9, 12, 12, 13]  ← sorted ✓</code></pre>
+
+<p>the equal 9s and equal 12s stay in their original order — the ≤ keeps the sort stable — and the leftover 13 is copied last → <code>[6, 7, 9, 9, 12, 12, 13]</code></p>
+
+<p>End of Step 6: <code>[6, 7, 9, 9, 12, 12, 13]</code></p>
+
+<pre><code>[ 6,  7,  9,  9, 12, 12, 13]
+ ┌─────────────────────────┐
+ │6,  7,  9,  9, 12, 12, 13│  ← sorted ✓
+ └─────────────────────────┘</code></pre>
+
+<h2>Basic Working → every <code>merge()</code> call</h2><ul><li><code>merge(0, 0, 1)</code> → merges [13] and [9] into [9, 13]</li><li><code>merge(2, 2, 3)</code> → merges [7] and [12] into [7, 12]</li><li><code>merge(0, 1, 3)</code> → merges [9, 13] and [7, 12] into [7, 9, 12, 13]</li><li><code>merge(4, 4, 5)</code> → merges [6] and [9] into [6, 9]</li><li><code>merge(4, 5, 6)</code> → merges [6, 9] and [12] into [6, 9, 12]</li><li><code>merge(0, 3, 6)</code> → merges [7, 9, 12, 13] and [6, 9, 12] into [6, 7, 9, 9, 12, 12, 13]</li></ul>
+
+<h2>Merge Sort Tree</h2><p><code>mergeSort()</code> plays both sides of the recursion in one figure below. The top half is the <strong>divide</strong> phase: the original array splits range by range (the <code>mergeSort(low, high) &rarr; mid</code> captions) down to seven single-element leaves in the middle. The bottom half, read on upward after the middle, is the <strong>conquer</strong> phase: the leaves merge in pairs (<code>merge(low, mid, high)</code> captions) until the root holds the final sorted array:</p><div class="st2-wrap"><div class="st2-canvas" style="width:710px;height:681px;"><svg class="st2-lines" width="710" height="680" viewBox="0 0 710 680" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><g class="st2-lines-split"><line x1="395.6" y1="40.0" x2="395.6" y2="68.0"/><line x1="200.6" y1="68.0" x2="590.6" y2="68.0"/><line x1="200.6" y1="68.0" x2="200.6" y2="96.0"/><line x1="590.6" y1="68.0" x2="590.6" y2="96.0"/><line x1="200.6" y1="144.0" x2="200.6" y2="172.0"/><line x1="96.6" y1="172.0" x2="304.6" y2="172.0"/><line x1="96.6" y1="172.0" x2="96.6" y2="200.0"/><line x1="304.6" y1="172.0" x2="304.6" y2="200.0"/><line x1="590.6" y1="144.0" x2="590.6" y2="172.0"/><line x1="512.6" y1="172.0" x2="668.6" y2="172.0"/><line x1="512.6" y1="172.0" x2="512.6" y2="200.0"/><line x1="668.6" y1="172.0" x2="668.6" y2="200.0"/><line x1="96.6" y1="248.0" x2="96.6" y2="276.0"/><line x1="44.6" y1="276.0" x2="148.6" y2="276.0"/><line x1="44.6" y1="276.0" x2="44.6" y2="304.0"/><line x1="148.6" y1="276.0" x2="148.6" y2="304.0"/><line x1="304.6" y1="248.0" x2="304.6" y2="276.0"/><line x1="252.6" y1="276.0" x2="356.6" y2="276.0"/><line x1="252.6" y1="276.0" x2="252.6" y2="304.0"/><line x1="356.6" y1="276.0" x2="356.6" y2="304.0"/><line x1="512.6" y1="248.0" x2="512.6" y2="276.0"/><line x1="460.6" y1="276.0" x2="564.6" y2="276.0"/><line x1="460.6" y1="276.0" x2="460.6" y2="304.0"/><line x1="564.6" y1="276.0" x2="564.6" y2="304.0"/><g class="st2-lines-merge"><line x1="200.6" y1="560.0" x2="200.6" y2="588.0"/><line x1="590.6" y1="560.0" x2="590.6" y2="588.0"/><line x1="200.6" y1="588.0" x2="590.6" y2="588.0"/><line x1="395.6" y1="588.0" x2="395.6" y2="616.0"/><line x1="96.6" y1="456.0" x2="96.6" y2="484.0"/><line x1="304.6" y1="456.0" x2="304.6" y2="484.0"/><line x1="96.6" y1="484.0" x2="304.6" y2="484.0"/><line x1="200.6" y1="484.0" x2="200.6" y2="512.0"/><line x1="512.6" y1="456.0" x2="512.6" y2="484.0"/><line x1="668.6" y1="456.0" x2="668.6" y2="484.0"/><line x1="512.6" y1="484.0" x2="668.6" y2="484.0"/><line x1="590.6" y1="484.0" x2="590.6" y2="512.0"/><line x1="44.6" y1="352.0" x2="44.6" y2="380.0"/><line x1="148.6" y1="352.0" x2="148.6" y2="380.0"/><line x1="44.6" y1="380.0" x2="148.6" y2="380.0"/><line x1="96.6" y1="380.0" x2="96.6" y2="408.0"/><line x1="252.6" y1="352.0" x2="252.6" y2="380.0"/><line x1="356.6" y1="352.0" x2="356.6" y2="380.0"/><line x1="252.6" y1="380.0" x2="356.6" y2="380.0"/><line x1="304.6" y1="380.0" x2="304.6" y2="408.0"/><line x1="460.6" y1="352.0" x2="460.6" y2="380.0"/><line x1="564.6" y1="352.0" x2="564.6" y2="380.0"/><line x1="460.6" y1="380.0" x2="564.6" y2="380.0"/><line x1="512.6" y1="380.0" x2="512.6" y2="408.0"/></svg><div class="st2-node" style="width:213.5px;height:48px;left:288.8px;top:-8.0px;"><span class="st2-label">[13, 9, 7, 12, 6, 9, 12]</span><span class="st2-cap">mergeSort(0, 6) → mid 3</span></div><div class="st2-node" style="width:161.2px;height:48px;left:120.0px;top:96.0px;"><span class="st2-label">[13, 9, 7, 12]</span><span class="st2-cap">mergeSort(0, 3) → mid 1</span></div><div class="st2-node" style="width:161.2px;height:48px;left:510.0px;top:96.0px;"><span class="st2-label">[6, 9, 12]</span><span class="st2-cap">mergeSort(4, 6) → mid 5</span></div><div class="st2-node" style="width:161.2px;height:48px;left:16.0px;top:200.0px;"><span class="st2-label">[13, 9]</span><span class="st2-cap">mergeSort(0, 1) → mid 0</span></div><div class="st2-node" style="width:161.2px;height:48px;left:224.0px;top:200.0px;"><span class="st2-label">[7, 12]</span><span class="st2-cap">mergeSort(2, 3) → mid 2</span></div><div class="st2-node" style="width:161.2px;height:48px;left:432.0px;top:200.0px;"><span class="st2-label">[6, 9]</span><span class="st2-cap">mergeSort(4, 5) → mid 4</span></div><div class="st2-node" style="width:52.2px;height:48px;left:642.5px;top:200.0px;"><span class="st2-label">[12]</span></div><div class="st2-node" style="width:52.2px;height:48px;left:18.5px;top:304.0px;"><span class="st2-label">[13]</span></div><div class="st2-node" style="width:44.2px;height:48px;left:126.5px;top:304.0px;"><span class="st2-label">[9]</span></div><div class="st2-node" style="width:44.2px;height:48px;left:230.5px;top:304.0px;"><span class="st2-label">[7]</span></div><div class="st2-node" style="width:52.2px;height:48px;left:330.5px;top:304.0px;"><span class="st2-label">[12]</span></div><div class="st2-node" style="width:44.2px;height:48px;left:438.5px;top:304.0px;"><span class="st2-label">[6]</span></div><div class="st2-node" style="width:44.2px;height:48px;left:542.5px;top:304.0px;"><span class="st2-label">[9]</span></div><div class="st2-node" style="width:213.5px;height:48px;left:288.8px;top:616.0px;"><span class="st2-label">[6, 7, 9, 9, 12, 12, 13]</span><span class="st2-cap">merge(0, 3, 6)</span></div><div class="st2-node" style="width:132.9px;height:48px;left:134.2px;top:512.0px;"><span class="st2-label">[7, 9, 12, 13]</span><span class="st2-cap">merge(0, 1, 3)</span></div><div class="st2-node" style="width:105.9px;height:48px;left:537.6px;top:512.0px;"><span class="st2-label">[6, 9, 12]</span><span class="st2-cap">merge(4, 5, 6)</span></div><div class="st2-node" style="width:105.9px;height:48px;left:43.6px;top:408.0px;"><span class="st2-label">[9, 13]</span><span class="st2-cap">merge(0, 0, 1)</span></div><div class="st2-node" style="width:105.9px;height:48px;left:251.6px;top:408.0px;"><span class="st2-label">[7, 12]</span><span class="st2-cap">merge(2, 2, 3)</span></div><div class="st2-node" style="width:105.9px;height:48px;left:459.6px;top:408.0px;"><span class="st2-label">[6, 9]</span><span class="st2-cap">merge(4, 4, 5)</span></div><div class="st2-node" style="width:52.2px;height:48px;left:642.5px;top:408.0px;"><span class="st2-label">[12]</span></div></div></div><p>Every internal node has two children, because a mid always leaves at least one element on each side. The six merges run in exactly the reverse order of the first tree: <code>[13] + [9]</code>, <code>[7] + [12]</code>, then <code>[9, 13] + [7, 12]</code>, and so on upward to <code>[7, 9, 12, 13] + [6, 9, 12]</code> at the root &mdash; the exact calls listed in <strong>Basic Working</strong> above.</p>
+
+<h2>C Code</h2><p>The <code>merge()</code> function — the comparison lives in the first <code>while</code> loop, and the two leftover loops copy whatever remains:</p>
+<pre><code>void merge(int arr[], int low, int mid, int high) {
+    int temp[high - low + 1];
+    int left = low;       // left half starting point
+    int right = mid + 1;  // right half starting point
+    int k = 0;
+
+    while (left &lt;= mid &amp;&amp; right &lt;= high) {
+        if (arr[left] &lt;= arr[right]) {
+            temp[k++] = arr[left++];
+        } else {
+            temp[k++] = arr[right++];
+        }
     }
 
-    while (i &lt; n1)
-        arr[k++] = L[i++];
+    while (left &lt;= mid) {
+        temp[k++] = arr[left++];
+    }
 
-    while (j &lt; n2)
-        arr[k++] = R[j++];
-}
+    while (right &lt;= high) {
+        temp[k++] = arr[right++];
+    }
 
-void mergeSort(int arr[], int left, int right)
-{
-    if (left &gt;= right)
-        return;
+    for (int i = low; i &lt;= high; i++) {
+        arr[i] = temp[i - low];
+    }
+}</code></pre>
+<p>The <code>mergeSort()</code> function only divides and recurses — all the sorting happens inside <code>merge()</code>:</p>
+<pre><code>void mergeSort(int arr[], int low, int high) {
+    if (low &gt;= high) return;
 
-    int mid = left + (right - left) / 2;
+    int mid = low + (high - low) / 2;
 
-    mergeSort(arr, left, mid);
-    mergeSort(arr, mid + 1, right);
-    merge(arr, left, mid, right);
-}</code></pre><p>Two details to remember:</p><ul><li><code>&lt;=</code> in the merge comparison keeps the sort <strong>stable</strong>.</li><li>The two <code>while</code> loops at the end copy whatever is left in the other half.</li></ul><h2>Complexity</h2><table><thead><tr><th>Case</th><th>Time</th></tr></thead><tbody><tr><td>Best</td><td>O(n log n)</td></tr><tr><td>Average</td><td>O(n log n)</td></tr><tr><td>Worst</td><td>O(n log n)</td></tr></tbody></table><p>Space: <strong>O(n)</strong> — it is out-of-place. Stable: <strong>Yes</strong>. The time is always <code>O(n log n)</code> because the array is always split into two equal halves.</p><blockquote>Merge sort never degrades to O(n²) and is stable, which makes it the standard choice for sorting linked lists and large files that are sorted separately and merged later.</blockquote>` },
+    mergeSort(arr, low, mid);
+    mergeSort(arr, mid + 1, high);
+    merge(arr, low, mid, high);
+}</code></pre>
+
+<h2>Key Idea</h2><blockquote><p>Merge sort keeps dividing the array until every part has only one element, then joins those parts back together in sorted order.</p></blockquote>
+<p>The <strong>sorting happens during the merge step</strong>. Equal elements are taken from the left half first, so the <code>&lt;=</code> comparison keeps the sort <strong>stable</strong>:</p>
+<pre><code>while (left &lt;= mid &amp;&amp; right &lt;= high) {
+    if (arr[left] &lt;= arr[right]) {
+        temp[k++] = arr[left++];
+    } else {
+        temp[k++] = arr[right++];
+    }
+}</code></pre>
+
+<h2>Complexity</h2><table><thead><tr><th>Case</th><th>Time</th><th>Why it never changes</th></tr></thead><tbody><tr><td>Best</td><td>O(n log n)</td><td>The array always splits into two equal halves</td></tr><tr><td>Average</td><td>O(n log n)</td><td>The tree shape is the same for any data</td></tr><tr><td>Worst</td><td>O(n log n)</td><td>A balanced split never degrades to O(n²)</td></tr></tbody></table>
+
+<p><strong>Space:</strong> O(n) for the temporary array, plus O(log n) recursion stack. <strong>Stable:</strong> yes.</p>
+
+<h2>When Merge Sort Shines</h2><ul><li>Linked lists — merging needs no random access, you can rewire pointers.</li><li>When stability matters — equal elements keep their original order.</li><li>When the worst case must stay O(n log n) — no bad input exists.</li><li>External sorting — big files are sorted in chunks, then merged.</li></ul>
+
+<blockquote>Merge sort trades extra memory for a guaranteed, stable O(n log n): it always needs O(n) extra space instead of sorting in place.</blockquote>` },
       { id: "sort-07", title: "Sorting Quick Reference", difficulty: "beginner", time: "4 min", desc: "All sorting algorithms compared, plus how to choose one.",
         content: `<h1>Sorting Quick Reference</h1><span class="step-badge">Chapter 7</span><h2>Complexity Table</h2><table><thead><tr><th>Algorithm</th><th>Best</th><th>Average</th><th>Worst</th><th>Space</th><th>Stable</th></tr></thead><tbody><tr><td>Bubble Sort</td><td>O(n)</td><td>O(n²)</td><td>O(n²)</td><td>O(1)</td><td>Yes</td></tr><tr><td>Selection Sort</td><td>O(n²)</td><td>O(n²)</td><td>O(n²)</td><td>O(1)</td><td>No</td></tr><tr><td>Insertion Sort</td><td>O(n)</td><td>O(n²)</td><td>O(n²)</td><td>O(1)</td><td>Yes</td></tr><tr><td>Quick Sort</td><td>O(n log n)</td><td>O(n log n)</td><td>O(n²)</td><td>O(log n)</td><td>No</td></tr><tr><td>Merge Sort</td><td>O(n log n)</td><td>O(n log n)</td><td>O(n log n)</td><td>O(n)</td><td>Yes</td></tr><tr><td>Counting Sort</td><td>O(n + k)</td><td>O(n + k)</td><td>O(n + k)</td><td>O(k)</td><td>Yes</td></tr></tbody></table><p>where <code>n</code> = number of elements and <code>k</code> = range of values (for counting sort).</p><h2>Which Sort Should You Use?</h2><table><thead><tr><th>Situation</th><th>Use</th></tr></thead><tbody><tr><td>Very small array</td><td>Insertion sort</td></tr><tr><td>Nearly sorted data</td><td>Insertion sort</td></tr><tr><td>Few swaps needed / big records</td><td>Selection sort</td></tr><tr><td>Fastest general purpose, in place</td><td>Quick sort</td></tr><tr><td>Stability required, or linked list</td><td>Merge sort</td></tr><tr><td>Small value range (marks, grades)</td><td>Counting sort</td></tr></tbody></table><h2>Formulas To Remember</h2><ul><li>Comparisons in selection sort: <code>n(n-1)/2</code></li><li>Maximum swaps in selection sort: <code>n - 1</code></li><li>Height of the recursion tree (merge/quick): <code>log2(n)</code></li><li>Levels of merge sort: <code>log2(n)</code>, work per level: <code>O(n)</code>, total: <code>O(n log n)</code></li></ul><h2>Comparison vs Non-Comparison</h2><pre><code>Comparison based  &#8594; compares two elements
                     bubble, selection, insertion,
@@ -3328,7 +3466,53 @@ void mergeSort(int arr[], int left, int right)
 
 Non-comparison    &#8594; uses the value directly
                     counting, bucket, radix
-                    can be O(n)</code></pre><blockquote>No single algorithm is best for everything — pick based on the size of the data, how sorted it already is, whether stability matters, and how much extra memory you can use.</blockquote>` }
+                    can be O(n)</code></pre><blockquote>No single algorithm is best for everything — pick based on the size of the data, how sorted it already is, whether stability matters, and how much extra memory you can use.</blockquote>` },
+
+                  { id: "sort-08", title: "Radix Sort", difficulty: "intermediate", time: "6 min", desc: "Ten FIFO buckets, one digit at a time, no comparisons needed.",
+                    content: `<h1>Radix Sort</h1><span class="step-badge">Chapter 8</span>
+
+<p><strong>Radix sort</strong> (also called <strong>LSD radix sort</strong>), shown here in its bucket form, never compares two elements. Instead it looks at one <strong>digit</strong> of every number at a time and drops each number into one of <strong>10 buckets numbered 0&ndash;9</strong> that match its digit. After every number has been placed, the buckets are collected back in order &mdash; and after as many passes as the biggest number has digits, the array comes out fully sorted.</p>
+
+<h2>Key Idea</h2><blockquote><p>Radix sort uses buckets as FIFO queues &mdash; each pass distributes every number into the bucket for its current digit, then collects the buckets from 0 to 9. Because a queue always keeps first-in-first-out order, the work of every earlier pass is preserved.</p></blockquote>
+
+<h2>The Digits &mdash; HTO</h2><p>Decimal numbers are made of place values, usually remembered as <strong>H</strong>undreds &mdash; <strong>T</strong>ens &mdash; <strong>O</strong>nes. The biggest number here is <code>802</code> (three digits), so we need three passes: ones first, then tens, then hundreds.</p><pre><code>H T O
+1 2 3  → place value (how many times 10²…)
+8 0 2  → 802 = 8 hundreds, 0 tens, 2 ones
+      ^
+      → pass 1 reads this O digit
+</code></pre>
+
+<h2>Visualizer</h2><p>Stepping forward one move at a time is the clearest way to see the FIFO rule: a number drops out of the <strong>input</strong>, lands on top of its bucket&rsquo;s stack, and during collection leaves from the <em>bottom</em> of the stack &mdash; the earliest value in exits first &mdash; bucket 0 first, bucket 9 last.</p><div class="bs-wrap" id="bs-wrap" data-array="[9,45,802,3,67,100]"></div><p class="bs-guide">Tip: <strong>Step</strong> shows one move at a time, <strong>Reset</strong> rewinds, and <strong>Play</strong> runs all three passes at a comfortable speed. Watch the <code>O</code>/<code>T</code>/<code>H</code> highlight above the buckets &mdash; it marks the digit each pass is reading.</p>
+
+<h2>Radix Sort &mdash; Pass by Pass</h2><p>Initial array: <code>[9, 45, 802, 3, 67, 100]</code></p>
+
+<h3>Pass 1 of 3 &mdash; ONES digit (O)</h3><p>Pass 1 of 3 &mdash; read the <strong>ones (O)</strong> digit. First every number is placed into the bucket for its ones (O) digit:</p><pre><code>bucket 00  [100]
+bucket 02  [802]
+bucket 03  [3]
+bucket 05  [45]
+bucket 07  [67]
+bucket 09  [9]</code></pre><p>Collecting every non-empty bucket from 0 to 9 &mdash; each queue shifted from its front &mdash; gives:</p><pre><code>[100, 802, 3, 45, 67, 9]</code></pre>
+
+<h3>Pass 2 of 3 &mdash; TENS (T digit (T)</h3><p>Pass 2 of 3 &mdash; read the <strong>tens (T)</strong> digit. First every number is placed into the bucket for its tens (T) digit:</p><pre><code>bucket 00  [100, 802, 3, 9]
+bucket 04  [45]
+bucket 06  [67]</code></pre><p>Collecting every non-empty bucket from 0 to 9 &mdash; each queue shifted from its front &mdash; gives:</p><pre><code>[100, 802, 3, 9, 45, 67]</code></pre>
+
+<h3>Pass 3 of 3 &mdash; HUNDREDS (H digit (H)</h3><p>Pass 3 of 3 &mdash; read the <strong>hundreds (H)</strong> digit. First every number is placed into the bucket for its hundreds (H) digit:</p><pre><code>bucket 00  [3, 9, 45, 67]
+bucket 01  [100]
+bucket 08  [802]</code></pre><p>Collecting every non-empty bucket from 0 to 9 &mdash; each queue shifted from its front &mdash; gives:</p><pre><code>[3, 9, 45, 67, 100, 802]</code></pre>
+
+<p>The final, fully sorted result after the hundreds pass:</p><pre><code>[3, 9, 45, 67, 100, 802]</code></pre>
+
+<h2>Why the Buckets Must Stay FIFO</h2><p>The collection step only works if every bucket preserves the order its values arrived in. Look at bucket 0 after pass 2: <code>[100, 802, 3, 9]</code> &mdash; 100 arrived first, then 802, 3 and 9. Collecting takes the <em>front</em> of the queue, so 100 leaves before 802. If a bucket reversed its order at collection time, the previous passes&rsquo; sorting would be undone &mdash; the stable, order-preserving queue is exactly what makes radix sort work.</p>
+
+<h2>Digit Places &mdash; How Many Passes?</h2><p>One pass per digit, from the least significant digit upward:</p><table><thead><tr><th>Place</th><th>Example number</th><th>Passes needed</th></tr></thead><tbody><tr><td>O</td><td>9 &mdash; ones only</td><td>1 pass</td></tr><tr><td>TO</td><td>45 &mdash; tens and ones</td><td>2 passes</td></tr><tr><td>HTO</td><td>802 &mdash; hundreds, tens, ones</td><td>3 passes</td></tr><tr><td>THTO</td><td>8020 &mdash; thousands and up</td><td>4 passes</td></tr></tbody></table>
+
+<h2>Complexity</h2><table><thead><tr><th>Case</th><th>Time</th><th>Note</th></tr></thead><tbody><tr><td>Best</td><td>O(d &middot; (n + k))</td><td>d = digit passes, k = 10 buckets</td></tr><tr><td>Average</td><td>O(d &middot; (n + k))</td><td>independent of the values themselves</td></tr><tr><td>Worst</td><td>O(d &middot; (n + k))</td><td>stable at each digit &mdash; no bad input</td></tr></tbody></table><p><strong>Space:</strong> O(n + k) for the ten buckets. <strong>Stable:</strong> yes, because of the FIFO queues (though stability depends on collecting in a stable order).</p>
+
+<h2>When Radix Sort Shines</h2><ul><li>Fixed-length keys &mdash; IDs, phone numbers, dates, IP addresses.</li><li>Small value ranges, short digits &mdash; few passes of n + 10 work each.</li><li>When stability across passes matters &mdash; the FIFO queues preserve order.</li><li>As the building block inside suffix arrays, radix-trie and hashing tools.</li></ul>
+
+<blockquote>Radix sort trades ten extra lists for a sort that runs in near-linear time &mdash; but it can only sort keys that can be split into digits or ranks.</blockquote>` }
+
     ]
   },
   {
