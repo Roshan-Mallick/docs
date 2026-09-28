@@ -275,6 +275,11 @@ function openArticle(topic, article) {
 
   document.getElementById("articleBack")?.addEventListener("click", showHome);
 
+  normalizeSortTree(articleBody);
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(() => normalizeSortTree(articleBody));
+  }
+
   document.querySelectorAll(".sidebar-item.active, .sidebar-child.active").forEach((el) => el.classList.remove("active"));
   const sidebarTopic = document.querySelector(`.sidebar-item[data-id="${topic.id}"]`);
   if (sidebarTopic) {
@@ -291,6 +296,25 @@ function openArticle(topic, article) {
 
   buildTOC();
   window.scrollTo(0, 0);
+}
+
+function normalizeSortTree(root) {
+  if (!root) return;
+  const rows = Array.from(root.querySelectorAll(".st-row")).reverse();
+  rows.forEach((row) => {
+    const halves = Array.from(row.children);
+    if (halves.length < 2) return;
+    halves.forEach((h) => {
+      h.style.width = "";
+      h.style.flex = "";
+    });
+    const natural = halves.map((h) => h.getBoundingClientRect().width);
+    const w = Math.max(...natural);
+    halves.forEach((h) => {
+      h.style.width = w + "px";
+      h.style.flex = "0 0 " + w + "px";
+    });
+  });
 }
 
 function buildTOC() {
@@ -525,6 +549,10 @@ sidebarOverlay.addEventListener("click", closeSidebarMobile);
 // ═══════════════════════════════════════════════════════════
 //  PROGRESS BAR & BACK TO TOP
 // ═══════════════════════════════════════════════════════════
+
+window.addEventListener("resize", () => {
+  normalizeSortTree(articleBody);
+});
 
 window.addEventListener("scroll", () => {
   const scrollTop = window.scrollY;

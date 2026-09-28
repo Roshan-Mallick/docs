@@ -3050,68 +3050,218 @@ if (arr[j] &lt; arr[minIndex])
 
 <blockquote>Insertion sort is the fastest simple sort when the data is small or almost sorted, and it is the only simple sort that handles linked lists naturally.</blockquote>` },
       { id: "sort-05", title: "Quick Sort", difficulty: "intermediate", time: "6 min", desc: "Divide and conquer with a pivot, partition step and recursion.",
-        content: `<h1>Quick Sort</h1><span class="step-badge">Chapter 5</span><p>Quick sort picks one element as the <strong>pivot</strong>, arranges the array so that smaller values are on the left and bigger values on the right, and then repeats the same work on the two parts.</p><h2>The Three Steps</h2><pre><code>1. PIVOT     — choose an element (here: the last element).
-2. PARTITION — smaller values to the left, bigger to the right.
-3. RECURSE   — apply quick sort on the left part and the right part.</code></pre><h2>Partition (Lomuto scheme)</h2><pre><code>Array:  5   3   8   1   2
-pivot = arr[high] = 2
-i is the boundary of the "smaller than pivot" region
+        content: `<h1>Quick Sort</h1><span class="step-badge">Chapter 5</span>
 
-j=0: 5 &gt; 2  &#8594;  i++        i = 1
-j=1: 3 &gt; 2  &#8594;  i++        i = 2
-j=2: 8 &gt; 2  &#8594;  i++        i = 3
-j=3: 1 &gt; 2 ? no
+<p>Quick sort picks one element as the <strong>pivot</strong>, then rearranges the array so that everything smaller sits on its left and everything bigger on its right. Once the pivot is in the middle with its final index, the same job is repeated on the left part and the right part.</p>
 
-swap(arr[3], arr[3])   &#8594;   5   3   8   1   2
-swap(arr[3], arr[4])   &#8594;   5   3   8   2   1
-                         &#9656;  pivot 2 is now at its final index 3
-                         5   3   8   |   1
-                         \_________/
-                          now sort these two parts</code></pre><h2>C Code</h2><pre><code>int partition(int arr[], int low, int high)
+<h2>Core Idea</h2><ol><li><strong>Pick</strong> a pivot — here <code>a[low]</code>.</li><li><strong>Walk</strong> <code>i</code> right and <code>j</code> left until they meet or cross.</li><li><strong>Swap</strong> every out-of-order pair, then swap the pivot into the spot <code>j</code> landed on.</li><li><strong>Recurse</strong> on the left part and the right part, which are both shorter.</li></ol>
+
+<h2>Algorithm Dry Run</h2><p>Array:</p><pre><code>[65, 34, 99, 18, 78, 25, 84]
+  0   1   2   3   4   5   6</code></pre>
+
+<h3>Step 1 → partition(0, 6) pivot 65</h3>
+
+<pre><code>[65, 34, 99, 18, 78, 25, 84]
+  0   1   2   3   4   5   6
+      ↑                   ↑
+                               pivot = a[0] = 65, i = 1, j = 6
+
+[65, 34, 99, 18, 78, 25, 84]
+  0   1   2   3   4   5   6
+      ↑                   ↑
+                               i scan: 34 &lt;= 65 ✓, 99 &lt;= 65 ✗ → i = 2
+
+[65, 34, 99, 18, 78, 25, 84]
+  0   1   2   3   4   5   6
+          ↑           ↑
+                               j scan: 84 &gt; 65 ✓, 25 &gt; 65 ✗ → j = 5
+
+[65, 34, 99, 18, 78, 25, 84]
+  0   1   2   3   4   5   6
+          ↑           ↑
+                               i = 2 &lt; j = 5 → swap a[2] with a[5]
+
+[65, 34, 25, 18, 78, 99, 84]
+  0   1   2   3   4   5   6
+          ↑           ↑
+                               i scan: 25 &lt;= 65 ✓, 18 &lt;= 65 ✓, 78 &lt;= 65 ✗ → i = 4
+
+[65, 34, 25, 18, 78, 99, 84]
+  0   1   2   3   4   5   6
+              ↑   ↑
+                               j scan: 99 &gt; 65 ✓, 78 &gt; 65 ✓, 18 &gt; 65 ✗ → j = 3
+
+[65, 34, 25, 18, 78, 99, 84]
+  0   1   2   3   4   5   6
+              ↑   ↑
+                               i = 4 &gt; j = 3 → the walk is over, break
+
+[65, 34, 25, 18, 78, 99, 84]
+  0   1   2   3   4   5   6
+  ↑           ↑
+                               swap a[0] with a[3] → pivot 65 is now at index 3</code></pre>
+
+<p>the walk crosses over (i = 4, j = 3), so the pivot is swapped into index 3 and 65 never moves again → <code>[18, 34, 25, 65, 78, 99, 84]</code></p>
+
+<p>End of Step 1: <code>[18, 34, 25, 65, 78, 99, 84]</code></p>
+
+<pre><code>[18, 34, 25, 65, 78, 99, 84]
+            ┌──┐
+            │65│  ← final position
+            └──┘</code></pre>
+
+<h3>Step 2 → partition(0, 2) pivot 18</h3>
+
+<pre><code>[18, 34, 25, 65, 78, 99, 84]
+  0   1   2   3   4   5   6
+      ↑   ↑
+                               pivot = a[0] = 18, i = 1, j = 2
+
+[18, 34, 25, 65, 78, 99, 84]
+  0   1   2   3   4   5   6
+      ↑   ↑
+                               i scan: 34 &lt;= 18 ✗ → i = 1
+
+[18, 34, 25, 65, 78, 99, 84]
+  0   1   2   3   4   5   6
+  ↑   ↑
+                               j scan: 25 &gt; 18 ✓, 34 &gt; 18 ✓, 18 &gt; 18 ✗ → j = 0
+
+[18, 34, 25, 65, 78, 99, 84]
+  0   1   2   3   4   5   6
+  ↑   ↑
+                               i = 1 &gt; j = 0 → the walk is over, break
+
+[18, 34, 25, 65, 78, 99, 84]
+  0   1   2   3   4   5   6
+  ↑
+                               swap a[0] with a[0] → a[0] swaps with itself, nothing moves</code></pre>
+
+<p>j is pulled all the way to index 0 by the pivot itself, so 18 is already in its final spot and nothing moves → <code>[18, 34, 25, 65, 78, 99, 84]</code></p>
+
+<p>End of Step 2: <code>[18, 34, 25, 65, 78, 99, 84]</code></p>
+
+<pre><code>[18, 34, 25, 65, 78, 99, 84]
+┌──┐
+│18│  ← final position
+└──┘</code></pre>
+
+<h3>Step 3 → partition(1, 2) pivot 34</h3>
+
+<pre><code>[18, 34, 25, 65, 78, 99, 84]
+  0   1   2   3   4   5   6
+          ↑
+                               pivot = a[1] = 34, i = 2, j = 2
+
+[18, 34, 25, 65, 78, 99, 84]
+  0   1   2   3   4   5   6
+      ↑   ↑
+                               swap a[1] with a[2] → pivot 34 is now at index 2</code></pre>
+
+<p>the main loop never runs, because i = 2 is not less than j = 2, and the final swap puts 34 at index 2 → <code>[18, 25, 34, 65, 78, 99, 84]</code></p>
+
+<p>End of Step 3: <code>[18, 25, 34, 65, 78, 99, 84]</code></p>
+
+<pre><code>[18, 25, 34, 65, 78, 99, 84]
+        ┌──┐
+        │34│  ← final position
+        └──┘</code></pre>
+
+<h3>Step 4 → partition(4, 6) pivot 78</h3>
+
+<pre><code>[18, 25, 34, 65, 78, 99, 84]
+  0   1   2   3   4   5   6
+                      ↑   ↑
+                               pivot = a[4] = 78, i = 5, j = 6
+
+[18, 25, 34, 65, 78, 99, 84]
+  0   1   2   3   4   5   6
+                      ↑   ↑
+                               i scan: 99 &lt;= 78 ✗ → i = 5
+
+[18, 25, 34, 65, 78, 99, 84]
+  0   1   2   3   4   5   6
+                  ↑   ↑
+                               j scan: 84 &gt; 78 ✓, 99 &gt; 78 ✓, 78 &gt; 78 ✗ → j = 4
+
+[18, 25, 34, 65, 78, 99, 84]
+  0   1   2   3   4   5   6
+                  ↑   ↑
+                               i = 5 &gt; j = 4 → the walk is over, break
+
+[18, 25, 34, 65, 78, 99, 84]
+  0   1   2   3   4   5   6
+                  ↑
+                               swap a[4] with a[4] → a[4] swaps with itself, nothing moves</code></pre>
+
+<p>same shape as step 2: 78 is the smallest of the three, so the partition is a no-op → <code>[18, 25, 34, 65, 78, 99, 84]</code></p>
+
+<p>End of Step 4: <code>[18, 25, 34, 65, 78, 99, 84]</code></p>
+
+<pre><code>[18, 25, 34, 65, 78, 99, 84]
+                ┌──┐
+                │78│  ← final position
+                └──┘</code></pre>
+
+<h3>Step 5 → partition(5, 6) pivot 99</h3>
+
+<pre><code>[18, 25, 34, 65, 78, 99, 84]
+  0   1   2   3   4   5   6
+                          ↑
+                               pivot = a[5] = 99, i = 6, j = 6
+
+[18, 25, 34, 65, 78, 99, 84]
+  0   1   2   3   4   5   6
+                      ↑   ↑
+                               swap a[5] with a[6] → pivot 99 is now at index 6</code></pre>
+
+<p>the main loop never runs, and the final swap puts 99 at index 6 → <code>[18, 25, 34, 65, 78, 84, 99]</code></p>
+
+<p>End of Step 5: <code>[18, 25, 34, 65, 78, 84, 99]</code></p>
+
+<pre><code>[18, 25, 34, 65, 78, 84, 99]
+┌──────────────────────────┐
+│18, 25, 34, 65, 78, 84, 99│  ← sorted ✓
+└──────────────────────────┘</code></pre>
+
+<h2>Basic Working → every <code>partition()</code> call</h2><ul><li><code>partition(0, 6)</code> → puts 65 at index 3</li><li><code>partition(0, 2)</code> → puts 18 at index 0</li><li><code>partition(1, 2)</code> → puts 34 at index 2</li><li><code>partition(4, 6)</code> → puts 78 at index 4</li><li><code>partition(5, 6)</code> → puts 99 at index 6</li></ul>
+
+<h2>Partition Tree</h2><p>Each node is one <code>partition()</code> call, and the tree splits exactly where the pivot landed:</p><div class="st-wrap"><div class="st-tree"><div class="st-node"><span class="st-label">[65, 34, 99, 18, 78, 25, 84]</span><span class="st-pivot">pivot 65 → index 3</span><div class="st-branches"><span class="st-trunk"></span><span class="st-arm"></span><div class="st-row"><div class="st-half"><div class="st-node"><span class="st-label">[18, 34, 25]</span><span class="st-pivot">pivot 18 → index 0</span><div class="st-branches"><span class="st-trunk"></span><span class="st-arm"></span><div class="st-row"><div class="st-half"><div class="st-node"><span class="st-label">[ ∅ ]</span></div></div><div class="st-half"><div class="st-node"><span class="st-label">[34, 25]</span><span class="st-pivot">pivot 34 → index 2</span><div class="st-branches"><span class="st-trunk"></span><span class="st-arm"></span><div class="st-row"><div class="st-half"><div class="st-node"><span class="st-label">[25]</span></div></div><div class="st-half"><div class="st-node"><span class="st-label">[ ∅ ]</span></div></div></div></div></div></div></div></div></div></div><div class="st-half"><div class="st-node"><span class="st-label">[78, 99, 84]</span><span class="st-pivot">pivot 78 → index 4</span><div class="st-branches"><span class="st-trunk"></span><span class="st-arm"></span><div class="st-row"><div class="st-half"><div class="st-node"><span class="st-label">[ ∅ ]</span></div></div><div class="st-half"><div class="st-node"><span class="st-label">[99, 84]</span><span class="st-pivot">pivot 99 → index 6</span><div class="st-branches"><span class="st-trunk"></span><span class="st-arm"></span><div class="st-row"><div class="st-half"><div class="st-node"><span class="st-label">[84]</span></div></div><div class="st-half"><div class="st-node"><span class="st-label">[ ∅ ]</span></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div>
+
+<p><code>[ ∅ ]</code> is the empty side of the split: when a pivot lands at the very edge of its range (18 → index 0, 78 → index 4, 99 → index 6), one half has no elements left, so no recursive call is made for it.</p>
+
+<h2>C Code</h2><pre><code>void quickSort(int a[], int low, int high)
 {
-    int pivot = arr[high];
-    int i = low - 1;
-
-    for (int j = low; j &lt; high; j++)
-    {
-        if (arr[j] &lt; pivot)
-        {
-            i++;
-            int temp = arr[i];
-            arr[i] = arr[j];
-            arr[j] = temp;
-        }
-    }
-
-    int pivotIndex = i + 1;
-    int temp = arr[pivotIndex];
-    arr[pivotIndex] = arr[high];
-    arr[high] = temp;
-
-    return pivotIndex;
+    if (low &gt;= high) return;
+    int p = partition(a, low, high);
+    quickSort(a, low, p - 1);
+    quickSort(a, p + 1, high);
 }
 
-void quickSort(int arr[], int low, int high)
+int partition(int a[], int low, int high)
 {
-    if (low &gt;= high)
-        return;
+    int pivot = a[low];
+    int i = low + 1;
+    int j = high;
 
-    int pi = partition(arr, low, high);
+    while (i &lt; j) {
+        while (i &lt;= high &amp;&amp; a[i] &lt;= pivot) i++;
+        while (a[j] &gt; pivot) j--;
+        if (i &gt; j) break;
+        swap(a[i], a[j]);
+    }
 
-    quickSort(arr, low, pi - 1);
-    quickSort(arr, pi + 1, high);
-}</code></pre><h2>Recursion Trace</h2><pre><code>quickSort(5 3 8 1 2, 0, 4)
-   pivot 2 fixed at index 3
-   |
-   +-- quickSort(5 3 8, 0, 2)
-   |      pivot 8 fixed at index 2
-   |      |
-   |      +-- quickSort(5 3, 0, 1)
-   |             pivot 3 fixed at index 1
-   |             +-- quickSort(5, 0, 0)  &#8594; already sorted
-   |
-   +-- quickSort(1, 4, 4)  &#8594; already sorted
+    swap(a[low], a[j]);
+    return j;
+}</code></pre>
 
-Result: 1 2 3 5 8</code></pre><h2>Complexity</h2><table><thead><tr><th>Case</th><th>Time</th><th>When</th></tr></thead><tbody><tr><td>Best / Average</td><td>O(n log n)</td><td>Good pivot, balanced partitions</td></tr><tr><td>Worst</td><td>O(n²)</td><td>Already sorted array with last-element pivot</td></tr></tbody></table><p>Space: <strong>O(log n)</strong> for the recursion stack. Stable: <strong>No</strong>. The <code>low &gt;= high</code> base case stops the recursion — without it, the same element would be partitioned forever.</p><blockquote>Quick sort is the fastest general-purpose comparison sort in practice, because it sorts in place and has excellent cache behaviour. Choosing a random or middle pivot removes the O(n²) worst case.</blockquote>` },
+<h2>Complexity</h2><table><thead><tr><th>Case</th><th>Time</th><th>When</th></tr></thead><tbody><tr><td>Best</td><td>O(n log n)</td><td>The pivot keeps landing in the middle</td></tr><tr><td>Average</td><td>O(n log n)</td><td>Random data</td></tr><tr><td>Worst</td><td>O(n²)</td><td>Sorted or reverse sorted with a[low] as pivot</td></tr></tbody></table>
+
+<p><strong>Space:</strong> O(log n) on average from the recursion stack. <strong>Stable:</strong> no.</p>
+
+<h2>When Quick Sort Shines</h2><ul><li>Large arrays — it is the fastest general-purpose sort in practice.</li><li>Arrays that are nearly sorted, as long as the pivot is not always taken from one end.</li><li>It sorts in place, so no extra array is needed for the data itself.</li></ul>
+
+<blockquote>Quick sort is the fastest comparison sort in practice, and picking the pivot carefully is what keeps the O(n²) worst case away.</blockquote>` },
       { id: "sort-06", title: "Merge Sort", difficulty: "intermediate", time: "6 min", desc: "Split into halves, sort each half, then merge them back in order.",
         content: `<h1>Merge Sort</h1><span class="step-badge">Chapter 6</span><p>Merge sort is a pure <strong>divide and conquer</strong> algorithm. It splits the array into two halves, sorts each half recursively, and then <em>merges</em> the two sorted halves into one sorted array.</p><h2>Divide and Merge</h2><pre><code>Divide:                 Merge:
  5  3  8  1              3  5  1  8
