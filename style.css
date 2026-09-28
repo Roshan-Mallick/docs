@@ -1344,6 +1344,56 @@ code {
   white-space: nowrap;
 }
 
+/* Quick sort partition node extras */
+
+.st2-meta {
+  font-family: var(--font);
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.st2-ranges {
+  font-family: var(--font);
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  opacity: 0.85;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.st2-tag {
+  font-family: var(--font);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.st2-result {
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--code-text);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.st2-lines-qsort .st2-guide,
+.st2-lines-qsort .st2-arrow,
+.st2-lines-split .st2-guide,
+.st2-lines-split .st2-arrow {
+  stroke: var(--code-text);
+  stroke-width: 2;
+  opacity: 0.35;
+  fill: none;
+}
+
 /* ── Bucket Sort visualizer (interactive) ────────────────── */
 
 .bs-wrap {
