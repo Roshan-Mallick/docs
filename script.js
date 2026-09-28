@@ -280,6 +280,7 @@ function openArticle(topic, article) {
     document.fonts.ready.then(() => normalizeSortTree(articleBody));
   }
   initBucketViz(articleBody);
+  initBucketSortViz(articleBody);
 
   document.querySelectorAll(".sidebar-item.active, .sidebar-child.active").forEach((el) => el.classList.remove("active"));
   const sidebarTopic = document.querySelector(`.sidebar-item[data-id="${topic.id}"]`);
@@ -582,6 +583,453 @@ function initBucketViz(root) {
   render();
 }
 
+// ═══════════════════════════════════════════════════════════
+//  BUCKET SORT VISUALIZER (interactive)
+//  value → bucket range → bucket → insertion sort inside each →
+//  concatenation left→right → sorted array
+//  Two methods, both derived from the real algorithm:
+//    Fixed-width: idx = ⌊(v − min) ÷ width⌋   width = ⌈(max−min) ÷ k⌉
+//    Fixed-count: idx = ⌊(v − min) × k ÷ (max − min + 1)⌋
+//  Every beat snapshot is produced by an actual run of the bucket-sort
+//  simulation, so the animation can never disagree with the math.
+// ═══════════════════════════════════════════════════════════
+
+let bkPlayTimer = null;
+
+function initBucketSortViz(root) {
+  if (bkPlayTimer) {
+    clearInterval(bkPlayTimer);
+    bkPlayTimer = null;
+  }
+  if (!root) return;
+  const wrap = root.querySelector("#bucket-wrap");
+  if (!wrap) return;
+  let data;
+  try {
+    data = JSON.parse(wrap.dataset.array);
+  } catch (e) {
+    return;
+  }
+  if (!Array.isArray(data) || data.length === 0) return;
+
+  const PRESETS = [
+    [7, 45, 250, 4790],
+    [29, 15, 43, 7, 88, 61, 34],
+    [48, 12, 73, 5, 89, 31, 77, 16, 58, 95, 24, 42],
+    [4, 2, 9, 1, 3]
+  ];
+  const METHOD_KEY = "bkMethod";
+  const clampNum = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+  const fmt = (a) => "[" + a.join(", ") + "]";
+  const arrayEquals = (a, b) =>
+    Array.isArray(a) && Array.isArray(b) && a.length === b.length && a.every((x, i) => x === b[i]);
+  const tile = (v) => {
+    const t = document.createElement("div");
+    t.className = "bs-tile";
+    t.textContent = v;
+    return t;
+  };
+  const rangeText = (r) => r.lo + "\u2013" + r.hi;
+  const methodLabel = (m) => (m === "count" ? "Fixed-Count" : "Fixed-Width");
+
+  // ── bucket plan: dynamic bucket count + ranges from the data ─────
+  function makePlan(array, m) {
+    const min = Math.min(...array);
+    const max = Math.max(...array);
+    const span = max - min;
+    const kTarget = clampNum(Math.round(Math.sqrt(2 * array.length)), 4, 10);
+    let nb, width, idxOf, ranges;
+    if (span === 0) {
+      nb = 1;
+      width = 1;
+      ranges = [{ lo: min, hi: max }];
+      idxOf = () => 0;
+    } else if (m === "width") {
+      width = Math.max(1, Math.ceil(span / kTarget));
+      const last = Math.floor(span / width);
+      nb = last + 1;
+      ranges = [];
+      for (let b = 0; b < nb; b++) {
+        ranges.push({
+          lo: min + b * width,
+          hi: b === nb - 1 ? max : min + (b + 1) * width - 1
+        });
+      }
+      idxOf = (v) => Math.floor((v - min) / width);
+    } else {
+      nb = kTarget;
+      const den = span + 1;
+      ranges = [];
+      for (let b = 0; b < nb; b++) {
+        ranges.push({
+          lo: min + Math.ceil((b * den) / nb),
+          hi: b === nb - 1 ? max : min + Math.ceil(((b + 1) * den) / nb) - 1
+        });
+      }
+      idxOf = (v) => Math.floor(((v - min) * nb) / den);
+    }
+    return { m, min, max, span, width, nb, ranges, idxOf };
+  }
+
+  const formula = (pl, v, b) =>
+    pl.m === "width"
+      ? "\u230a(" + v + " \u2212 " + pl.min + ") \u00f7 " + pl.width + "\u230b = " + b
+      : "\u230a(" + v + " \u2212 " + pl.min + ") \u00d7 " + pl.nb + " \u00f7 " + (pl.span + 1) + "\u230b = " + b;
+
+  // ── one REST snapshot per logical move, straight from the run ────
+  function buildBeats(pl) {
+    const beats = [];
+    const cur = data.slice();
+    const buckets = Array.from({ length: pl.nb }, () => []);
+    const out = [];
+    const snap = (phase, meta, text) =>
+      beats.push({ cur: cur.slice(), buckets: buckets.map((x) => x.slice()), out: out.slice(), phase, meta, text });
+
+    snap("ready", { type: "ready" }, "Starting Bucket Sort \u2014 " + methodLabel(pl.m) + " buckets. Press Play, or Step to begin.");
+    snap("plan", { type: "minmax" }, "Step 1/2 of the bucket plan \u2014 Minimum = " + pl.min + " \u00b7 Maximum = " + pl.max);
+    snap("plan", { type: "plan" },
+      pl.m === "width"
+        ? "Bucket ranges \u2014 " + pl.nb + " buckets, width " + pl.width + " each: min/min\u2192bucket 0, max\u2192bucket " + (pl.nb - 1)
+        : "Bucket ranges \u2014 " + pl.nb + " equally sized buckets over " + (pl.span + 1) + " distinct values");
+
+    // distribution: every value one at a time (calculation beat, then entry)
+    for (const v of data) {
+      const b = pl.idxOf(v);
+      snap("distribute", { type: "calc", value: v, bucket: b, op: formula(pl, v, b) },
+        v + " \u2192 Bucket " + b + "   " + formula(pl, v, b));
+      const pos = cur.indexOf(v);
+      cur.splice(pos, 1);
+      buckets[b].push(v);
+      snap("distribute", { type: "enter", value: v, bucket: b, op: "insert into " + rangeText(pl.ranges[b]) },
+        "Insert " + v + " into Bucket " + b + "  (range " + rangeText(pl.ranges[b]) + ")");
+    }
+    snap("distributed", { type: "distributed", op: "all buckets populated" },
+      "Distribution complete \u2014 every value sits inside its bucket; empty buckets stay visible.");
+
+    // internal sort: insertion sort per non-empty bucket, one move per beat
+    for (let b = 0; b < pl.nb; b++) {
+      const arr = buckets[b];
+      if (arr.length === 0) continue;
+      snap("sort", { type: "sortStart", bucket: b, op: "insertion sort" },
+        "Sorting Bucket " + b + " \u2014 before " + fmt(arr) + " (insertion sort)");
+      for (let i = 1; i < arr.length; i++) {
+        const key = arr[i];
+        let j = i;
+        snap("sort", { type: "sortHold", bucket: b, key, gap: j, op: "hold " + key + ", sorted part " + fmt(arr.slice(0, j)) },
+          "Bucket " + b + " \u2014 hold " + key + ", compare with the sorted part " + fmt(arr.slice(0, j)));
+        while (j > 0 && arr[j - 1] > key) {
+          const left = arr[j - 1];
+          arr[j] = left;
+          j--;
+          snap("sort", { type: "sortShift", bucket: b, key, gap: j, movedTo: j + 1,
+                          op: key + " < " + left + " \u2192 shift " + left + " right" },
+            "Bucket " + b + ": " + key + " < " + left + " \u2192 shift " + left + " right");
+        }
+        arr[j] = key;
+        snap("sort", { type: "sortPlace", bucket: b, key, gap: j, op: "insert " + key + " at position " + j },
+          "Insert " + key + " at position " + j + " \u2192 Bucket " + b + " = " + fmt(arr));
+      }
+      snap("sort", { type: "sortDone", bucket: b, op: "done" },
+        "Bucket " + b + " sorted \u2014 " + fmt(arr));
+    }
+
+    // concatenation: buckets left → right into the output array
+    snap("concat", { type: "concat", op: "left \u2192 right" },
+      "Concatenate the buckets from left to right into the output array.");
+    for (let b = 0; b < pl.nb; b++) {
+      while (buckets[b].length) {
+        const v = buckets[b].shift();
+        snap("concat", { type: "leave", value: v, bucket: b, op: "leftmost value leaves first" },
+          "Bucket " + b + " \u2192 " + v + "  (leftmost value leaves first)");
+        out.push(v);
+        snap("concat", { type: "enter", value: v, bucket: b, op: "appended to output" },
+          v + " appended to output \u2014 " + fmt(out));
+      }
+    }
+    snap("done", { type: "done", op: "complete" }, "Bucket Sort Complete \u2014 " + fmt(out));
+    return beats;
+  }
+
+  // ── state ────────────────────────────────────────────────────────
+  let method = "width";
+  try {
+    method = localStorage.getItem(METHOD_KEY) === "count" ? "count" : "width";
+  } catch (e) { /* ignore */ }
+  let plan = makePlan(data, method);
+  let beats = buildBeats(plan);
+  let idx = 0;
+  let lastDelta = 0;
+
+  const STAGE_MAP = { ready: 0, plan: 1, distribute: 2, distributed: 2, sort: 3, concat: 4, done: 5 };
+  const STAGES = ["Input", "Bucket Plan", "Distribution", "Sort Inside", "Concatenation", "Output"];
+
+  wrap.innerHTML =
+    '<div class="bs-head">' +
+      '<div class="bs-status">' +
+        '<span class="bk-step"></span>' +
+        '<span class="bs-phase"></span>' +
+      "</div>" +
+      '<div class="bs-controls">' +
+        '<button class="bs-btn" data-bs="prev" title="Previous step">\u25c0 Step</button>' +
+        '<button class="bs-btn" data-bs="play" title="Play / Pause">\u25b6 Play</button>' +
+        '<button class="bs-btn" data-bs="next" title="Next step">Step \u25b6</button>' +
+        '<button class="bs-btn" data-bs="reset" title="Reset to start">\u27f2 Reset</button>' +
+      "</div>" +
+    "</div>" +
+    '<div class="bk-bar">' +
+      '<div class="bk-methods">' +
+        '<span class="bk-bar-label">Method</span>' +
+        '<button class="bk-method" data-method="width">Fixed-Width</button>' +
+        '<button class="bk-method" data-method="count">Fixed-Count</button>' +
+      "</div>" +
+      '<div class="bk-arrays">' +
+        '<span class="bk-bar-label">Array</span>' +
+        '<select class="bk-array" aria-label="Input array">' +
+        PRESETS.map((p, i) =>
+          '<option value="' + i + '"' + (arrayEquals(p, data) ? " selected" : "") + ">" + fmt(p) + "</option>"
+        ).join("") +
+        "</select>" +
+      "</div>" +
+    "</div>" +
+    '<div class="bk-params">' +
+      '<span class="bk-params-min"></span><span class="bk-params-max"></span>' +
+      '<span class="bk-params-count"></span><span class="bk-params-method"></span>' +
+    "</div>" +
+    '<div class="bs-scene bk-scene">' +
+      '<div class="bs-lane">' +
+        '<div class="bs-lane-label">Input array</div>' +
+        '<div class="bs-track" data-lane="input"></div>' +
+      "</div>" +
+      '<div class="bk-focus"></div>' +
+      '<div class="bk-band">' +
+        '<div class="bk-band-label">Buckets \u2014 each an ordered range; values drop inside, then sort in place' +
+          '<span class="bs-fifo">distribute \u00b7 sort inside \u00b7 concatenate</span>' +
+        "</div>" +
+        '<div class="bk-buckets"></div>' +
+      "</div>" +
+      '<div class="bs-lane">' +
+        '<div class="bs-lane-label">Output array</div>' +
+        '<div class="bs-track" data-lane="output"></div>' +
+      "</div>" +
+    "</div>" +
+    '<div class="bs-pipeline">' +
+    STAGES.map((st, i) => '<span class="bs-pp" data-stage="' + i + '">' + st + "</span>").join('<span class="bs-pp-arrow">\u2192</span>') +
+    "</div>";
+
+  const inputTrack = wrap.querySelector('[data-lane="input"]');
+  const outTrack = wrap.querySelector('[data-lane="output"]');
+  const bucketsEl = wrap.querySelector(".bk-buckets");
+  const stepEl = wrap.querySelector(".bk-step");
+  const phaseEl = wrap.querySelector(".bs-phase");
+  const focusEl = wrap.querySelector(".bk-focus");
+
+  // ── render one beat ──────────────────────────────────────────────
+  function render() {
+    const beat = beats[idx];
+    const prev = beats[Math.max(0, idx - 1)];
+    const fly = lastDelta === 1;
+    const meta = beat.meta || {};
+    bucketsEl.innerHTML = "";
+    inputTrack.innerHTML = "";
+    outTrack.innerHTML = "";
+    focusEl.innerHTML = "";
+
+    // input lane
+    const showIn = fly && meta.type === "enter" ? prev.cur : beat.cur;
+    showIn.forEach((v) => {
+      const t = tile(v);
+      if (meta.type === "calc" && v === meta.value) t.classList.add("bk-current");
+      if (fly && meta.type === "enter" && v === meta.value) t.classList.add("bs-tile--depart");
+      inputTrack.appendChild(t);
+    });
+
+    // buckets
+    beat.buckets.forEach((arr, b) => {
+      const isSorting = beat.phase === "sort" && meta.bucket === b;
+      const col = document.createElement("div");
+      col.className = "bk-bucket" + (isSorting ? " bk-bucket--active" : "");
+      col.dataset.b = b;
+
+      const head = document.createElement("div");
+      head.className = "bk-bucket-head";
+      const num = document.createElement("span");
+      num.className = "bk-bucket-num";
+      num.textContent = "Bucket " + b;
+      const rge = document.createElement("span");
+      rge.className = "bk-bucket-range";
+      rge.textContent = rangeText(plan.ranges[b]);
+      head.appendChild(num);
+      head.appendChild(rge);
+      col.appendChild(head);
+
+      const box = document.createElement("div");
+      box.className = "bk-bucket-box" + (arr.length === 0 ? " bk-bucket-box--empty" : "");
+      arr.forEach((v, i) => {
+        const t = tile(v);
+        t.classList.add("bk-slot");
+        if (fly && meta.type === "enter" && meta.bucket === b && v === meta.value) {
+          t.classList.add("bs-tile--arrive");
+        }
+        if (isSorting && (meta.type === "sortHold" || meta.type === "sortShift" || meta.type === "sortPlace") && meta.gap === i) {
+          t.classList.add("bk-slot--key");
+          if (meta.type !== "sortHold") t.textContent = meta.key;
+        }
+        if (isSorting && meta.type === "sortShift" && meta.movedTo === i) {
+          t.classList.add("bk-slot--moved");
+        }
+        box.appendChild(t);
+      });
+      if (fly && meta.type === "leave" && meta.bucket === b) {
+        const d = tile(meta.value);
+        d.classList.add("bs-tile--depart");
+        box.insertBefore(d, box.firstChild);
+      }
+      if (box.childElementCount === 0) {
+        const ph = document.createElement("div");
+        ph.className = "bs-bucket-empty";
+        ph.textContent = "\u2013";
+        box.appendChild(ph);
+      }
+      box.classList.toggle("bk-bucket-box--glow", isSorting);
+      col.appendChild(box);
+      bucketsEl.appendChild(col);
+    });
+
+    // output lane
+    beat.out.forEach((v, i) => {
+      const t = tile(v);
+      if (fly && meta.type === "enter" && i === beat.out.length - 1) t.classList.add("bs-tile--arrive");
+      outTrack.appendChild(t);
+    });
+
+    // drop distances (input → bucket, bucket → output), same as radix
+    const gapIn = Math.max(24, inputTrack.getBoundingClientRect().bottom - bucketsEl.getBoundingClientRect().top);
+    const gapOut = Math.max(24, bucketsEl.getBoundingClientRect().bottom - outTrack.getBoundingClientRect().top);
+    bucketsEl.querySelectorAll(".bs-tile--arrive").forEach((t) => t.style.setProperty("--drop", "-" + gapIn + "px"));
+    outTrack.querySelectorAll(".bs-tile--arrive").forEach((t) => t.style.setProperty("--drop", "-" + gapOut + "px"));
+
+    // focus strip — the "what is happening now" line
+    const mk = (cls, txt) => { const s = document.createElement("span"); s.className = cls; s.textContent = txt; return s; };
+    if (beat.phase === "distribute") {
+      focusEl.appendChild(mk("bk-focus-arrow", "\u25bc"));
+      focusEl.appendChild(mk("bk-focus-val", String(meta.value)));
+      focusEl.appendChild(mk("bk-focus-arrow", "\u25bc"));
+      focusEl.appendChild(mk("bk-focus-calc", formula(plan, meta.value, meta.bucket)));
+      focusEl.appendChild(mk("bk-focus-arrow", "\u25bc"));
+      focusEl.appendChild(mk("bk-focus-dest", "Bucket " + meta.bucket + " \u00b7 " + rangeText(plan.ranges[meta.bucket])));
+    } else if (beat.phase === "sort") {
+      focusEl.appendChild(mk("bk-focus-tag", "BUCKET " + meta.bucket));
+      focusEl.appendChild(mk("bk-focus-op", String(meta.op || "")));
+    } else if (beat.phase === "concat" && (meta.type === "leave" || meta.type === "enter")) {
+      focusEl.appendChild(mk("bk-focus-tag", "CONCAT"));
+      focusEl.appendChild(mk("bk-focus-calc", "Bucket " + meta.bucket + " \u2192 " + meta.value));
+      focusEl.appendChild(mk("bk-focus-op", "\u2192 Output"));
+    } else if (beat.phase === "plan") {
+      focusEl.appendChild(mk("bk-focus-tag", methodLabel(plan.m).toUpperCase()));
+      focusEl.appendChild(mk("bk-focus-op", "Buckets: " + plan.nb + (plan.m === "width" ? " \u00b7 width " + plan.width : " \u00b7 " + (plan.span + 1) + " values across " + plan.nb + " ranges")));
+    } else if (beat.phase === "done") {
+      focusEl.appendChild(mk("bk-focus-tag", "\u2713 DONE"));
+      focusEl.appendChild(mk("bk-focus-op", "Bucket Sort Complete"));
+    } else if (beat.phase === "ready") {
+      focusEl.appendChild(mk("bk-focus-op", "Press \u25b6 Play or Step to begin"));
+    } else {
+      focusEl.appendChild(mk("bk-focus-op", String(meta.op || beat.text)));
+    }
+
+    // status line, pipeline stage, params
+    wrap.querySelectorAll(".bs-pp").forEach((el) => {
+      el.classList.toggle("bs-pp--active", Number(el.dataset.stage) === STAGE_MAP[beat.phase]);
+    });
+    stepEl.textContent = "Step " + idx + " / " + (beats.length - 1) + " \u00b7 " + methodLabel(plan.m) + " Buckets";
+    phaseEl.textContent = beat.text;
+
+    wrap.querySelector(".bk-params-min").innerHTML = "Min <b>" + plan.min + "</b>";
+    wrap.querySelector(".bk-params-max").innerHTML = "Max <b>" + plan.max + "</b>";
+    wrap.querySelector(".bk-params-count").innerHTML = "Buckets <b>" + plan.nb + "</b>";
+    wrap.querySelector(".bk-params-method").innerHTML =
+      plan.m === "width" ? "Width <b>" + plan.width + "</b>" : "Range <b>" + (plan.span + 1) + "</b>";
+
+    wrap.querySelector('[data-bs="prev"]').disabled = idx === 0;
+    wrap.querySelector('[data-bs="next"]').disabled = idx === beats.length - 1;
+  }
+
+  function step(d) {
+    const n = Math.min(beats.length - 1, Math.max(0, idx + d));
+    lastDelta = d > 0 ? 1 : d < 0 ? -1 : 0;
+    idx = n;
+    render();
+  }
+
+  function togglePlay() {
+    const btn = wrap.querySelector('[data-bs="play"]');
+    if (bkPlayTimer) {
+      clearInterval(bkPlayTimer);
+      bkPlayTimer = null;
+      btn.textContent = "\u25b6 Play";
+      return;
+    }
+    if (idx === beats.length - 1) { idx = 0; lastDelta = 0; render(); }
+    btn.textContent = "\u23f8 Pause";
+    bkPlayTimer = setInterval(() => {
+      if (!wrap.isConnected) {
+        clearInterval(bkPlayTimer);
+        bkPlayTimer = null;
+        return;
+      }
+      if (idx >= beats.length - 1) {
+        clearInterval(bkPlayTimer);
+        bkPlayTimer = null;
+        btn.textContent = "\u25b6 Play";
+        return;
+      }
+      lastDelta = 1;
+      idx++;
+      render();
+    }, 1350);
+  }
+
+  function rebuild(m) {
+    clearInterval(bkPlayTimer);
+    bkPlayTimer = null;
+    wrap.querySelector('[data-bs="play"]').textContent = "\u25b6 Play";
+    method = m;
+    try { localStorage.setItem(METHOD_KEY, m); } catch (e) { /* ignore */ }
+    plan = makePlan(data, method);
+    beats = buildBeats(plan);
+    idx = 0;
+    lastDelta = 0;
+    wrap.querySelectorAll(".bk-method").forEach((b) =>
+      b.classList.toggle("bk-method--on", b.dataset.method === m));
+    render();
+  }
+
+  wrap.querySelector('[data-bs="prev"]').addEventListener("click", () => step(-1));
+  wrap.querySelector('[data-bs="next"]').addEventListener("click", () => step(1));
+  wrap.querySelector('[data-bs="play"]').addEventListener("click", togglePlay);
+  wrap.querySelector('[data-bs="reset"]').addEventListener("click", () => {
+    clearInterval(bkPlayTimer);
+    bkPlayTimer = null;
+    wrap.querySelector('[data-bs="play"]').textContent = "\u25b6 Play";
+    idx = 0;
+    lastDelta = 0;
+    render();
+  });
+  wrap.querySelectorAll(".bk-method").forEach((b) =>
+    b.addEventListener("click", () => rebuild(b.dataset.method)));
+  wrap.querySelector(".bk-array").addEventListener("change", (e) => {
+    const p = PRESETS[Number(e.target.value)];
+    if (!p) return;
+    data = p.slice();
+    wrap.dataset.array = JSON.stringify(data);
+    plan = makePlan(data, method);
+    beats = buildBeats(plan);
+    idx = 0;
+    lastDelta = 0;
+    render();
+  });
+
+  render();
+}
 function buildTOC() {
   toc.innerHTML = "";
   const headings = articleBody.querySelectorAll("h2, h3");
