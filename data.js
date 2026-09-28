@@ -2908,47 +2908,147 @@ if (arr[j] &lt; arr[minIndex])
 
 <p>We get: <code>[9, 46, 24, 52, 20, 13]</code></p>` },
       { id: "sort-04", title: "Insertion Sort", difficulty: "beginner", time: "5 min", desc: "Take the current element as key and shift all larger elements one step right.",
-        content: `<h1>Insertion Sort</h1><span class="step-badge">Chapter 4</span><p>Insertion sort works like sorting playing cards in your hand. You take the next card (the <strong>key</strong>), slide every bigger card to the right, and drop the key into the gap it creates.</p><h2>Core Idea</h2><pre><code>1. Take arr[i] as the key.
-2. Compare the key with the sorted part on its left.
-3. While the left element is bigger than the key, shift it one step right.
-4. Insert the key into the free position.</code></pre><h2>Step By Step</h2><pre><code>Array:  5   3   8   1   2
+        content: `<h1>Insertion Sort</h1><span class="step-badge">Chapter 4</span>
 
-i = 1, key = 3:
- 5 &gt; 3  &#8594; shift 5 right
- 5   5   8   1   2
- 3   5   8   1   2
+<p>Insertion sort works like sorting playing cards in your hand. You take the next card and slide it left by swapping it with its left neighbour, one index at a time, until it settles in the right spot.</p>
 
-i = 2, key = 8:
- 5 &lt; 8  &#8594; already in place
- 3   5   8   1   2
+<h2>Core Idea</h2><ol><li>Start at <code>i = 1</code>, because the first element is already in place on its own.</li><li>Set <code>j = i - 1</code>, the index just behind <code>i</code>.</li><li>While <code>j &gt;= 0</code> and <code>arr[j] &gt; arr[j + 1]</code>, swap the pair and step <code>j</code> one index left.</li><li>Stop when <code>j</code> falls below 0, or when the pair is already in order — the card is now in place.</li></ol>
 
-i = 3, key = 1:
- 8 &gt; 1  &#8594; shift 8 right
- 3   5   8   8   2
- 5 &gt; 1  &#8594; shift 5 right
- 3   5   5   8   2
- 3 &gt; 1  &#8594; shift 3 right
- 3   3   5   8   2
- 1   3   5   8   2
+<h2>Algorithm Dry Run</h2><p>Array:</p><pre><code>[ 5,  3,  8,  1,  2]
+  0   1   2   3   4</code></pre>
 
-i = 4, key = 2:
- 8 &gt; 2, 5 &gt; 2, 3 &gt; 2  &#8594; shift all
- 1   2   3   5   8</code></pre><h2>C Code</h2><pre><code>void insertionSort(int arr[], int n)
+<h3>Step 1 (i = 1, j = i - 1 = 0)</h3>
+
+<pre><code>[ 5,  3,  8,  1,  2]
+  0   1   2   3   4
+      ↑
+                       i = 1 and j = i - 1 = 0
+
+[ 5,  3,  8,  1,  2]
+  0   1   2   3   4
+  ↑   ↑
+                       5 &gt; 3 → swap arr[0] with arr[1]</code></pre>
+
+<p>5 is bigger than 3, so the pair is swapped and j steps left past index 0, which ends the step → <code>[3, 5, 8, 1, 2]</code></p>
+
+<p>End of Step 1: <code>[3, 5, 8, 1, 2]</code></p>
+
+<pre><code>[ 3,  5,  8,  1,  2]
+ ┌─────┐
+ │3,  5│  ← sorted
+ └─────┘</code></pre>
+
+<h3>Step 2 (i = 2, j = i - 1 = 1)</h3>
+
+<pre><code>[ 3,  5,  8,  1,  2]
+  0   1   2   3   4
+          ↑
+                       i = 2 and j = i - 1 = 1
+
+[ 3,  5,  8,  1,  2]
+  0   1   2   3   4
+      ↑   ↑
+                       5 &lt; 8 → stop the walk</code></pre>
+
+<p>5 is smaller than 8, so the walk stops at once and nothing moves → <code>[3, 5, 8, 1, 2]</code></p>
+
+<p>End of Step 2: <code>[3, 5, 8, 1, 2]</code></p>
+
+<pre><code>[ 3,  5,  8,  1,  2]
+ ┌─────────┐
+ │3,  5,  8│  ← sorted
+ └─────────┘</code></pre>
+
+<h3>Step 3 (i = 3, j = i - 1 = 2)</h3>
+
+<pre><code>[ 3,  5,  8,  1,  2]
+  0   1   2   3   4
+              ↑
+                       i = 3 and j = i - 1 = 2
+
+[ 3,  5,  8,  1,  2]
+  0   1   2   3   4
+          ↑   ↑
+                       8 &gt; 1 → swap arr[2] with arr[3]
+
+[ 3,  5,  1,  8,  2]
+  0   1   2   3   4
+      ↑   ↑
+                       5 &gt; 1 → swap arr[1] with arr[2]
+
+[ 3,  1,  5,  8,  2]
+  0   1   2   3   4
+  ↑   ↑
+                       3 &gt; 1 → swap arr[0] with arr[1]</code></pre>
+
+<p>8, 5 and 3 are all bigger than 1, so every swap steps j one index left until 1 sits at index 0 → <code>[1, 3, 5, 8, 2]</code></p>
+
+<p>End of Step 3: <code>[1, 3, 5, 8, 2]</code></p>
+
+<pre><code>[ 1,  3,  5,  8,  2]
+ ┌─────────────┐
+ │1,  3,  5,  8│  ← sorted
+ └─────────────┘</code></pre>
+
+<h3>Step 4 (i = 4, j = i - 1 = 3)</h3>
+
+<pre><code>[ 1,  3,  5,  8,  2]
+  0   1   2   3   4
+                  ↑
+                       i = 4 and j = i - 1 = 3
+
+[ 1,  3,  5,  8,  2]
+  0   1   2   3   4
+              ↑   ↑
+                       8 &gt; 2 → swap arr[3] with arr[4]
+
+[ 1,  3,  5,  2,  8]
+  0   1   2   3   4
+          ↑   ↑
+                       5 &gt; 2 → swap arr[2] with arr[3]
+
+[ 1,  3,  2,  5,  8]
+  0   1   2   3   4
+      ↑   ↑
+                       3 &gt; 2 → swap arr[1] with arr[2]
+
+[ 1,  2,  3,  5,  8]
+  0   1   2   3   4
+  ↑   ↑
+                       1 &lt; 2 → stop the walk</code></pre>
+
+<p>8, 5 and 3 are all bigger than 2, so j steps left until 1 stops it at index 0 → <code>[1, 2, 3, 5, 8]</code></p>
+
+<p>End of Step 4: <code>[1, 2, 3, 5, 8]</code></p>
+
+<pre><code>[ 1,  2,  3,  5,  8]
+ ┌─────────────────┐
+ │1,  2,  3,  5,  8│  ← sorted ✓
+ └─────────────────┘</code></pre>
+
+<h2>Basic Working → Both <code>i</code> and <code>j</code> are indexes</h2><ul><li><strong>i = 1</strong> → <code>j = i - 1 = 0</code>, only arr[0] and arr[1] are compared</li><li><strong>i = 2</strong> → <code>j = 1</code>, the sorted part on the left is now [3, 5]</li><li><strong>i = 3</strong> → <code>j = 2</code>, the whole left part is swapped right one at a time</li><li>It continues until every index has been placed and the array is sorted.</li></ul>
+
+<h2>C Code</h2><pre><code>void insertionSort(int arr[], int n)
 {
     for (int i = 1; i &lt; n; i++)
     {
-        int key = arr[i];
-        int j = i - 1;
+        int j = i - 1;             // j starts just behind i
 
-        while (j &gt;= 0 &amp;&amp; arr[j] &gt; key)
+        while (j &gt;= 0 &amp;&amp; arr[j] &gt; arr[j + 1])
         {
-            arr[j + 1] = arr[j];
+            swap(arr[j], arr[j + 1]);
             j--;
         }
-
-        arr[j + 1] = key;
     }
-}</code></pre><h2>Complexity</h2><table><thead><tr><th>Case</th><th>Time</th><th>When</th></tr></thead><tbody><tr><td>Best</td><td>O(n)</td><td>Already sorted — the while loop never runs</td></tr><tr><td>Average</td><td>O(n²)</td><td>Random data</td></tr><tr><td>Worst</td><td>O(n²)</td><td>Reverse sorted</td></tr></tbody></table><p>Space: <strong>O(1)</strong> — in place. Stable: <strong>Yes</strong>. The number of comparisons equals the number of <strong>inversions</strong> plus one per key.</p><h2>When Insertion Sort Shines</h2><ul><li>Small arrays (under ~10 elements) — many real libraries use it inside quicksort.</li><li>Nearly sorted data, where it behaves almost like O(n).</li><li>Inserting one element into an already sorted list — no need to sort everything again.</li></ul><blockquote>Insertion sort is the fastest simple sort when the data is small or almost sorted, and it is the only simple sort that handles linked lists naturally.</blockquote>` },
+}</code></pre>
+
+<h2>Complexity</h2><table><thead><tr><th>Case</th><th>Time</th><th>When</th></tr></thead><tbody><tr><td>Best</td><td>O(n)</td><td>Already sorted — the while loop never runs</td></tr><tr><td>Average</td><td>O(n²)</td><td>Random data</td></tr><tr><td>Worst</td><td>O(n²)</td><td>Reverse sorted</td></tr></tbody></table>
+
+<p><strong>Space:</strong> O(1) — in place. <strong>Stable:</strong> yes. The number of swaps equals the number of inversions.</p>
+
+<h2>When Insertion Sort Shines</h2><ul><li>Small arrays (under ~10 elements) — many real libraries use it inside quicksort.</li><li>Nearly sorted data, where it behaves almost like O(n).</li><li>Inserting one element into an already sorted list — no need to sort everything again.</li></ul>
+
+<blockquote>Insertion sort is the fastest simple sort when the data is small or almost sorted, and it is the only simple sort that handles linked lists naturally.</blockquote>` },
       { id: "sort-05", title: "Quick Sort", difficulty: "intermediate", time: "6 min", desc: "Divide and conquer with a pivot, partition step and recursion.",
         content: `<h1>Quick Sort</h1><span class="step-badge">Chapter 5</span><p>Quick sort picks one element as the <strong>pivot</strong>, arranges the array so that smaller values are on the left and bigger values on the right, and then repeats the same work on the two parts.</p><h2>The Three Steps</h2><pre><code>1. PIVOT     — choose an element (here: the last element).
 2. PARTITION — smaller values to the left, bigger to the right.
