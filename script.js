@@ -285,6 +285,7 @@ function openArticle(topic, article) {
   initSimpleSortViz(articleBody);
   initHeapSortViz(articleBody);
   initHeapTreeArt(articleBody);
+  initSortFigures(articleBody);
 
   document.querySelectorAll(".sidebar-item.active, .sidebar-child.active").forEach((el) => el.classList.remove("active"));
   const sidebarTopic = document.querySelector(`.sidebar-item[data-id="${topic.id}"]`);
@@ -2595,6 +2596,1191 @@ function initHeapTreeArt(root) {
     if (Array.isArray(arr)) drawBinaryHeapTree(svg, arr);
   });
   root.querySelectorAll("[data-heap-array]").forEach(renderHeapTreeArray);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  SORTING VISUALIZATION KIT
+//  Shared primitives for every sorting diagram. All geometry is
+//  computed here: node boxes are measured, parents are centred
+//  over the span of their children, and every connector is
+//  derived from the final centre coordinates. No diagram in the
+//  Sorting section hardcodes a line or a position.
+// ═══════════════════════════════════════════════════════════
+
+const VIZ = (() => {
+  const SVGNS = "http://www.w3.org/2000/svg";
+
+  // ── Shared node scale ───────────────────────────────────────
+  // One scale for every tree figure. Box heights, corner radius, font
+  // sizes and the row/column spacing all come from here, so the Quick
+  // Sort and Merge Sort trees cannot drift apart, and the
+  // .viz-node-* font sizes in the stylesheet have exactly one
+  // counterpart to stay in step with.
+  const SCALE = {
+    // Font sizes, mirrored by .viz-node-val / -cap / -tag in the stylesheet.
+    valRem: 0.9, capRem: 0.72, tagRem: 0.64,
+    // Box heights, in px of a 16px root. A one line node is a chip; a two
+    // or three line node is a little taller but shares the same padding.
+    leafH: 36, splitH2: 46, splitH3: 50,
+    // Width clamps, px of a 16px root. A box is sized from its own text
+    // and then clamped, so a short range stays a small chip and one long
+    // value can never turn the node into an oversized card.
+    leafW: [48, 56], emptyW: [44, 52], splitW: [104, 260],
+    // Shape and spacing.
+    rx: 8, step: 13, padX: 8,
+    // Layout grid handed to drawTree.
+    cfg: { levelH: 78, nodeH: 50, padY: 26, padX: 22, gap: 18 },
+    // Narrowest a tree is allowed to get before the card scrolls instead.
+    minTreeW: 320,
+  };
+
+  // Box metrics for one figure, resolved against the live root font size so
+  // the measurements track the .viz-node-* font sizes (and browser text
+  // zoom) instead of drifting apart from them.
+  function metrics() {
+    const px = parseFloat(getComputedStyle(document.documentElement).fontSize);
+    const u = (px > 0 ? px : 16) / 16;
+    const valPx = SCALE.valRem * 16 * u;
+    const capPx = SCALE.capRem * 16 * u;
+    const tagPx = SCALE.tagRem * 16 * u;
+    // Rough advance width of one line: a mono run is ~0.6em per character, a
+    // sans caption ~0.56em, plus whatever letter-spacing the class adds.
+    const lineW = (text, p, mono, ls) =>
+      text.length * p * (mono ? 0.6 : 0.56) + (ls || 0) * text.length * p;
+    const boxW = (lines) =>
+      Math.ceil(lines.reduce((m, l) => Math.max(m, lineW(l.text, l.px, l.mono, l.ls)), 0)) +
+      2 * SCALE.padX * u;
+    const fit = (w, lo, hi) => Math.max(lo * u, Math.min(hi * u, w));
+    return {
+      u: u,
+      valPx: valPx, capPx: capPx, tagPx: tagPx,
+      leafH: SCALE.leafH * u,
+      splitH2: SCALE.splitH2 * u,
+      splitH3: SCALE.splitH3 * u,
+      // Line constructors, so no figure spells out the px or the class.
+      val: (text) => ({ text: text, px: valPx, mono: true }),
+      cap: (text) => ({ text: text, px: capPx, mono: false, cls: "viz-node-cap" }),
+      tag: (text) => ({ text: text, px: tagPx, mono: false, ls: 0.04, cls: "viz-node-tag" }),
+      emptyW: (lines) => fit(boxW(lines), SCALE.emptyW[0], SCALE.emptyW[1]),
+      leafW: (lines) => fit(boxW(lines), SCALE.leafW[0], SCALE.leafW[1]),
+      splitW: (lines) => fit(boxW(lines), SCALE.splitW[0], SCALE.splitW[1]),
+      // The shared layout grid, with the shared shape values folded in.
+      cfg: Object.assign({}, SCALE.cfg, { step: SCALE.step, rx: SCALE.rx }),
+    };
+  }
+
+  // ── Tree layout ────────────────────────────────────────────
+  // Standard leaf-packing layout: every subtree reserves the
+  // width it needs, a parent is placed at the midpoint of the
+  // first and last child, so children are always evenly spread
+  // and a parent is always centred above them.
+  function treeLayout(root, cfg) {
+    const gap = cfg.gap != null ? cfg.gap : 22;
+    const nodes = [];
+
+    // Pass 1 - reserve horizontal space for every subtree.
+    //
+    // A subtree's span is the width of the widest row it contains: its own
+    // box, or its children packed together with `gap` between them. Using a
+    // real subtree extent (instead of only the leaf cursor) is what keeps a
+    // wide parent label from overlapping its neighbouring subtree.
+    (function measure(n) {
+      n.w = Math.max(n.width || 0, 46);
+      n.h = n.height || cfg.nodeH;
+      if (!n.children || !n.children.length) {
+        n.span = n.w;
+        return n.span;
+      }
+      let sum = 0;
+      n.children.forEach((c, i) => {
+        sum += measure(c);
+        if (i) sum += gap;
+      });
+      n.span = Math.max(n.w, sum);
+      return n.span;
+    })(root);
+
+    // Pass 2 - place each subtree inside the space reserved for it.
+    //
+    // `left` is the x coordinate the subtree may start at; the subtree is
+    // laid out inside that box and its own centre is returned so the parent
+    // can centre itself over the children.
+    let maxRight = 0;
+
+    function place(n, left, depth) {
+      n.depth = depth;
+      n.y = cfg.padY + depth * cfg.levelH;
+      nodes.push(n);
+
+      if (!n.children || !n.children.length) {
+        n.x = left + n.span / 2;
+        maxRight = Math.max(maxRight, n.x + n.w / 2);
+        return n.x;
+      }
+
+      // Children fill the reserved span in order, keeping `gap` between them.
+      // Leftover room is distributed so the group stays centred.
+      const kids = n.children;
+      const total = kids.reduce((s, c) => s + c.span, 0) + gap * (kids.length - 1);
+      let cursor = left + (n.span - total) / 2;
+      kids.forEach((c, i) => {
+        place(c, cursor, depth + 1);
+        cursor += c.span + (i < kids.length - 1 ? gap : 0);
+      });
+
+      // The parent is centred over its children, then nudged so its own box
+      // never leaves the span reserved for this subtree.
+      const first = kids[0];
+      const last = kids[kids.length - 1];
+      n.x = (first.x + last.x) / 2;
+      const halfW = n.w / 2;
+      const boxLeft = left;
+      const boxRight = left + n.span;
+      if (n.x - halfW < boxLeft) n.x = boxLeft + halfW;
+      if (n.x + halfW > boxRight) n.x = boxRight - halfW;
+      // Re-centre if the clamp left us off, as long as the box still fits.
+      const ideal = (first.x + last.x) / 2;
+      if (n.w <= n.span) n.x = ideal;
+      maxRight = Math.max(maxRight, n.x + halfW);
+      return n.x;
+    }
+
+    place(root, cfg.padX, 0);
+
+    let maxDepth = 0;
+    let maxH = 0;
+    nodes.forEach((n) => {
+      maxDepth = Math.max(maxDepth, n.depth);
+      maxH = Math.max(maxH, n.h);
+    });
+
+    const W = Math.max(maxRight + cfg.padX, cfg.padX + root.span);
+    const H = cfg.padY * 2 + maxDepth * cfg.levelH + maxH;
+    return { nodes, W, H, root };
+  }
+
+  // ── Tree drawing ───────────────────────────────────────────
+  // A connector always starts at the bottom-centre of the parent
+  // box and ends at the top-centre of the child box. A straight
+  // segment is used when the centres line up, otherwise a
+  // three-segment elbow through the gap between the two rows.
+  function drawTree(svg, spec) {
+    const cfg = Object.assign(
+      { padX: 26, padY: 30, levelH: 104, nodeH: 50, gap: 22, elbow: true, step: 15, rx: 10 },
+      spec.cfg || {}
+    );
+    const L = treeLayout(spec.root, cfg);
+    svg.innerHTML = "";
+    // Keep intrinsic width/height alongside the viewBox: the CSS scales
+    // the tree with width:100%; height:auto, which needs an explicit
+    // aspect ratio or the SVG collapses to zero height.
+    svg.setAttribute("viewBox", "0 0 " + L.W + " " + L.H);
+    svg.setAttribute("width", L.W);
+    svg.setAttribute("height", L.H);
+    svg.setAttribute("preserveAspectRatio", "xMidYMin meet");
+    // Pin the ceiling to the tree's own width. width:100% alone would stretch
+    // a narrow tree up to the full card, blowing every box and label up with
+    // it; capped here the tree only ever shrinks (narrow screens) so the whole
+    // recursion stays visible at its natural size with no side scrolling.
+    svg.style.maxWidth = L.W + "px";
+    // ...and pin a floor as well: below it the boxes and labels would shrink
+    // past readability, so the card scrolls the tree instead of squashing it.
+    svg.style.minWidth = Math.min(L.W, SCALE.minTreeW) + "px";
+
+    const links = [];
+    L.nodes.forEach((n) => {
+      if (!n.children) return;
+      n.children.forEach((c) => links.push({ p: n, c: c }));
+    });
+
+    links.forEach(({ p, c }) => {
+      const px = p.x, py = p.y + p.h / 2;
+      const cx = c.x, cy = c.y - c.h / 2;
+      const cls = "viz-link" + (c.linkClass ? " " + c.linkClass : "");
+      const straight = Math.abs(px - cx) < 0.75;
+      const d = straight
+        ? "M " + px + " " + py + " L " + cx + " " + cy
+        : "M " + px + " " + py +
+          " L " + px + " " + (py + (cy - py) / 2) +
+          " L " + cx + " " + (py + (cy - py) / 2) +
+          " L " + cx + " " + cy;
+      const path = document.createElementNS(SVGNS, "path");
+      path.setAttribute("class", cls);
+      path.setAttribute("d", d);
+      svg.appendChild(path);
+    });
+
+    L.nodes.forEach((n) => {
+      const g = document.createElementNS(SVGNS, "g");
+      g.setAttribute("class", "viz-node" + (n.cls ? " " + n.cls : ""));
+      g.setAttribute("data-node", n.id != null ? String(n.id) : "");
+      const rect = document.createElementNS(SVGNS, "rect");
+      rect.setAttribute("x", n.x - n.w / 2);
+      rect.setAttribute("y", n.y - n.h / 2);
+      rect.setAttribute("width", n.w);
+      rect.setAttribute("height", n.h);
+      rect.setAttribute("rx", cfg.rx);
+      g.appendChild(rect);
+      const lines = n.lines || [];
+      const step = cfg.step;
+      const top = n.y - ((lines.length - 1) * step) / 2;
+      lines.forEach((ln, i) => {
+        const t = document.createElementNS(SVGNS, "text");
+        t.setAttribute("class", ln.cls || "viz-node-val");
+        t.setAttribute("x", n.x);
+        t.setAttribute("y", top + i * step);
+        t.setAttribute("dy", "0.35em");
+        t.textContent = ln.text;
+        g.appendChild(t);
+      });
+      svg.appendChild(g);
+    });
+
+    return L;
+  }
+
+  // ── Merge ladder primitives ────────────────────────────────
+  // A chip is one contiguous run of values as a single compact block, the
+  // unit a bottom-up merge is built from. `cap` is the optional caption
+  // underneath it (a call signature, a stage name).
+  function chip(values, cls, cap) {
+    const c = el("div", "viz-chip" + (cls ? " " + cls : ""));
+    c.appendChild(el("span", "viz-chip-val", "[" + values.join(", ") + "]"));
+    if (cap) c.appendChild(el("span", "viz-chip-cap", cap));
+    return c;
+  }
+
+  // The same downward arrow the flow diagram uses, so a ladder step and a
+  // flow step are visually identical.
+  function downArrow(cls) {
+    const a = el("div", cls || "viz-flow-arrow");
+    a.setAttribute("aria-hidden", "true");
+    a.innerHTML =
+      '<svg width="14" height="16" viewBox="0 0 18 20" fill="none">' +
+      '<path d="M9 1v14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>' +
+      '<path d="M3.5 11.5 9 17.5l5.5-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' +
+      "</svg>";
+    return a;
+  }
+
+  // ── Ladder connectors ─────────────────────────────────────
+  // Draws the same three-segment elbow the tree uses, but between two HTML
+  // rows of the merge ladder instead of two tree nodes. Geometry is read
+  // back from the laid-out DOM, so a line always starts on the real
+  // bottom edge of the chip it leaves and ends on the real top edge of the
+  // chip it joins, however the rows wrapped on screen.
+  //
+  // `pairs` is [{ from, to, cls }] of DOM elements. The overlay is sized to
+  // the ladder and absolutely positioned behind the chips.
+  function ladderLinks(ladder, pairs) {
+    if (!pairs.length) return;
+    const box = ladder.getBoundingClientRect();
+    if (!box.width) return;
+
+    // This runs again on font load, window resize and ResizeObserver, so the
+    // previous overlay has to go first or the connectors stack up and the
+    // ladder fills with copies of itself.
+    const stale = ladder.querySelector(":scope > .viz-ladder-links");
+    if (stale) stale.remove();
+
+    const svg = document.createElementNS(SVGNS, "svg");
+    svg.setAttribute("class", "viz-ladder-links");
+    svg.setAttribute("aria-hidden", "true");
+    svg.setAttribute("viewBox", "0 0 " + box.width + " " + box.height);
+    svg.setAttribute("width", box.width);
+    svg.setAttribute("height", box.height);
+
+    // The horizontal run of an elbow sits halfway between the two ROWS, not
+    // halfway between the two boxes. Rows are uniform in height but their
+    // chips are not — a carried element has no caption, so it is shorter than
+    // its neighbours. Centring each elbow on its own two boxes would give
+    // neighbouring elbows different mid-points and send their horizontal runs
+    // across each other; centring on the row gap keeps every elbow in a
+    // transition on one shared line, so they can only meet at a shared target.
+    const rowBand = (chip) => {
+      const row = chip.closest(".viz-ladder-row");
+      if (!row) return null;
+      const r = row.getBoundingClientRect();
+      return { top: r.top - box.top, bottom: r.bottom - box.top };
+    };
+
+    pairs.forEach((p) => {
+      const a = p.from.getBoundingClientRect();
+      const b = p.to.getBoundingClientRect();
+      // Bottom-centre of the source, top-centre of the target, in ladder space.
+      const x1 = a.left + a.width / 2 - box.left;
+      const y1 = a.bottom - box.top;
+      const x2 = b.left + b.width / 2 - box.left;
+      const y2 = b.top - box.top;
+      if (y2 <= y1) return;
+      const fromBand = rowBand(p.from);
+      const toBand = rowBand(p.to);
+      const straight = Math.abs(x1 - x2) < 0.75;
+      const my = fromBand && toBand
+        ? (fromBand.bottom + toBand.top) / 2
+        : y1 + (y2 - y1) / 2;
+      const d = straight
+        ? "M " + x1 + " " + y1 + " L " + x2 + " " + y2
+        : "M " + x1 + " " + y1 + " L " + x1 + " " + my +
+          " L " + x2 + " " + my + " L " + x2 + " " + y2;
+      const path = document.createElementNS(SVGNS, "path");
+      path.setAttribute("class", "viz-ladder-link" + (p.cls ? " " + p.cls : ""));
+      path.setAttribute("d", d);
+      svg.appendChild(path);
+    });
+
+    ladder.insertBefore(svg, ladder.firstChild);
+  }
+
+  // ── Divide → merge boundary links ──────────────────────────
+  // The divide tree ends in a row of leaves and the bottom-up pass starts
+  // from the very same elements, restated as merge inputs. The tree is an
+  // SVG and the ladder is HTML, so the two halves are laid out by different
+  // engines; the only reliable join is to measure both after layout and
+  // draw the links in one overlay that spans the shared container.
+  //
+  // `leaves` is [{ node, chip }] matching a tree node (with x/y/w/h in SVG
+  // user units) to the ladder chip it feeds.
+  function leafLinks(flow, treeSvg, layout, leaves) {
+    const stale = flow.querySelector(":scope > .viz-leaf-links");
+    if (stale) stale.remove();
+    if (!leaves.length) return;
+    const box = flow.getBoundingClientRect();
+    if (!box.width) return;
+
+    const svg = document.createElementNS(SVGNS, "svg");
+    svg.setAttribute("class", "viz-leaf-links");
+    svg.setAttribute("aria-hidden", "true");
+    svg.setAttribute("viewBox", "0 0 " + box.width + " " + box.height);
+    svg.setAttribute("width", box.width);
+    svg.setAttribute("height", box.height);
+
+    // The tree SVG is scaled to fit its card, so measure the live scale
+    // rather than assuming user units equal CSS pixels.
+    const tb = treeSvg.getBoundingClientRect();
+    const sx = layout.W ? tb.width / layout.W : 1;
+    const sy = layout.H ? tb.height / layout.H : 1;
+
+    leaves.forEach((pair) => {
+      const n = pair.node;
+      const chip = pair.chip;
+      if (!n || !chip) return;
+      const cb = chip.getBoundingClientRect();
+      const x1 = tb.left - box.left + n.x * sx;
+      const y1 = tb.top - box.top + (n.y + n.h / 2) * sy;
+      const x2 = cb.left - box.left + cb.width / 2;
+      const y2 = cb.top - box.top;
+      if (y2 <= y1) return;
+      const path = document.createElementNS(SVGNS, "path");
+      path.setAttribute("class", "viz-leaf-link");
+      path.setAttribute("d", "M " + x1 + " " + y1 + " L " + x2 + " " + y2);
+      svg.appendChild(path);
+    });
+
+    flow.insertBefore(svg, flow.firstChild);
+  }
+
+  // ── Array lane ─────────────────────────────────────────────
+  // states is a per-index object; keys match the .viz-cell--*
+  // modifiers so every algorithm reuses one tile component.
+  // sepAfter is the index of the cell the divider follows; -1 puts it
+  // ahead of the first cell (a leading "unsorted" marker). It stays null
+  // when the caller asks for none, so a plain lane gets no divider at all
+  // rather than an unlabelled bar pinned to its left edge.
+  function arrayLane(values, states, opts) {
+    const o = Object.assign({ sepAfter: null, sepLabel: "", showIndex: false }, opts || {});
+    const lane = el("div", "viz-array");
+    values.forEach((v, i) => {
+      if (o.sepAfter != null && i === o.sepAfter + 1) {
+        const sep = el("div", "viz-sep");
+        if (o.sepLabel) sep.appendChild(el("div", "viz-sep-label", o.sepLabel));
+        lane.appendChild(sep);
+      }
+      const st = [].concat((states && states[i]) || [])
+        .filter(Boolean)
+        .map((s) => "viz-cell--" + s);
+      const cell = el("div", "viz-cell" + (st.length ? " " + st.join(" ") : ""));
+      cell.textContent = v;
+      if (o.showIndex) cell.appendChild(el("span", "viz-cell-idx", "i " + i));
+      lane.appendChild(cell);
+    });
+    return lane;
+  }
+
+  // ── Bucket containers ──────────────────────────────────────
+  // Each bucket is a real vertical container: header on top, a
+  // bordered body, values stacked bottom-up inside the body.
+  function bucketRow(buckets, opts) {
+    const o = Object.assign({ emptySlot: true }, opts || {});
+    const row = el("div", "viz-buckets");
+    buckets.forEach((b) => {
+      const box = el("div", "viz-bucket" + (b.cls ? " " + b.cls : ""));
+      const head = el("div", "viz-bucket-head");
+      head.appendChild(el("div", "viz-bucket-name", b.name));
+      if (b.range) head.appendChild(el("div", "viz-bucket-range", b.range));
+      box.appendChild(head);
+      const body = el("div", "viz-bucket-body");
+      (b.items || []).forEach((v) => body.appendChild(el("div", "viz-bucket-cell", String(v))));
+      if (o.emptySlot && !(b.items || []).length) body.appendChild(el("div", "viz-bucket-empty"));
+      box.appendChild(body);
+      row.appendChild(box);
+    });
+    return row;
+  }
+
+  // ── Gap groups (Shell) ─────────────────────────────────────
+  // Each group is one gapped chain, joined by a real connector so
+  // the distance a value travels inside its group is visible.
+  function groupRow(groups, opts) {
+    const o = Object.assign({ link: "→" }, opts || {});
+    const row = el("div", "viz-groups");
+    groups.forEach((g) => {
+      const box = el("div", "viz-group" + (g.cls ? " " + g.cls : ""));
+      const head = el("div", "viz-group-head");
+      head.appendChild(el("div", "viz-group-name", g.name));
+      if (g.indices) head.appendChild(el("div", "viz-group-idx", g.indices));
+      box.appendChild(head);
+      const chain = el("div", "viz-group-chain");
+      (g.items || []).forEach((it, i) => {
+        if (i) chain.appendChild(el("span", "viz-group-link", o.link));
+        chain.appendChild(el("div", "viz-group-cell" + (it.cls ? " " + it.cls : ""), String(it.v)));
+      });
+      box.appendChild(chain);
+      row.appendChild(box);
+    });
+    return row;
+  }
+
+  // ── Flow (Introduction) ────────────────────────────────────
+  function flow(steps) {
+    const f = el("div", "viz-flow");
+    steps.forEach((s, i) => {
+      if (i) {
+        const a = el("div", "viz-flow-arrow");
+        a.innerHTML =
+          '<svg width="18" height="20" viewBox="0 0 18 20" fill="none" aria-hidden="true">' +
+          '<path d="M9 1v14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>' +
+          '<path d="M3.5 11.5 9 17.5l5.5-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' +
+          "</svg>";
+        f.appendChild(a);
+      }
+      if (s.label) f.appendChild(el("div", "viz-flow-label", s.label));
+      if (s.box) f.appendChild(el("div", "viz-flow-box", s.box));
+      if (s.nodes) f.appendChild(s.nodes);
+    });
+    return f;
+  }
+
+  function cardGrid(items) {
+    const g = el("div", "viz-cards");
+    items.forEach((it) => {
+      const c = el("div", "viz-card-item");
+      c.appendChild(el("p", "viz-card-name", it.name));
+      c.appendChild(el("p", "viz-card-idea", it.idea));
+      g.appendChild(c);
+    });
+    return g;
+  }
+
+  function legend(pairs) {
+    const l = el("div", "viz-legend");
+    pairs.forEach((p) => {
+      const i = el("span", "viz-legend-item");
+      i.appendChild(el("span", "viz-legend-swatch" + (p[1] ? " viz-legend-swatch--" + p[1] : "")));
+      i.appendChild(document.createTextNode(p[0]));
+      l.appendChild(i);
+    });
+    return l;
+  }
+
+  function el(tag, cls, text) {
+    // "svg" must be created in the SVG namespace, otherwise it is just an
+    // unknown HTML element: it never paints and collapses to zero height.
+    const e = tag === "svg"
+      ? document.createElementNS("http://www.w3.org/2000/svg", "svg")
+      : document.createElement(tag);
+    // SVGElement ignores .className, so set the class attribute directly.
+    if (cls) {
+      if (e.namespaceURI === "http://www.w3.org/2000/svg") e.setAttribute("class", cls);
+      else e.className = cls;
+    }
+    if (text != null) e.textContent = text;
+    return e;
+  }
+
+  function caption(text, after) {
+    return el("div", "viz-caption" + (after ? " viz-caption--after" : ""), text);
+  }
+
+  function note(text) {
+    return el("p", "viz-note", text);
+  }
+
+  return {
+    SCALE, metrics,
+    treeLayout, drawTree, arrayLane, bucketRow, groupRow, flow, cardGrid, legend,
+    chip, downArrow, ladderLinks, leafLinks,
+    el, caption, note,
+  };
+})();
+
+// ── Figure registry ─────────────────────────────────────────
+// data.js only ships a mount point; the figure itself is built
+// here so every sorting page shares one implementation.
+  // Figures may override their array from the mount point so the
+  // article copy and the diagram can never drift apart.
+  function readArray(host, fallback) {
+    if (host && host.dataset.array) {
+      try {
+        const v = JSON.parse(host.dataset.array);
+        if (Array.isArray(v) && v.length) return v;
+      } catch (e) { /* fall through to the default */ }
+    }
+    return fallback;
+  }
+
+const SORT_FIGURES = {};
+
+// ── Bubble Sort figure ──────────────────────────────────────
+// Shows the three mechanical steps of one bubble pass: pick an
+// adjacent pair, compare it, swap if out of order.
+SORT_FIGURES["bubble-mechanics"] = (host) => {
+  const a = [5, 1, 4, 2, 8];
+  const step = (label, values, states, noteText) => {
+    host.appendChild(VIZ.caption(label, true));
+    host.appendChild(VIZ.arrayLane(values, states));
+    if (noteText) host.appendChild(VIZ.note(noteText));
+  };
+  host.appendChild(VIZ.caption("Bubble Sort \u2014 one pass, step by step"));
+
+  step("1. Compare the adjacent pair", a, { 0: ["cmp"], 1: ["cmp"] });
+  const cmp = VIZ.el("div", "viz-cmp-note");
+  cmp.appendChild(VIZ.el("span", "viz-op", "5 > 1"));
+  cmp.appendChild(VIZ.el("span", "viz-op viz-op--yes", "yes \u2192 swap"));
+  host.appendChild(cmp);
+
+  step("2. Swap them", [1, 5, 4, 2, 8], { 0: ["swap"], 1: ["swap"] });
+
+  step("3. Move one step right and repeat", [1, 5, 4, 2, 8], { 1: ["cmp"], 2: ["cmp"] });
+  const cmp2 = VIZ.el("div", "viz-cmp-note");
+  cmp2.appendChild(VIZ.el("span", "viz-op", "5 > 4"));
+  cmp2.appendChild(VIZ.el("span", "viz-op viz-op--no", "no \u2192 keep, advance"));
+  host.appendChild(cmp2);
+
+  step("4. End of pass 1 \u2014 the largest value has bubbled to the end", [1, 4, 2, 5, 8], { 4: ["sorted"] },
+    "Every pass pushes the largest remaining value into its final position on the right.");
+  host.appendChild(VIZ.legend([
+    ["compared", "cmp"], ["swapped", "swap"], ["already sorted", "sorted"],
+  ]));
+};
+
+// ── Selection Sort figure ────────────────────────────────────
+// The whole point is the scan for the minimum inside the
+// unsorted range, then one swap across the divider.
+SORT_FIGURES["selection-mechanics"] = (host) => {
+  const a = [7, 4, 5, 2, 9];
+  const step = (label, values, states, opts, noteText) => {
+    host.appendChild(VIZ.caption(label, true));
+    host.appendChild(VIZ.arrayLane(values, states, opts));
+    if (noteText) host.appendChild(VIZ.note(noteText));
+  };
+  host.appendChild(VIZ.caption("Selection Sort \u2014 find the minimum, then swap it home"));
+
+  step("1. The unsorted range starts at index 0", a,
+    { 0: ["active"] },
+    { sepAfter: -1, sepLabel: "unsorted" },
+    "The sorted prefix is empty; every element is still a candidate.");
+
+  step("2. Scan the range, remembering the smallest value so far", a,
+    { 0: ["active"], 1: ["cmp"], 2: ["min"] },
+    { sepAfter: -1, sepLabel: "unsorted" });
+
+  step("3. A smaller value is found", a,
+    { 0: ["active"], 2: ["min"], 3: ["cmp"] },
+    { sepAfter: -1, sepLabel: "unsorted" },
+    "2 is the minimum, so the scan can stop early.");
+
+  step("4. Swap the minimum with the first unsorted position", [2, 4, 5, 7, 9],
+    { 0: ["swap"], 3: ["swap"] },
+    { sepAfter: 0, sepLabel: "sorted" },
+    "One swap per pass \u2014 selection sort never shifts elements one at a time.");
+
+  step("5. Pass complete, the sorted prefix grows", [2, 4, 5, 7, 9],
+    { 0: ["sorted"], 1: ["active"], 2: ["active"], 3: ["active"], 4: ["active"] },
+    { sepAfter: 0, sepLabel: "sorted" });
+  host.appendChild(VIZ.legend([
+    ["current position", "active"], ["comparing", "cmp"], ["minimum so far", "min"],
+    ["swapping", "swap"], ["sorted prefix", "sorted"],
+  ]));
+};
+
+// ── Insertion Sort figure ───────────────────────────────────
+// A single key is lifted out and walked left across the sorted
+// prefix, shifting bigger values right until the key fits.
+SORT_FIGURES["insertion-mechanics"] = (host) => {
+  const a = [4, 7, 3, 9, 1];
+  const step = (label, values, states, opts, noteText) => {
+    host.appendChild(VIZ.caption(label, true));
+    host.appendChild(VIZ.arrayLane(values, states, opts));
+    if (noteText) host.appendChild(VIZ.note(noteText));
+  };
+  host.appendChild(VIZ.caption("Insertion Sort \u2014 lift the key, walk it left"));
+
+  step("1. The prefix is sorted, the key is the next element", a,
+    { 0: ["sorted"], 1: ["sorted"], 2: ["key"] },
+    { sepAfter: 1, sepLabel: "sorted" },
+    "Elements 0 and 1 are already in order, so the key is 3.");
+
+  step("2. Compare the key with the element to its left", a,
+    { 1: ["cmp", "sorted"], 2: ["key"] },
+    { sepAfter: 1, sepLabel: "sorted" });
+
+  const cmp = VIZ.el("div", "viz-cmp-note");
+  cmp.appendChild(VIZ.el("span", "viz-op", "7 > 3"));
+  cmp.appendChild(VIZ.el("span", "viz-op viz-op--yes", "yes \u2192 shift 7 right"));
+  host.appendChild(cmp);
+
+  step("3. Shift every bigger value one slot right", [4, 7, 7, 9, 1],
+    { 1: ["swap", "sorted"], 2: ["key"] },
+    { sepAfter: 1, sepLabel: "sorted" },
+    "The key is held in memory while the prefix is shifted, not copied.");
+
+  step("4. Compare against the new left neighbour", [4, 3, 7, 9, 1],
+    { 0: ["cmp", "sorted"], 1: ["key"] },
+    { sepAfter: 1, sepLabel: "sorted" });
+
+  const cmp2 = VIZ.el("div", "viz-cmp-note");
+  cmp2.appendChild(VIZ.el("span", "viz-op", "4 > 3"));
+  cmp2.appendChild(VIZ.el("span", "viz-op viz-op--yes", "yes \u2192 shift 4 right"));
+  host.appendChild(cmp2);
+
+  step("5. Insert the key into the gap it belongs in", [3, 4, 7, 9, 1],
+    { 0: ["sorted"], 1: ["sorted"], 2: ["sorted"] },
+    { sepAfter: 2, sepLabel: "sorted" },
+    "The sorted prefix grew by one. Insertion sort is O(n) on sorted input.");
+  host.appendChild(VIZ.legend([
+    ["sorted prefix", "sorted"], ["key being inserted", "key"],
+    ["comparing", "cmp"], ["shifting", "swap"],
+  ]));
+};
+
+// ── Quick Sort figure ───────────────────────────────────────
+// The partition tree is generated by actually running quicksort
+// on the array, so every node, pivot and split shown in the
+// figure is the real recursion — nothing is hand-placed.
+SORT_FIGURES["quick-tree"] = (host) => {
+  const src = readArray(host, [65, 34, 99, 18, 78, 25, 84]);
+  const a = src.slice();
+  const fmt = (r) => "[" + a.slice(r[0], r[1] + 1).join(", ") + "]";
+
+  // Box metrics come from the shared sorting scale, so this tree and the
+  // Merge Sort tree are built to identical dimensions by construction.
+  const M = VIZ.metrics();
+
+  const build = (lo, hi) => {
+    if (lo > hi) {
+      const lines = [M.val("[\u2205]")];
+      return { id: "e" + lo + "_" + hi, lines, cls: "viz-node--leaf", width: M.emptyW(lines), height: M.leafH };
+    }
+    if (lo === hi) {
+      const lines = [M.val(fmt([lo, hi]))];
+      return { id: "s" + lo, lines, cls: "viz-node--leaf", width: M.leafW(lines), height: M.leafH };
+    }
+    // The node shows the range this call received, so snapshot it before the
+    // partition below rearranges the shared array.
+    const input = fmt([lo, hi]);
+    // partition() exactly as the article's C code defines it: the pivot is
+    // a[lo], i starts just after it and j at the far end, the two walks cross
+    // over, and the pivot is then swapped onto the index j stopped on. The
+    // j-walk needs no lower guard because a[lo] holds the pivot and is never
+    // touched until that final swap.
+    const pivot = a[lo];
+    let i = lo + 1;
+    let j = hi;
+    while (i < j) {
+      while (i <= hi && a[i] <= pivot) i++;
+      while (a[j] > pivot) j--;
+      if (i > j) break;
+      const t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    const first = a[lo]; a[lo] = a[j]; a[j] = first;
+    const final = j;
+    // fmt() now reads the range as the partition left it: the pivot at its
+    // final index, everything smaller in front of it, everything larger behind.
+    const lines = [
+      M.val(input),
+      M.cap("pivot " + pivot + " \u2192 index " + final),
+      M.tag(fmt([lo, hi])),
+    ];
+    return {
+      id: "p" + lo + "_" + hi,
+      lines,
+      cls: "viz-node--split",
+      width: M.splitW(lines),
+      height: M.splitH3,
+      children: [build(lo, final - 1), build(final + 1, hi)],
+    };
+  };
+
+  const root = build(0, a.length - 1);
+  const svg = VIZ.el("svg", "viz-tree");
+  svg.setAttribute("role", "img");
+  svg.setAttribute("aria-label", "Quicksort partition recursion tree");
+  host.appendChild(VIZ.caption("Quicksort \u2014 every partition recurses on two smaller ranges"));
+  host.appendChild(svg);
+  VIZ.drawTree(svg, {
+    root: root,
+    cfg: M.cfg,
+  });
+  host.appendChild(VIZ.note(
+    "Each node is one partition(lo, hi) call: the pivot lands between the two recursive ranges, so every level of the tree works on a strictly shorter array."
+  ));
+};
+
+// ── Merge Sort figure ───────────────────────────────────────
+// The divide phase is a real recursion and stays a tree, drawn on
+// the same compact scale as the Quicksort figure. The merge phase is
+// deliberately NOT a second tree: merge sort does not recurse back up,
+// so drawing it as an upside-down tree misrepresents the control flow.
+// It is shown as a bottom-up ladder of runs instead — every merge is
+// one row of "run + run → longer run", grouped by the depth at which
+// it happens, with the single-element leaves at the top and the whole
+// sorted array at the bottom. All of it is generated by running the
+// real algorithm on the real array.
+SORT_FIGURES["merge-tree"] = (host) => {
+  const src = readArray(host, [13, 9, 7, 12, 6, 9, 12]);
+  const a = src.slice();
+  const M = VIZ.metrics();
+  const fmt = (r) => "[" + a.slice(r[0], r[1] + 1).join(", ") + "]";
+
+  // ── Divide phase ────────────────────────────────────────────
+  // Snapshot the ranges first, before the merge phase below mutates
+  // `a`, so the tree shows the array as it was received.
+  const ranges = [];
+  const collectRanges = (lo, hi) => {
+    if (lo === hi) {
+      ranges.push({ lo: lo, hi: hi, mid: lo, text: fmt([lo, hi]), leaf: true });
+      return;
+    }
+    const mid = lo + Math.floor((hi - lo) / 2);
+    const text = fmt([lo, hi]);
+    collectRanges(lo, mid);
+    collectRanges(mid + 1, hi);
+    ranges.push({ lo: lo, hi: hi, mid: mid, text: text, leaf: false });
+  };
+  collectRanges(0, a.length - 1);
+
+  const byId = new Map();
+  ranges.forEach((r) => {
+    const lines = r.leaf
+      ? [M.val(r.text)]
+      : [M.val(r.text), M.cap("mergeSort(" + r.lo + ", " + r.hi + ") \u2192 mid " + r.mid)];
+    byId.set(r.lo + "_" + r.hi, {
+      id: "d" + r.lo + "_" + r.hi,
+      lines: lines,
+      cls: r.leaf ? "viz-node--leaf" : "viz-node--split",
+      width: r.leaf ? M.leafW(lines) : M.splitW(lines),
+      height: r.leaf ? M.leafH : M.splitH2,
+      children: [],
+    });
+  });
+  // Re-link: every non-leaf range has the exact two halves it divided into.
+  ranges.forEach((r) => {
+    if (r.leaf) return;
+    const node = byId.get(r.lo + "_" + r.hi);
+    const mid = r.mid;
+    [[r.lo, mid], [mid + 1, r.hi]].forEach((half) => {
+      const child = byId.get(half[0] + "_" + half[1]);
+      if (child) node.children.push(child);
+    });
+  });
+
+  // ── Merge phase ────────────────────────────────────────────
+  // Record every merge as a real bottom-up pass, grouped by depth:
+  // depth 1 merges single elements into pairs, depth 2 merges pairs
+  // into quads, and so on. The array is mutated by a genuine linear
+  // merge, so each row's inputs are the runs the row above produced.
+  const passes = [];
+  const mergePass = (lo, hi, depth) => {
+    if (lo >= hi) return;
+    const mid = lo + Math.floor((hi - lo) / 2);
+    if (lo < mid) mergePass(lo, mid, depth + 1);
+    if (mid < hi) mergePass(mid + 1, hi, depth + 1);
+
+    const left = a.slice(lo, mid + 1);
+    const right = a.slice(mid + 1, hi + 1);
+    const out = [];
+    let li = 0;
+    let ri = 0;
+    while (li < left.length && ri < right.length) {
+      out.push(left[li] <= right[ri] ? left[li++] : right[ri++]);
+    }
+    while (li < left.length) out.push(left[li++]);
+    while (ri < right.length) out.push(right[ri++]);
+    for (let k = 0; k < out.length; k++) a[lo + k] = out[k];
+
+    (passes[depth] || (passes[depth] = [])).push({
+      lo: lo, mid: mid, hi: hi,
+      left: left, right: right, out: out,
+    });
+  };
+  mergePass(0, a.length - 1, 0);
+  // mergePass records depth 0 as the top-level merge, so the deepest
+  // (smallest) passes come last in the array. A bottom-up ladder reads
+  // from the bottom up, so render the passes deepest-first.
+  passes.reverse();
+
+  // ── Render ─────────────────────────────────────────────────
+  host.appendChild(VIZ.caption("Merge Sort — divide down, merge back up"));
+
+  // The divide tree and the bottom-up ladder are one figure, so they share a
+  // single relative container: that is what lets the tree's leaves be joined
+  // to the merge inputs by measured lines instead of dropping a single
+  // generic arrow between two unrelated halves.
+  const flow = VIZ.el("div", "viz-merge-flow");
+  host.appendChild(flow);
+
+  flow.appendChild(VIZ.el("div", "viz-flow-label", "Divide"));
+  const splitSvg = VIZ.el("svg", "viz-tree");
+  splitSvg.setAttribute("role", "img");
+  splitSvg.setAttribute("aria-label", "Merge sort divide tree");
+  flow.appendChild(splitSvg);
+  const treeL = VIZ.drawTree(splitSvg, { root: byId.get("0_" + (a.length - 1)), cfg: M.cfg });
+
+  flow.appendChild(VIZ.el("div", "viz-flow-label viz-flow-label--merge", "Merge (bottom-up)"));
+
+
+  // Fold the passes into explicit levels: level 0 is the array as single
+  // elements, and each level after it is the set of runs that exist once the
+  // next pass has run. Tracking this way is what lets every connector be
+  // drawn between a run and the two runs directly above it, so no line has
+  // to skip a level or cross another.
+  //
+  // A run that no merge consumed this pass (an odd element left over at the
+  // end of a pass) is carried down unchanged, which is what merge sort really
+  // does; it stays in the figure so the run it eventually joins is one level
+  // away from its partner rather than two.
+  let level = src.map((v, i) => ({ lo: i, hi: i, values: [v], carried: false }));
+  const levels = [level];
+  passes.forEach((merges) => {
+    const next = [];
+    const used = new Set();
+    merges.forEach((mg) => {
+      const li = level.findIndex((r) => r.lo === mg.lo && r.hi === mg.mid);
+      const ri = level.findIndex((r) => r.lo === mg.mid + 1 && r.hi === mg.hi);
+      if (li < 0 || ri < 0) return;
+      used.add(li);
+      used.add(ri);
+      next.push({
+        lo: mg.lo, hi: mg.hi, values: mg.out, merge: mg, carried: false,
+        sources: [level[li], level[ri]],
+      });
+    });
+    level.forEach((r, i) => {
+      if (!used.has(i)) next.push({ lo: r.lo, hi: r.hi, values: r.values, merge: null, carried: true, sources: [r] });
+    });
+    next.sort((p, q) => p.lo - q.lo);
+    levels.push(next);
+    level = next;
+  });
+
+  // Render the levels, remembering the chip element for every run so the
+  // connectors can be measured against the real laid-out boxes afterwards.
+  const ladder = VIZ.el("div", "viz-ladder");
+  const pairs = [];
+  levels.forEach((runs, depth) => {
+    const row = VIZ.el("div", "viz-ladder-row");
+    runs.forEach((run) => {
+      const last = depth === levels.length - 1;
+      const cls = last ? "viz-chip--final" : run.carried ? "viz-chip--carry" : "viz-chip--out";
+      const cap = run.merge
+        ? "merge(" + run.merge.lo + ", " + run.merge.mid + ", " + run.merge.hi + ")" + (last ? " \u2192 sorted" : "")
+        : null;
+      const node = VIZ.chip(run.values, cls, cap);
+      run.node = node;
+      row.appendChild(node);
+    });
+    ladder.appendChild(row);
+
+    if (depth === 0) return;
+    runs.forEach((run) => {
+      const linkCls = run.carried ? "viz-ladder-link--carry" : null;
+      run.sources.forEach((s) => {
+        if (!s.node) return;
+        pairs.push({ from: s.node, to: run.node, cls: linkCls });
+      });
+    });
+  });
+  flow.appendChild(ladder);
+
+  // Divide leaves → merge inputs. The bottom-up pass starts from exactly the
+  // elements the divide phase ended on, so each tree leaf is joined to the
+  // chip it feeds. Node ids are "d" + lo + "_" + hi, so a single element is
+  // always d<i>_<i>.
+  const leafPairs = (levels[0] || []).map((run, i) => ({
+    node: treeL.nodes.find((n) => n.id === "d" + i + "_" + i),
+    chip: run.node,
+  }));
+
+  // Connectors are drawn from the laid-out DOM, so they need the chips in
+  // place and measurable first.
+  const redraw = () => {
+    VIZ.ladderLinks(ladder, pairs);
+    VIZ.leafLinks(flow, splitSvg, treeL, leafPairs);
+  };
+  redraw();
+  // Re-measure if the webfont lands after first paint, or the window resizes
+  // and the rows rewrap, so every line stays glued to the chip edges.
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(redraw);
+  window.addEventListener("resize", redraw);
+  if (window.ResizeObserver) new ResizeObserver(redraw).observe(flow);
+
+  host.appendChild(VIZ.note(
+    "Each pass merges every pair of runs into one run twice as long, so the merge phase walks back up the exact ranges the divide phase split: single elements become pairs, pairs become quads, and the last pass is the whole array."
+  ));
+};
+
+// ── Radix Sort figure ───────────────────────────────────────
+// Ten real bucket containers. Elements are distributed by the
+// current digit and then read back out in bucket order.
+SORT_FIGURES["radix-buckets"] = (host) => {
+  const src = readArray(host, [170, 45, 75, 90, 802, 24, 2, 66]);
+  const passes = [
+    { name: "Ones", digit: 0 },
+    { name: "Tens", digit: 1 },
+    { name: "Hundreds", digit: 2 },
+  ];
+  const maxDigit = (v, p) => Math.floor(v / Math.pow(10, p)) % 10;
+
+  host.appendChild(VIZ.caption("Radix Sort \u2014 distribute by one digit, then collect 0 \u2192 9"));
+  host.appendChild(VIZ.note("Start: [" + src.join(", ") + "]"));
+
+  // LSD radix sort is a chain: each pass distributes the array the
+  // previous pass produced, so the earlier digit ordering is carried
+  // forward instead of being thrown away.
+  let current = src.slice();
+  const buckets = passes.map((p) => {
+    const groups = [[], [], [], [], [], [], [], [], [], []];
+    current.forEach((v) => groups[maxDigit(v, p.digit)].push(v));
+    // Stable within a bucket: equal digits keep their incoming order,
+    // so no extra sort is needed.
+    const order = groups.reduce((acc, g) => acc.concat(g), []);
+    current = order;
+    return { name: p.name, items: groups, order: order };
+  });
+
+  buckets.forEach((b, i) => {
+    host.appendChild(VIZ.caption(i + 1 + ". Distribute by the " + b.name.toLowerCase() + " digit", true));
+    host.appendChild(VIZ.bucketRow(b.items.map((items, d) => ({
+      name: "Bucket " + d,
+      items: items,
+      cls: items.length ? "viz-bucket--active" : "",
+    }))));
+    const out = VIZ.el("div", "viz-flow-row");
+    out.appendChild(VIZ.caption("collect", true));
+    out.appendChild(VIZ.arrayLane(b.order, b.order.map((v, k) => [
+      "sorted", k === b.order.length - 1 ? "active" : "",
+    ])));
+    host.appendChild(out);
+  });
+
+  host.appendChild(VIZ.note(
+    "Every pass is stable and reads the buckets in order, so the previous digit keeps its ordering \u2014 that is why LSD radix sort works from the least significant digit upward."
+  ));
+};
+
+// ── Bucket Sort figure ──────────────────────────────────────
+// Buckets are real containers spanning the value range, not text
+// that names a bucket and prints a list.
+SORT_FIGURES["bucket-containers"] = (host) => {
+  const src = readArray(host, [7, 3, 4, 8, 13, 11, 9, 1]);
+  const min = Math.min.apply(null, src);
+  const max = Math.max.apply(null, src);
+  const count = 5;
+  const size = Math.max(1, Math.ceil((max - min + 1) / count));
+  const rangeOf = (b) => {
+    const lo = min + b * size;
+    const hi = Math.min(max, lo + size - 1);
+    return lo + "\u2013" + hi;
+  };
+  const nBuckets = Math.ceil((max - min + 1) / size);
+
+  host.appendChild(VIZ.caption("Bucket Sort \u2014 scatter into " + nBuckets + " buckets, sort each, concatenate"));
+  host.appendChild(VIZ.note("Input: [" + src.join(", ") + "]"));
+
+  const groups = [];
+  for (let b = 0; b < nBuckets; b++) groups.push([]);
+  src.forEach((v) => groups[Math.min(nBuckets - 1, Math.floor((v - min) / size))].push(v));
+
+  host.appendChild(VIZ.caption("1. Scatter \u2014 each value lands in the bucket covering its range", true));
+  host.appendChild(VIZ.bucketRow(groups.map((items, b) => ({
+    name: "Bucket " + b,
+    range: rangeOf(b),
+    items: items,
+    cls: items.length ? "viz-bucket--active" : "",
+  }))));
+
+  host.appendChild(VIZ.caption("2. Sort inside each bucket", true));
+  const sortedGroups = groups.map((g) => g.slice().sort((x, y) => x - y));
+  host.appendChild(VIZ.bucketRow(sortedGroups.map((items, b) => ({
+    name: "Bucket " + b,
+    range: rangeOf(b),
+    items: items,
+    cls: items.length ? "viz-bucket--collected" : "",
+  }))));
+
+  const flat = sortedGroups.reduce((acc, g) => acc.concat(g), []);
+  host.appendChild(VIZ.caption("3. Concatenate buckets 0 \u2192 " + (nBuckets - 1), true));
+  host.appendChild(VIZ.arrayLane(flat, flat.map(() => ["sorted"])));
+  host.appendChild(VIZ.note(
+    "Every bucket covers a disjoint slice of the value range and each is sorted in place, so concatenating them in order yields a fully sorted array."
+  ));
+};
+
+// ── Shell Sort figure ───────────────────────────────────────
+// A gapped pass is a set of independent groups. The chains show
+// exactly which array positions move together at a given gap.
+SORT_FIGURES["shell-groups"] = (host) => {
+  const src = readArray(host, [7, 3, 4, 8, 13, 11, 9, 1]);
+  const a = src.slice();
+  const n = a.length;
+  const fmt = (arr) => "[" + arr.join(", ") + "]";
+
+  const insertionOn = (arr, gap) => {
+    for (let i = gap; i < arr.length; i++) {
+      const v = arr[i];
+      let j = i;
+      while (j >= gap && arr[j - gap] > v) { arr[j] = arr[j - gap]; j -= gap; }
+      arr[j] = v;
+    }
+  };
+
+  const gaps = [];
+  let g = Math.floor(n / 2);
+  while (g >= 1) { gaps.push(g); g = Math.floor(g / 2); }
+
+  host.appendChild(VIZ.caption("Shell Sort \u2014 each gap splits the array into independent groups"));
+  host.appendChild(VIZ.note("Start: " + fmt(a)));
+
+  gaps.forEach((gap) => {
+    const groups = [];
+    for (let s = 0; s < gap; s++) {
+      const idx = [];
+      const vals = [];
+      for (let i = s; i < n; i += gap) { idx.push(i); vals.push(a[i]); }
+      groups.push({ s: s, idx: idx, vals: vals });
+    }
+    host.appendChild(VIZ.caption("Gap = " + gap + " \u2014 " + groups.length +
+      (groups.length === 1 ? " group" : " groups"), true));
+    host.appendChild(VIZ.groupRow(groups.map((gr) => ({
+      name: "Group " + (gr.s + 1),
+      indices: gr.idx.join(" \u2192 "),
+      items: gr.vals.map((v) => ({ v: v })),
+      cls: "viz-group--active",
+    }))));
+
+    const before = a.slice();
+    insertionOn(a, gap);
+
+    const after = groups.map((gr) => ({
+      name: "Group " + (gr.s + 1),
+      indices: gr.idx.join(" \u2192 "),
+      items: gr.idx.map((i, k) => ({ v: a[i], cls: before[i] === a[i] ? "" : "viz-group-cell--done" })),
+      cls: "viz-group--done",
+    }));
+    host.appendChild(VIZ.caption("After insertion-sorting each group, values return to their own indices", true));
+    host.appendChild(VIZ.groupRow(after));
+    host.appendChild(VIZ.arrayLane(a, a.map((v, i) => (before[i] === v ? [] : ["swap"]))));
+    host.appendChild(VIZ.note("Array is now " + fmt(a)));
+  });
+
+  host.appendChild(VIZ.caption("Gap = 1 \u2014 one group, the array itself \u2192 fully sorted", true));
+  host.appendChild(VIZ.arrayLane(a, a.map(() => ["sorted"])));
+  host.appendChild(VIZ.note(
+    "A group never contains two elements that are less than a gap apart in the rebuilt array, so the final gap-1 pass only has to do an ordinary insertion sort."
+  ));
+};
+
+// ── Introduction overview ───────────────────────────────────
+// A single clean pass-through: unsorted data, a sorting
+// algorithm, sorted data, then the catalogue of algorithms.
+SORT_FIGURES["sorting-overview"] = (host) => {
+  const before = [7, 3, 9, 1, 5];
+  const after = before.slice().sort((x, y) => x - y);
+  host.appendChild(VIZ.flow([
+    { label: "Unsorted data", nodes: VIZ.arrayLane(before, before.map(() => ["inactive"])) },
+    { box: "Sorting algorithm" },
+    { label: "Sorted data", nodes: VIZ.arrayLane(after, after.map(() => ["sorted"])) },
+  ]));
+  host.appendChild(VIZ.note(
+    "Sorting only reorders elements \u2014 the same values, the same length, a defined order. A sorting algorithm decides how to get there."
+  ));
+
+  host.appendChild(VIZ.caption("The algorithms covered in this section", true));
+  host.appendChild(VIZ.cardGrid([
+    { name: "Bubble Sort", idea: "Compare every adjacent pair and swap the ones that are out of order. Each pass bubbles the largest value to the end." },
+    { name: "Selection Sort", idea: "Scan the unsorted range for its minimum, then swap that minimum into place. One swap per pass." },
+    { name: "Insertion Sort", idea: "Take the next element as a key and shift it left across the sorted prefix until it fits." },
+    { name: "Quick Sort", idea: "Partition around a pivot, then recurse into the two smaller ranges. Divides the problem in half." },
+    { name: "Merge Sort", idea: "Split to single elements, then merge sorted halves back together. Always n log n." },
+    { name: "Radix Sort", idea: "Distribute into ten buckets by one digit at a time, from least to most significant digit." },
+    { name: "Bucket Sort", idea: "Scatter values into buckets spanning the value range, sort each bucket, concatenate." },
+    { name: "Shell Sort", idea: "Insertion sort over decreasing gaps, moving values far apart early so later passes finish quickly." },
+    { name: "Heap Sort", idea: "Build a max heap, then repeatedly remove the root and heapify. Sorts in place in n log n." },
+  ]));
+};
+
+// ── Quick Reference comparison table ────────────────────────
+// Deliberately a table, not a diagram: this page is for looking
+// values up, not for watching a process.
+SORT_FIGURES["sorting-comparison"] = (host) => {
+  const rows = [
+    ["Bubble Sort", "O(n)", "O(n\u00b2)", "O(n\u00b2)", "O(1)", "Yes", "Swap adjacent pairs; each pass settles the largest remaining value at the end."],
+    ["Selection Sort", "O(n\u00b2)", "O(n\u00b2)", "O(n\u00b2)", "O(1)", "No", "Find the minimum of the unsorted range and swap it home. Exactly n \u2212 1 swaps."],
+    ["Insertion Sort", "O(n)", "O(n\u00b2)", "O(n\u00b2)", "O(1)", "Yes", "Shift a key left across the sorted prefix. Fast when the input is nearly sorted."],
+    ["Quick Sort", "O(n log n)", "O(n log n)", "O(n\u00b2)", "O(log n)", "No", "Partition on a pivot and recurse. Best average case, but a bad pivot degrades to quadratic."],
+    ["Merge Sort", "O(n log n)", "O(n log n)", "O(n log n)", "O(n)", "Yes", "Split to single elements and merge sorted halves. Predictable, needs extra memory."],
+    ["Heap Sort", "O(n log n)", "O(n log n)", "O(n log n)", "O(1)", "No", "Build a heap and extract the root repeatedly. Worst-case safe and in place."],
+    ["Shell Sort", "O(n log n)", "~O(n^1.5)", "O(n\u00b2)", "O(1)", "No", "Insertion sort over decreasing gaps. In place, cache friendly, no fixed bound."],
+    ["Bucket Sort", "O(n + k)", "O(n + k)", "O(n + k)", "O(n + k)", "Yes", "Scatter into value-range buckets, sort each, concatenate."],
+    ["Radix Sort", "O(dn)", "O(dn)", "O(dn)", "O(n)", "Yes", "Bucket by one digit per pass, least significant first. No comparisons."],
+    ["Counting Sort", "O(n + k)", "O(n + k)", "O(n + k)", "O(k)", "Yes", "Count occurrences, then rebuild. Only for small integer ranges."],
+  ];
+  const scroll = VIZ.el("div", "viz-table-scroll");
+  const t = VIZ.el("table", "viz-cmp");
+  const thead = VIZ.el("thead");
+  const hr = VIZ.el("tr");
+  ["Algorithm", "Best", "Average", "Worst", "Space", "Stable", "Main idea"].forEach((h) => {
+    hr.appendChild(VIZ.el("th", null, h));
+  });
+  thead.appendChild(hr);
+  t.appendChild(thead);
+  const tb = VIZ.el("tbody");
+  rows.forEach((r) => {
+    const tr = VIZ.el("tr");
+    tr.appendChild(VIZ.el("th", null, r[0]));
+    r.slice(1, 6).forEach((c) => tr.appendChild(VIZ.el("td", null, c)));
+    tr.appendChild(VIZ.el("td", "viz-cmp-idea", r[6]));
+    tb.appendChild(tr);
+  });
+  t.appendChild(tb);
+  scroll.appendChild(t);
+  host.appendChild(scroll);
+  host.appendChild(VIZ.note(
+    "O(n log n) is the practical target for general sorting. The O(1) space algorithms (Bubble, Selection, Insertion, Shell, Heap) also sort in place."
+  ));
+};
+
+function initSortFigures(root) {
+  if (!root) return;
+  root.querySelectorAll("[data-viz]").forEach((host) => {
+    const name = host.dataset.viz;
+    const build = SORT_FIGURES[name];
+    if (!build) return;
+    if (host.dataset.vizBuilt === "1") return;
+    host.dataset.vizBuilt = "1";
+    build(host);
+  });
 }
 
 function buildTOC() {

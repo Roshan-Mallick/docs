@@ -12,6 +12,7 @@ A personal documentation website built with HTML, CSS, and JavaScript.
 - **CSS** — Selectors, box model
 - **JavaScript** — Variables, functions, arrays, objects, DOM, async/await, ES6 modules
 - **C** — Hello world, variables, conditionals, loops, arrays, functions, pointers, strings
+- **OOP** — Classes, objects, encapsulation, abstraction, inheritance, polymorphism, SOLID, OOP in C
 - **Linux** — Malware scanning, firewalls, AppArmor, file integrity, hardening, security checklist
 
 ## Features

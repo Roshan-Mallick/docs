@@ -1868,6 +1868,496 @@ asyncio.run(fetch_all(urls))</code></pre><h2>Learning Roadmap</h2><table><thead>
     ]
   },
   {
+    id: "oop", label: "Object Oriented Programming", icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg>`,
+    desc: "Classes, objects, encapsulation, abstraction, inheritance, and polymorphism.",
+    tags: ["oop", "classes", "design"],
+    articles: [
+      { id: "oop-01", title: "What is OOP?", difficulty: "beginner", time: "4 min", desc: "Objects, why they exist, and procedural vs OOP.",
+        content: `<h1>What is OOP?</h1><p><strong>Object-Oriented Programming (OOP)</strong> is a way of organizing a program around <strong>objects</strong> — a bundle of data (attributes) plus the functions that work on that data (methods).</p><h2>Why OOP?</h2><ul><li><strong>Reuse</strong> — write once, use it everywhere</li><li><strong>Maintainability</strong> — a change lives in one place</li><li><strong>Real-world modelling</strong> — code reads like the problem</li><li><strong>Clear boundaries</strong> — each object owns its own data</li></ul><h2>Procedural vs OOP</h2><p>Procedural code passes raw data into standalone functions:</p><pre><code># Procedural — data and logic are separate
+def deposit(account, amount):
+    account["balance"] += amount
+
+alice = {"balance": 100}
+deposit(alice, 50)</code></pre><p>Any function can modify any dictionary. Nothing stops a typo from setting a negative balance.</p><p>OOP attaches the data and the behaviour together, so the object keeps itself valid:</p><pre><code># Object-oriented — data + behaviour in one place
+class BankAccount:
+    def __init__(self, balance=0):
+        self.balance = balance
+
+    def deposit(self, amount):
+        self.balance += amount
+
+alice = BankAccount(100)
+alice.deposit(50)</code></pre><h2>Core Concepts</h2><table><thead><tr><th>Concept</th><th>Meaning</th><th>Example</th></tr></thead><tbody><tr><td>Class</td><td>Blueprint / template</td><td><code>BankAccount</code></td></tr><tr><td>Object</td><td>Instance of a class</td><td><code>alice</code></td></tr><tr><td>Attribute</td><td>Data stored on the object</td><td><code>alice.balance</code></td></tr><tr><td>Method</td><td>Function that belongs to the class</td><td><code>alice.deposit(50)</code></td></tr><tr><td>Encapsulation</td><td>Hide internal data</td><td><code>balance</code> is not edited directly</td></tr><tr><td>Abstraction</td><td>Hide complexity behind a simple API</td><td>Call <code>withdraw()</code> without seeing the checks</td></tr><tr><td>Inheritance</td><td>Reuse and extend a class</td><td><code>SavingsAccount</code> is a <code>BankAccount</code></td></tr><tr><td>Polymorphism</td><td>Same call, different behaviour</td><td><code>dog.speak()</code> and <code>cat.speak()</code></td></tr></tbody></table><h2>Where OOP Shows Up</h2><ul><li>Every object in Python (lists, dicts, files are all class instances)</li><li>Game entities, GUI widgets, and DOM elements in JavaScript</li><li>Exceptions, streams, and collections in C++ / Java / C#</li></ul><blockquote>OOP is a tool, not a religion. Use it when your program models things with behaviour and state — not for every problem.</blockquote>` },
+      { id: "oop-02", title: "Classes & Objects", difficulty: "beginner", time: "5 min", desc: "Blueprints, instances, attributes, methods, self and this.",
+        content: `<h1>Classes &amp; Objects</h1><p>A <strong>class</strong> describes what every object of that kind will contain. An <strong>object</strong> is one real thing built from that description.</p><h2>Anatomy</h2><pre><code>class Car:
+    def __init__(self, brand, speed):   # constructor
+        self.brand = brand               # attribute
+        self.speed = speed               # attribute
+
+    def accelerate(self, amount):       # method
+        self.speed += amount
+        return self.speed</code></pre><ul><li><code>__init__</code> runs once, right when the object is created</li><li><code>self</code> means <strong>this particular object</strong></li><li>Everything before the dot is the object; everything after is its data or behaviour</li></ul><pre><code>my_car = Car("Toyota", 0)
+my_car.accelerate(50)     # 50
+your_car = Car("Tesla", 100)
+
+my_car.speed     # 50   — each object keeps its OWN copy
+your_car.speed   # 100</code></pre><h2>The Same Thing in JavaScript</h2><pre><code>class Car {
+  constructor(brand, speed) {
+    this.brand = brand;
+    this.speed = speed;
+  }
+
+  accelerate(amount) {
+    this.speed += amount;
+    return this.speed;
+  }
+}
+
+const myCar = new Car("Toyota", 0);
+myCar.accelerate(50);   // 50</code></pre><h2>Methods Shared, Data Separate</h2><p>Attributes live on each object. Methods live once on the class and are shared by every object — that is why methods are memory-cheap.</p><h2>Inspecting Objects</h2><pre><code>type(my_car)                  # &lt;class '__main__.Car'&gt;
+isinstance(my_car, Car)      # True
+my_car.__dict__              # {'brand': 'Toyota', 'speed': 50}
+Car.count                    # every object knows its class</code></pre><h2>Objects Are Everywhere</h2><pre><code>print(type(42))          # &lt;class 'int'&gt;
+print(type([1, 2]))      # &lt;class 'list'&gt;
+print(type("hi"))        # &lt;class 'str'&gt;
+
+[1, 2, 3].append(4)      # calling a method on a list object
+"name".upper()           # calling a method on a str object</code></pre><blockquote>If you have used Python or JavaScript, you have already used OOP — you just have not written a class yet.</blockquote>` },
+      { id: "oop-03", title: "Encapsulation", difficulty: "beginner", time: "5 min", desc: "Keep data private and control how it changes.",
+        content: `<h1>Encapsulation</h1><p><strong>Encapsulation</strong> means: keep an object's data private and let the object itself decide how that data is read or changed.</p><h2>Why It Matters</h2><p>Without protection, any code anywhere can set an invalid value:</p><pre><code>account.balance = -500     # nonsense, and nothing stops it</code></pre><p>With encapsulation, the object validates every change:</p><pre><code>class BankAccount:
+    def __init__(self, owner, balance=0):
+        self.owner = owner
+        self.__balance = balance      # __ = private (name-mangled)
+
+    def get_balance(self):
+        return self.__balance
+
+    def deposit(self, amount):
+        if amount &lt;= 0:
+            raise ValueError("Deposit must be positive")
+        self.__balance += amount
+
+    def set_balance(self, value):
+        if value &lt; 0:
+            raise ValueError("Balance cannot be negative")
+        self.__balance = value</code></pre><h2>Python Naming Conventions</h2><table><thead><tr><th>Prefix</th><th>Meaning</th><th>Accessible outside?</th></tr></thead><tbody><tr><td><code>name</code></td><td>Public</td><td>Yes</td></tr><tr><td><code>_name</code></td><td>Protected (internal hint)</td><td>Yes, but don't</td></tr><tr><td><code>__name</code></td><td>Private (mangled to <code>_Class__name</code>)</td><td>No</td></tr></tbody></table><h2>Private Fields in JavaScript</h2><pre><code>class BankAccount {
+  #balance;                       // truly private — no access from outside
+
+  constructor(balance = 0) {
+    this.#balance = balance;
+  }
+
+  deposit(amount) {
+    if (amount &lt;= 0) throw new Error("Deposit must be positive");
+    this.#balance += amount;
+  }
+
+  get balance() { return this.#balance; }
+}
+
+const a = new BankAccount(100);
+a.balance          // 100  — through the getter
+a.#balance         // SyntaxError — not allowed
+a.balance = 500    // ignored (getter only)</code></pre><h2>Getters and Setters</h2><p>Properties let you expose a clean interface while still running validation behind the scenes.</p><pre><code>class Temperature:
+    def __init__(self, celsius):
+        self.set_celsius(celsius)
+
+    @property
+    def fahrenheit(self):
+        return self.celsius * 9 / 5 + 32
+
+    @fahrenheit.setter
+    def fahrenheit(self, value):
+        self.celsius = (value - 32) * 5 / 9
+
+t = Temperature(100)
+t.fahrenheit        # 212</code></pre><blockquote>Encapsulation protects <em>invariants</em> — the rules that must always be true about your object. If a rule can be broken from outside, it is not really a rule.</blockquote>` },
+      { id: "oop-04", title: "Abstraction", difficulty: "intermediate", time: "5 min", desc: "Expose what an object does, hide how it does it.",
+        content: `<h1>Abstraction</h1><p><strong>Abstraction</strong> is the idea of showing <em>what</em> an object can do while hiding <em>how</em> it does it. The user of your code should not need to know the internals.</p><h2>Example: Sending Messages</h2><p>Bad design — every caller must know the internals:</p><pre><code>import smtplib
+from twilio.rest import Client
+
+def notify_user(user, message):
+    if user.channel == "email":
+        smtplib.SMTP("smtp.gmail.com").send_message(message)   # details leak
+    else:
+        Client(token).messages.create(body=message)            # details leak</code></pre><p>Good design — the caller only knows the contract:</p><pre><code>class Notifier(ABC):
+    @abstractmethod
+    def send(self, message):
+        """Every notifier must be able to send a message."""
+
+
+class EmailNotifier(Notifier):
+    def __init__(self, smtp_server):
+        self.server = smtp_server
+
+    def send(self, message):
+        print(f"email sent via {self.server}: {message}")
+
+
+class SMSNotifier(Notifier):
+    def __init__(self, token):
+        self.token = token
+
+    def send(self, message):
+        print(f"sms sent with token {self.token}: {message}")
+
+
+def notify_user(notifier, message):
+    notifier.send(message)          # same call, any notifier</code></pre><h2>Abstract Class vs Interface</h2><table><thead><tr><th>Language</th><th>Mechanism</th></tr></thead><tbody><tr><td>Python</td><td><code>abc.ABC</code> + <code>@abstractmethod</code></td></tr><tr><td>JavaScript</td><td>No keyword — just document the shape, or check <code>typeof</code></td></tr><tr><td>Java / C#</td><td><code>abstract class</code> or <code>interface</code></td></tr><tr><td>C</td><td>Function-pointer struct (a vtable in disguise)</td></tr></tbody></table><h2>Rules of Thumb</h2><ul><li>Abstraction is a <strong>boundary</strong>, not an extra layer to add everywhere</li><li>If there is only one implementation and no plan for a second, skip the abstract class</li><li>Depend on the interface, not on the concrete class</li></ul><h2>Abstraction vs Encapsulation</h2><table><thead><tr><th>Pillar</th><th>Hides</th><th>Question it answers</th></tr></thead><tbody><tr><td>Encapsulation</td><td>Data</td><td>Who can change this value?</td></tr><tr><td>Abstraction</td><td>Implementation</td><td>What can this object do?</td></tr></tbody></table>` },
+      { id: "oop-05", title: "Inheritance", difficulty: "intermediate", time: "5 min", desc: "Reuse a parent class, override behaviour, call super.",
+        content: `<h1>Inheritance</h1><p><strong>Inheritance</strong> creates a new class from an existing one. The child gets everything the parent has and can change or add to it.</p><h2>Is-a, Not Has-a</h2><p>Use inheritance only when the child really <em>is</em> a kind of the parent. A <code>SavingsAccount</code> <strong>is a</strong> <code>BankAccount</code>. An <code>AccountManager</code> does <strong>not</strong> is-a <code>BankAccount</code> — it has one.</p><pre><code>class BankAccount:
+    def __init__(self, owner, balance=0):
+        self.owner = owner
+        self.balance = balance
+
+    def deposit(self, amount):
+        self.balance += amount
+
+    def summary(self):
+        return f"{self.owner}: {self.balance}"
+
+
+class SavingsAccount(BankAccount):        # inherits everything
+    def __init__(self, owner, balance=0, rate=0.05):
+        super().__init__(owner, balance)   # call the parent constructor
+        self.rate = rate
+
+    def add_interest(self):
+        self.balance *= (1 + self.rate)
+
+    def summary(self):                      # overriding the parent
+        return f"{super().summary()} (rate {self.rate})"</code></pre><h2>What super() Does</h2><p><code>super()</code> calls the parent version of a method, so you extend behaviour instead of rewriting it.</p><pre><code>class SavingsAccount(BankAccount):
+    def deposit(self, amount):
+        if amount &lt;= 0:
+            raise ValueError("Deposit must be positive")
+        super().deposit(amount)      # reuse parent logic
+        self.last_deposit = amount    # then add your own</code></pre><h2>The is-a Test</h2><table><thead><tr><th>Relationship</th><th>Use</th></tr></thead><tbody><tr><td><code>SavingsAccount</code> <strong>is a</strong> <code>BankAccount</code></td><td>Inheritance</td></tr><tr><td><code>Car</code> <strong>has a</strong> <code>Engine</code></td><td>Composition (see next article)</td></tr></tbody></table><h2>Single Inheritance Rule of Thumb</h2><ul><li>Prefer <strong>one</strong> parent. Deep chains get fragile fast.</li><li>Every override should be compatible with the parent signature (LSP).</li><li>Use <code>isinstance(child, Parent)</code> to check the relationship.</li><li>In C, you get inheritance by embedding a struct inside a struct.</li></ul><pre><code>typedef struct { int wheels; } Vehicle;
+typedef struct { Vehicle base;   /* acts like inheritance */ int doors; } Car;</code></pre><blockquote>Inheritance is for genuine <em>is-a</em> reuse. For everything else, use composition.</blockquote>` },
+      { id: "oop-06", title: "Polymorphism", difficulty: "intermediate", time: "5 min", desc: "One call, different behaviour — the point of OOP.",
+        content: `<h1>Polymorphism</h1><p><strong>Polymorphism</strong> means "many shapes". You call the same method on different objects, and each one responds in its own way.</p><h2>Run-Time Polymorphism (Overriding)</h2><pre><code>class Animal:
+    def speak(self):
+        return "..."
+
+
+class Dog(Animal):
+    def speak(self):
+        return "Woof"
+
+
+class Cat(Animal):
+    def speak(self):
+        return "Meow"
+
+
+animals = [Dog(), Cat(), Animal()]
+for animal in animals:
+    print(animal.speak())     # Woof / Meow / ...</code></pre><p>The loop never asks what type each object is. It just calls <code>speak()</code> and each object handles it. This is also called <strong>dynamic dispatch</strong>.</p><h2>Compile-Time Polymorphism (Overloading)</h2><p>Overloading means the same method name with different parameter types or counts, resolved before the program runs. Java, C++, and C# have it; Python and JavaScript do not.</p><table><thead><tr><th>Kind</th><th>Resolved</th><th>Example</th></tr></thead><tbody><tr><td>Overloading</td><td>Compile time</td><td><code>add(int, int)</code> vs <code>add(double, double)</code></td></tr><tr><td>Overriding</td><td>Run time</td><td>A child class replaces the parent method</td></tr></tbody></table><h2>Python Simulates Overloading</h2><pre><code>class Adder:
+    def add(self, a, b=None):
+        if b is None:                 # called with one list argument
+            return sum(a)
+        return a + b                  # called with two numbers
+
+Adder().add(2, 3)      # 5
+Adder().add([1, 2, 3])  # 6</code></pre><h2>Operator Overloading Is Polymorphism Too</h2><p>You already use polymorphism when you write <code>+</code> — the operator calls a different method depending on the object types.</p><pre><code>print(2 + 3)          # int.__add__
+print("a" + "b")      # str.__add__
+print([1] + [2])      # list.__add__</code></pre><h2>Duck Typing (Python)</h2><p>Python does not need a declared base class. If an object has the method, it works:</p><pre><code>class Robot:
+    def speak(self):
+        return "Beep"
+
+
+def make_it_speak(thing):
+    return thing.speak()      # no type check, no inheritance
+
+make_it_speak(Dog())      # Woof
+make_it_speak(Robot())    # Beep</code></pre><h2>JavaScript Does It Too</h2><pre><code>const animals = [new Dog(), new Cat()];
+animals.forEach((a) =&gt; console.log(a.speak()));
+// same call, each object uses its own method</code></pre><blockquote>Code that depends on behaviour instead of type is the whole point of OOP — it lets you add new classes without touching old code.</blockquote>` },
+      { id: "oop-07", title: "Constructors & Destructors", difficulty: "intermediate", time: "4 min", desc: "Set up valid state on creation, clean up on destruction.",
+        content: `<h1>Constructors &amp; Destructors</h1><p>A <strong>constructor</strong> runs when an object is created. Its job is to leave the object in a valid state. A <strong>destructor</strong> (or cleanup method) runs when the object goes away.</p><h2>Python</h2><pre><code>class Rectangle:
+    def __init__(self, width, height):
+        if width &lt;= 0 or height &lt;= 0:
+            raise ValueError("Sides must be positive")
+        self.width = width          # private-ish with _ prefix
+        self.height = height
+
+    @property
+    def area(self):
+        return self.width * self.height
+
+    def __del__(self):              # rarely used in Python
+        print("rectangle destroyed")</code></pre><p>Python normally frees memory for you. Prefer an explicit <code>close()</code> or a context manager over <code>__del__</code>.</p><pre><code>class File:
+    def __enter__(self):
+        self.handle = open("data.txt")
+        return self
+
+    def __exit__(self, *args):
+        self.handle.close()</code></pre><h2>JavaScript</h2><pre><code>class Rectangle {
+  #width;                       // class fields
+  #height;
+
+  constructor(width, height) {
+    if (width &lt;= 0) throw new Error("Sides must be positive");
+    this.#width = width;
+    this.#height = height;
+  }
+
+  get area() { return this.#width * this.#height; }
+}
+
+const r = new Rectangle(4, 5);   // constructor runs here</code></pre><h2>C — No Constructors, So You Write One</h2><pre><code>typedef struct { double width, height; } Rectangle;
+
+void rect_init(Rectangle *r, double w, double h) {
+    if (w &lt;= 0 || h &lt;= 0) return;   /* refuse invalid state */
+    r-&gt;width = w;
+    r-&gt;height = h;
+}
+
+void rect_free(Rectangle *r) {          /* cleanup */
+    (void)r;
+}</code></pre><h2>Constructor Chaining</h2><p>A child constructor usually calls the parent first, then adds its own fields:</p><pre><code>class SavingsAccount(BankAccount):
+    def __init__(self, owner, balance=0, rate=0.05):
+        if rate &lt; 0 or rate &gt; 1:
+            raise ValueError("rate must be between 0 and 1")
+        super().__init__(owner, balance)   # 1. parent first
+        self.rate = rate                    # 2. then child fields</code></pre><h2>Rules</h2><ul><li>Do heavy setup in the constructor, not at every call site</li><li>Validate arguments in the constructor so the object is never half-built</li><li>Avoid work in constructors that can fail later (network calls, file reads)</li><li>Pair every resource you acquire with a method that releases it</li></ul>` },
+      { id: "oop-08", title: "Static & Class Members", difficulty: "intermediate", time: "4 min", desc: "Data and functions that belong to the class, not the object.",
+        content: `<h1>Static &amp; Class Members</h1><p>Sometimes data belongs to the <strong>class as a whole</strong>, not to each object. Class-level members are shared by every instance.</p><h2>Class Variable vs Instance Variable</h2><pre><code>class Dog:
+    species = "Canis familiaris"    # class variable — ONE copy, shared
+
+    def __init__(self, name):
+        self.name = name            # instance variable — one per object
+
+
+rex = Dog("Rex")
+fido = Dog("Fido")
+
+Dog.species        # 'Canis familiaris'
+rex.name           # 'Rex'
+fido.name          # 'Fido'  — separate</code></pre><h2>The Classic Shared-State Bug</h2><pre><code>class Team:
+    members = []                 # BUG: shared by every instance
+
+    def __init__(self, name):
+        self.name = name
+
+    def add(self, member):
+        self.members.append(member)
+
+
+a = Team("Alpha")
+b = Team("Beta")
+a.add("Rex")
+len(b.members)     # 1 — "Rex" leaked into Beta!</code></pre><p>The fix is to create the list per object:</p><pre><code>    def __init__(self, name):
+        self.name = name
+        self.members = []        # each team gets its own list</code></pre><h2>Class Methods and Static Methods</h2><table><thead><tr><th>Type</th><th>Receives</th><th>Use for</th></tr></thead><tbody><tr><td>Instance method</td><td><code>self</code></td><td>Behaviour that uses the object's data</td></tr><tr><td>Class method</td><td><code>cls</code></td><td>Alternative constructors / factories</td></tr><tr><td>Static method</td><td>Nothing</td><td>Helper functions that belong to the class</td></tr></tbody></table><pre><code>class Date:
+    def __init__(self, y, m, d):
+        self.y, self.m, self.d = y, m, d
+
+    @classmethod
+    def from_string(cls, s):
+        return cls(*map(int, s.split("-")))   # alternative constructor
+
+    @staticmethod
+    def is_valid(y, m, d):
+        return 1 &lt;= m &lt;= 12 and 1 &lt;= d &lt;= 31
+
+Date.from_string("2026-01-31")
+Date.is_valid(2026, 2, 30)</code></pre><h2>JavaScript</h2><pre><code>class Counter {
+  static instances = 0;          // shared across all objects
+  #count = 0;
+
+  constructor() {
+    Counter.instances++;
+  }
+
+  increment() { this.#count++; }
+  get count() { return this.#count; }
+}
+
+new Counter();
+Counter.instances;   // 1</code></pre><h2>C</h2><pre><code>static int instances = 0;   /* shared by the whole program */
+
+int counter_create(void) {
+    instances++;
+    return instances;
+}</code></pre><blockquote>Shared mutable state is the number one source of bugs in object-oriented programs. Keep it read-only or keep it local.</blockquote>` },
+      { id: "oop-09", title: "Magic Methods (Dunder)", difficulty: "intermediate", time: "5 min", desc: "Make your objects work with built-in operators and functions.",
+        content: `<h1>Magic Methods</h1><p>Some methods Python calls <strong>for you</strong> when you use an operator or a built-in function. They are called <strong>dunder</strong> methods (double underscore).</p><h2>Common Dunder Methods</h2><table><thead><tr><th>Method</th><th>Called by</th><th>Purpose</th></tr></thead><tbody><tr><td><code>__init__</code></td><td><code>Obj()</code></td><td>Set up a new object</td></tr><tr><td><code>__str__</code></td><td><code>print(obj)</code>, <code>str(obj)</code></td><td>Human-readable text</td></tr><tr><td><code>__repr__</code></td><td><code>repr(obj)</code>, the REPL</td><td>Unambiguous debug form</td></tr><tr><td><code>__len__</code></td><td><code>len(obj)</code></td><td>Size of the object</td></tr><tr><td><code>__eq__</code></td><td><code>a == b</code></td><td>Value equality</td></tr><tr><td><code>__lt__</code></td><td><code>a &lt; b</code>, <code>sorted()</code></td><td>Comparison</td></tr><tr><td><code>__add__</code></td><td><code>a + b</code></td><td>Operator overloading</td></tr><tr><td><code>__getitem__</code></td><td><code>obj[i]</code></td><td>Indexing</td></tr><tr><td><code>__iter__</code></td><td><code>for x in obj</code></td><td>Iteration</td></tr><tr><td><code>__enter__</code> / <code>__exit__</code></td><td><code>with obj:</code></td><td>Resource management</td></tr></tbody></table><h2>A Complete Example</h2><pre><code>class Vector:
+    def __init__(self, x, y):
+        self.x, self.y = x, y
+
+    def __add__(self, other):
+        return Vector(self.x + other.x, self.y + other.y)
+
+    def __eq__(self, other):
+        return self.x == other.x and self.y == other.y
+
+    def __repr__(self):
+        return f"Vector({self.x}, {self.y})"
+
+
+a = Vector(1, 2)
+b = Vector(3, 4)
+
+print(a + b)     # Vector(4, 6)   -> uses __add__
+a == Vector(1, 2)  # True        -> uses __eq__</code></pre><h2>JavaScript Equivalents</h2><pre><code>class Vector {
+  constructor(x, y) { this.x = x; this.y = y; }
+
+  toString() { return "Vector(" + this.x + ", " + this.y + ")"; }
+  valueOf()  { return Math.hypot(this.x, this.y); }   // enables arithmetic
+
+  *[Symbol.iterator]() {          // makes the object for...of-able
+    yield this.x;
+    yield this.y;
+  }
+}
+
+const v = new Vector(3, 4);
+console.log(String(v));        // Vector(3, 4)
+for (const n of v) console.log(n);</code></pre><h2>Rules</h2><ul><li>Implement <code>__str__</code> for humans, <code>__repr__</code> for developers</li><li>If you define <code>__eq__</code>, consider defining <code>__hash__</code> too</li><li>Keep magic methods small and predictable — they should feel like the built-in types</li></ul><blockquote>Operator overloading should be intuitive. If <code>a + b</code> on your class is surprising, remove it.</blockquote>` },
+      { id: "oop-10", title: "SOLID Principles", difficulty: "advanced", time: "6 min", desc: "Five rules that keep object-oriented code from rotting.",
+        content: `<h1>SOLID Principles</h1><p>SOLID is a set of five design principles for object-oriented code. They are guidelines, not laws.</p><table><thead><tr><th>Letter</th><th>Principle</th><th>In one line</th></tr></thead><tbody><tr><td><strong>S</strong></td><td>Single Responsibility</td><td>A class should do one job — one reason to change</td></tr><tr><td><strong>O</strong></td><td>Open/Closed</td><td>Open for extension, closed for modification</td></tr><tr><td><strong>L</strong></td><td>Liskov Substitution</td><td>A child class must be usable wherever the parent is</td></tr><tr><td><strong>I</strong></td><td>Interface Segregation</td><td>Many small interfaces beat one big interface</td></tr><tr><td><strong>D</strong></td><td>Dependency Inversion</td><td>Depend on abstractions, not on concrete classes</td></tr></tbody></table><h2>S — Single Responsibility</h2><pre><code>class User:
+    def save_to_db(self): ...      # BAD: user now knows about SQL
+    def send_welcome_email(self): ...  # and about SMTP
+    def to_json(self): ...</code></pre><p>Split into <code>UserRepository</code> and <code>Mailer</code>.</p><h2>O — Open/Closed</h2><p>To add a new payment type, add a new class — do not edit the old <code>if/elif</code> chain.</p><pre><code>class PaymentMethod(ABC):
+    @abstractmethod
+    def charge(self, amount): ...
+
+
+class Card(PaymentMethod):
+    def charge(self, amount): ...
+
+
+class Upi(PaymentMethod):          # new type, no existing code changed
+    def charge(self, amount): ...
+
+
+class Checkout:
+    def __init__(self, method: PaymentMethod):
+        self.method = method      # depends on the abstraction</code></pre><h2>L — Liskov Substitution</h2><p>Overriding must not break the parent's contract.</p><pre><code>class FileWriter:
+    def write(self, data): ...
+
+
+class ReadOnlyWriter(FileWriter):     # BAD: cannot honour the contract
+    def write(self, data):
+        raise NotImplementedError</code></pre><h2>I — Interface Segregation</h2><p>Do not force a class to implement methods it does not need.</p><pre><code>class Printer:                      # BAD: report() is irrelevant for printing
+    def print(self, doc): ...
+    def scan(self, doc): ...
+    def fax(self, doc): ...
+
+
+class SimplePrinter:                 # GOOD: only what it needs
+    def print(self, doc): ...</code></pre><h2>D — Dependency Inversion</h2><pre><code>class OrderService:
+    def __init__(self, repository):     # receives a dependency
+        self.repo = repository
+
+    def place(self, item):
+        self.repo.save(item)</code></pre><p>The caller chooses the implementation, so tests can inject a fake:</p><pre><code>class FakeRepo:
+    def save(self, item):
+        self.saved = item
+
+OrderService(FakeRepo()).place("book")   # no database needed</code></pre><h2>How to Use These</h2><ul><li>Not every class needs all five — apply the rule that fixes the problem you actually have</li><li>Start with SRP; the rest follows naturally</li><li>If a change forces you to touch five files, one of them probably has too many responsibilities</li></ul>` },
+      { id: "oop-11", title: "Composition vs Inheritance", difficulty: "intermediate", time: "4 min", desc: "Prefer has-a over is-a, and keep hierarchies flat.",
+        content: `<h1>Composition vs Inheritance</h1><p>Two ways to reuse code. <strong>Inheritance</strong> is <em>is-a</em>. <strong>Composition</strong> is <em>has-a</em>. Composition is almost always the safer choice.</p><h2>Side by Side</h2><table><thead><tr><th>Aspect</th><th>Inheritance</th><th>Composition</th></tr></thead><tbody><tr><td>Relationship</td><td>is-a</td><td>has-a</td></tr><tr><td>Tight coupling</td><td>Very</td><td>Loose</td></tr><tr><td>Change at runtime</td><td>Hard</td><td>Easy — swap the part</td></tr><tr><td>Depth limit</td><td>Keep it to 2–3 levels</td><td>No limit</td></tr><tr><td>Best for</td><td>Genuine subtypes</td><td>Almost everything else</td></tr></tbody></table><h2>Composition Example</h2><pre><code>class Engine:
+    def __init__(self, power):
+        self.power = power
+
+    def start(self):
+        return "engine running"
+
+
+class Car:
+    def __init__(self, engine):
+        self.engine = engine          # Car has an Engine
+
+    def start(self):
+        return self.engine.start()
+
+
+car = Car(Engine(120))
+car.start()        # 'engine running'
+
+# Swap the part at any time
+car.engine = Engine(200)</code></pre><p>With inheritance you would have needed a <code>ElectricCar</code> subclass, then a <code>DieselCar</code>, then combinations of both...</p><h2>Composition With Roles</h2><pre><code>class Logger:
+    def write(self, msg):
+        print(f"[file] {msg}")
+
+
+class Service:
+    def __init__(self, logger=None):     # injected, not inherited
+        self.logger = logger or Logger()
+
+    def run(self):
+        self.logger.write("service started")</code></pre><h2>The Diamond Problem</h2><p>Multiple inheritance makes the shared base ambiguous. Prefer composition:</p><pre><code>class A: pass
+class B(A): pass
+class C(A): pass
+class D(B, C): pass       # D().run() — which run() from A?</code></pre><h2>Rule of Thumb</h2><ul><li>Use inheritance for real subtypes (<code>SavingsAccount</code> is a <code>BankAccount</code>)</li><li>Use composition for everything else</li><li>If you say "has a" in a sentence, do not use inheritance</li><li>A hierarchy deeper than three levels is usually a design smell</li></ul><blockquote>Ask "is-a" for inheritance, "has-a" for composition. When in doubt, compose.</blockquote>` },
+      { id: "oop-12", title: "OOP in C", difficulty: "advanced", time: "6 min", desc: "Structs, function pointers, and a hand-rolled vtable.",
+        content: `<h1>OOP in C</h1><p>C has no <code>class</code> keyword and no built-in inheritance, but the object-oriented ideas are all expressible with structs and function pointers.</p><h2>Struct + Functions = Object</h2><pre><code>#include &lt;stdio.h&gt;
+
+typedef struct {
+    int wheels;
+    int speed;
+} Car;
+
+void car_accelerate(Car *car, int amount) {
+    car-&gt;speed += amount;
+}
+
+int main(void) {
+    Car my_car = {4, 0};
+    car_accelerate(&amp;my_car, 50);
+    printf("%d\\n", my_car.speed);      /* 50 */
+    return 0;
+}</code></pre><p>Convention: functions that take a <code>Type *</code> as their first argument belong to that type. This is the <code>self</code>/<code>this</code> pointer in disguise.</p><h2>Encapsulation With an Opaque Struct</h2><p>Declare the struct in the header, define it only in the .c file. Callers can use the type but cannot touch its fields.</p><pre><code>/* counter.h */
+typedef struct Counter Counter;      /* incomplete type — fields hidden */
+Counter *counter_create(int start);
+void counter_add(Counter *c, int amount);
+int  counter_value(const Counter *c);
+void counter_destroy(Counter *c);</code></pre><h2>Polymorphism With Function Pointers</h2><p>A struct of function pointers is a <strong>vtable</strong>. This is exactly what C++ and Java implement behind the scenes.</p><pre><code>typedef struct Shape Shape;
+
+struct Shape {
+    const char *name;
+    double (*area)(const Shape *self);
+};
+
+typedef struct { Shape base; double w, h; } Rectangle;
+
+static double rect_area(const Shape *self) {
+    const Rectangle *r = (const Rectangle *)self;   /* cast back */
+    return r-&gt;w * r-&gt;h;
+}
+
+void print_area(const Shape *s) {
+    printf("%s: %.2f\\n", s-&gt;name, s-&gt;area(s));    /* dynamic dispatch */
+}</code></pre><h2>One Virtual Method Is Enough for Polymorphism</h2><pre><code>typedef struct { Shape base; double r; } Circle;
+
+static double circle_area(const Shape *self) {
+    const Circle *c = (const Circle *)self;
+    return 3.14159 * c-&gt;r * c-&gt;r;
+}
+
+
+int main(void) {
+    Rectangle rect = { { "rectangle", rect_area }, 4, 5 };
+    Circle   circ = { { "circle",   circle_area }, 2 };
+
+    print_area(&rect.base);
+    print_area(&circ.base);      /* same function, different behaviour */
+    return 0;
+}</code></pre><h2>Inheritance by Embedding</h2><pre><code>typedef struct { int wheels; } Vehicle;
+typedef struct {
+    Vehicle base;      /* first member = acts like a parent */
+    int doors;
+} Car;
+
+Car my_car = { { 4 }, 5 };
+my_car.base.wheels      /* access the "inherited" field */
+my_car.wheels           /* works too — no real inheritance in C */</code></pre><h2>Summary Table</h2><table><thead><tr><th>OOP concept</th><th>C equivalent</th></tr></thead><tbody><tr><td>Class</td><td><code>struct</code></td></tr><tr><td>Object</td><td><code>struct</code> instance</td></tr><tr><td>Method</td><td>Function taking a pointer to the struct</td></tr><tr><td>Encapsulation</td><td>Opaque struct defined in the .c file</td></tr><tr><td>Inheritance</td><td>Embedding a struct as the first member</td></tr><tr><td>Polymorphism</td><td>Struct of function pointers (vtable)</td></tr><tr><td>Constructor / Destructor</td><td><code>_create()</code> / <code>_destroy()</code> pair</td></tr></tbody></table><blockquote>Write this once in C and C++ classes feel familiar. Every object is a pointer to a struct whose first member may be a vtable.</blockquote>` },
+      { id: "oop-13", title: "Quick Reference", difficulty: "beginner", time: "3 min", desc: "One-page cheat sheet across Python, JavaScript, and C.",
+        content: `<h1>OOP Quick Reference</h1><h2>Same Idea, Three Languages</h2><table><thead><tr><th>Concept</th><th>Python</th><th>JavaScript</th><th>C</th></tr></thead><tbody><tr><td>Class</td><td><code>class A:</code></td><td><code>class A {}</code></td><td><code>typedef struct {...} A;</code></td></tr><tr><td>Object</td><td><code>A()</code></td><td><code>new A()</code></td><td><code>A a;</code></td></tr><tr><td>Constructor</td><td><code>__init__</code></td><td><code>constructor()</code></td><td><code>a_init(&amp;a)</code></td></tr><tr><td>Instance field</td><td><code>self.x</code></td><td><code>this.x</code></td><td><code>a.x</code></td></tr><tr><td>Private field</td><td><code>self.__x</code></td><td><code>this.#x</code></td><td>opaque struct</td></tr><tr><td>Class / static</td><td><code>@classmethod</code></td><td><code>static</code></td><td><code>static</code></td></tr><tr><td>Inheritance</td><td><code>class B(A)</code></td><td><code>class B extends A</code></td><td>embed struct</td></tr><tr><td>Call parent</td><td><code>super().__init__()</code></td><td><code>super()</code></td><td>call the function</td></tr><tr><td>Polymorphism</td><td>duck typing</td><td>duck typing</td><td>function pointers</td></tr></tbody></table><h2>The Four Pillars</h2><table><thead><tr><th>Pillar</th><th>One-line definition</th></tr></thead><tbody><tr><td>Encapsulation</td><td>Bundle data with the code that guards it</td></tr><tr><td>Abstraction</td><td>Show what, hide how</td></tr><tr><td>Inheritance</td><td>Reuse a parent (is-a)</td></tr><tr><td>Polymorphism</td><td>One interface, many behaviours</td></tr></tbody></table><h2>Checklist Before You Ship</h2><ul><li>Is the object's state always valid, whatever the caller does?</li><li>Does each class have one clear reason to change?</li><li>Would a new subclass work without editing existing code?</li><li>Have you used composition where the relationship is "has a"?</li><li>Are shared mutable class variables really needed?</li></ul><h2>Next Steps</h2><ul><li>Python: see <code>python-11</code> for the syntax in depth</li><li>C: <code>c-11</code> covers structs, typedef, and the arrow operator</li><li>JavaScript: <code>js-11</code> covers ES6 classes</li><li>Next topics: design patterns (singleton, factory, observer, strategy)</li></ul>` }
+    ]
+  },
+  {
     id: "linear-ds", label: "Linear DS", icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/></svg>`,
     desc: "Linear data structures in C — arrays, stacks, queues and linked lists.",
     tags: ["arrays", "stacks", "queues", "linked lists", "linear"],
@@ -2729,13 +3219,8 @@ Tree sizes (n nodes)
     tags: ["bubble sort", "quick sort", "merge sort", "algorithms"],
     articles: [
       { id: "sort-01", title: "Introduction to Sorting", difficulty: "beginner", time: "4 min", desc: "What is sorting, key, orders, stability and classifications.",
-        content: `<h1>Introduction to Sorting</h1><span class="step-badge">Chapter 1</span><p><strong>Sorting</strong> means arranging the elements of a collection in a particular order so the data becomes easy to search and process.</p><h2>Unsorted vs Sorted</h2><pre><code>Unsorted:   40  10  70  20  60
-
-Ascending:  10  20  40  60  70
-            small &#8594; big
-
-Descending: 70  60  40  20  10
-            big &#8594; small</code></pre><h2>Why Sorting?</h2><ul><li>Binary search works <strong>only</strong> on sorted data.</li><li>Duplicates become easy to count and group.</li><li>Sorting is the first step of many algorithms — searching, merging, grouping.</li></ul><h2>Key Terms</h2><table><thead><tr><th>Term</th><th>Meaning</th></tr></thead><tbody><tr><td>Key</td><td>The value used for comparison.</td></tr><tr><td>Record</td><td>A key plus its other information.</td></tr><tr><td>Collection</td><td>The list (array) of records to sort.</td></tr><tr><td>Internal sort</td><td>All data stays in memory (arrays).</td></tr><tr><td>External sort</td><td>Data is larger than memory, sorted as files.</td></tr></tbody></table><h2>Types of Sorting Algorithms</h2><h3>1. Comparison Based</h3><p>Compare two elements and decide the order.</p><ul><li>Bubble sort</li><li>Selection sort</li><li>Insertion sort</li><li>Quick sort</li><li>Merge sort</li></ul><h3>2. Non-Comparison Based</h3><p>Use the value of the element directly, without comparing two elements.</p><ul><li>Counting sort</li><li>Bucket sort</li><li>Radix sort</li></ul><h2>Other Ways to Classify</h2><table><thead><tr><th>Type</th><th>Meaning</th><th>Examples</th></tr></thead><tbody><tr><td>In-place</td><td>Sorting happens inside the same array, no extra array.</td><td>Bubble, selection, insertion, quick</td></tr><tr><td>Out-of-place</td><td>Needs extra memory (an extra array).</td><td>Merge, counting, radix</td></tr><tr><td>Stable</td><td>Equal keys keep their original relative order.</td><td>Bubble, insertion, merge</td></tr><tr><td>Unstable</td><td>Equal keys may change their relative order.</td><td>Selection, quick</td></tr></tbody></table><h2>What Stability Means</h2><pre><code>Records:  (name, score)
+        content: `<h1>Introduction to Sorting</h1><span class="step-badge">Chapter 1</span><p><strong>Sorting</strong> means arranging the elements of a collection in a particular order so the data becomes easy to search and process.</p><h2>Unsorted vs Sorted</h2><p>Sorting rearranges the elements of a collection into a defined order. Ascending puts the smallest first, descending puts the largest first — the values themselves never change, only their positions.</p>
+<div class="viz-card" data-viz="sorting-overview"></div><h2>Why Sorting?</h2><ul><li>Binary search works <strong>only</strong> on sorted data.</li><li>Duplicates become easy to count and group.</li><li>Sorting is the first step of many algorithms — searching, merging, grouping.</li></ul><h2>Key Terms</h2><table><thead><tr><th>Term</th><th>Meaning</th></tr></thead><tbody><tr><td>Key</td><td>The value used for comparison.</td></tr><tr><td>Record</td><td>A key plus its other information.</td></tr><tr><td>Collection</td><td>The list (array) of records to sort.</td></tr><tr><td>Internal sort</td><td>All data stays in memory (arrays).</td></tr><tr><td>External sort</td><td>Data is larger than memory, sorted as files.</td></tr></tbody></table><h2>Types of Sorting Algorithms</h2><h3>1. Comparison Based</h3><p>Compare two elements and decide the order.</p><ul><li>Bubble sort</li><li>Selection sort</li><li>Insertion sort</li><li>Quick sort</li><li>Merge sort</li></ul><h3>2. Non-Comparison Based</h3><p>Use the value of the element directly, without comparing two elements.</p><ul><li>Counting sort</li><li>Bucket sort</li><li>Radix sort</li></ul><h2>Other Ways to Classify</h2><table><thead><tr><th>Type</th><th>Meaning</th><th>Examples</th></tr></thead><tbody><tr><td>In-place</td><td>Sorting happens inside the same array, no extra array.</td><td>Bubble, selection, insertion, quick</td></tr><tr><td>Out-of-place</td><td>Needs extra memory (an extra array).</td><td>Merge, counting, radix</td></tr><tr><td>Stable</td><td>Equal keys keep their original relative order.</td><td>Bubble, insertion, merge</td></tr><tr><td>Unstable</td><td>Equal keys may change their relative order.</td><td>Selection, quick</td></tr></tbody></table><h2>What Stability Means</h2><pre><code>Records:  (name, score)
 
 Ana   70
 Bina  70
@@ -2753,7 +3238,9 @@ Chai  80</code></pre><p>Both <code>Ana</code> and <code>Bina</code> have the sam
     }
 }</code></pre><blockquote><strong>Note:</strong> some notebooks show the swap as <code>int temp = arr[j+1]; arr[j+1] = arr[j+1]; arr[j] = temp;</code> — as written that assigns the same value twice and never actually swaps. The code above uses the standard correct swap.</blockquote>
 
-<h2>Dry Run</h2><p>Array: <code>[5, 4, 2, 1]</code></p><table><thead><tr><th>Index</th><th>0</th><th>1</th><th>2</th><th>3</th></tr></thead><tbody><tr><td>Value</td><td>5</td><td>4</td><td>2</td><td>1</td></tr></tbody></table>
+<h2>Dry Run</h2>
+<div class="viz-card" data-viz="bubble-mechanics"></div>
+<p>Array: <code>[5, 4, 2, 1]</code></p><table><thead><tr><th>Index</th><th>0</th><th>1</th><th>2</th><th>3</th></tr></thead><tbody><tr><td>Value</td><td>5</td><td>4</td><td>2</td><td>1</td></tr></tbody></table>
 
 <h3>Pass 1 (i = 0, j runs [0, 1, 2])</h3><pre><code>j=0:  [ 5,  4,  2,  1]
         0   1   2   3
@@ -2771,10 +3258,7 @@ j=2:  [ 4,  2,  5,  1]
         0   1   2   3
                 ↑   ↑
                 swap    5 &gt; 1 → swap
-    → [ 4,  2,  1,  5]</code></pre><p>End of Pass 1: <code>[4, 2, 1, 5]</code></p><pre><code>    → [ 4,  2,  1,  5]
-                   ┌─┐
-                   │5│  ← sorted
-                   └─┘</code></pre>
+    → [ 4,  2,  1,  5]</code></pre><p>End of Pass 1: <code>[4, 2, 1, 5]</code></p>
 
 <h3>Pass 2 (i = 1, j runs [0, 1])</h3><pre><code>j=0:  [ 4,  2,  1,  5]
         0   1   2   3
@@ -2786,19 +3270,13 @@ j=1:  [ 2,  4,  1,  5]
         0   1   2   3
             ↑   ↑
             swap        4 &gt; 1 → swap
-    → [ 2,  1,  4,  5]</code></pre><p>End of Pass 2: <code>[2, 1, 4, 5]</code></p><pre><code>    → [ 2,  1,  4,  5]
-               ┌─────┐
-               │4,  5│  ← sorted
-               └─────┘</code></pre>
+    → [ 2,  1,  4,  5]</code></pre><p>End of Pass 2: <code>[2, 1, 4, 5]</code></p>
 
 <h3>Pass 3 (i = 2, j runs [0])</h3><pre><code>j=0:  [ 2,  1,  4,  5]
         0   1   2   3
         ↑   ↑
         swap            2 &gt; 1 → swap
-    → [ 1,  2,  4,  5]</code></pre><p>End of Pass 3: <code>[1, 2, 4, 5]</code></p><pre><code>    → [ 1,  2,  4,  5]
-       ┌─────────────┐
-       │1,  2,  4,  5│  ← sorted ✓
-       └─────────────┘</code></pre>
+    → [ 1,  2,  4,  5]</code></pre><p>End of Pass 3: <code>[1, 2, 4, 5]</code></p>
 
 <h3>Pass 4 (i = 3)</h3><p>The inner loop condition <code>j &lt; size - i - 1</code> becomes <code>j &lt; 0</code>, so it never runs. The array is already fully sorted.</p><ul><li>Outer loop: <code>for (i = 0; i &lt; size; i++)</code></li><li>Inner loop: <code>for (j = 0; j &lt; size - i - 1; j++)</code> — when <code>i = 0</code>: <code>j &lt; 4 - 0 - 1</code> → <code>j &lt; 3</code>, so <code>j</code> runs through <code>[0, 1, 2]</code></li></ul><p>Each inner-loop pass compares <code>arr[j]</code> with <code>arr[j + 1]</code> and swaps them if <code>arr[j] &gt; arr[j + 1]</code>. Then <code>i</code> increases, and the inner loop runs over a slightly smaller range each time.</p>
 
@@ -2807,78 +3285,40 @@ j=1:  [ 2,  4,  1,  5]
       { id: "sort-03", title: "Selection Sort", difficulty: "beginner", time: "5 min", desc: "Find the minimum element and place it at the front, one swap per pass.",
         content: `<h1>Selection Sort</h1><span class="step-badge">Chapter 3</span>
 
-<h2>Algorithm Dry Run</h2><p>Array:</p><pre><code>[13, 46, 24, 52, 20,  9]
+<h2>Algorithm Dry Run</h2>
+<div class="viz-card" data-viz="selection-mechanics"></div>
+<p>Array:</p><pre><code>[13, 46, 24, 52, 20,  9]
   0   1   2   3   4   5</code></pre>
 
-<h3>Step 1</h3><pre><code>[13, 46, 24, 52, 20,  9]
-  0   1   2   3   4   5
-  ↑                   ↑
-  └─────── swap ──────┘</code></pre>
+<h3>Step 1</h3>
 
 <p>9 is the minimum in the array, so it swaps with 13 (index 0) → <code>[9, 46, 24, 52, 20, 13]</code></p>
 
 <p>End of Step 1: <code>[9, 46, 24, 52, 20, 13]</code></p>
 
-<pre><code>[ 9, 46, 24, 52, 20, 13]
- ┌─┐
- │9│  ← sorted
- └─┘</code></pre>
-
-<h3>Step 2</h3><pre><code>[ 9, 46, 24, 52, 20, 13]
-  0   1   2   3   4   5
-      ↑               ↑
-      └───── swap ────┘</code></pre>
+<h3>Step 2</h3>
 
 <p>13 is the minimum of the remaining unsorted part (index 1-5), so it swaps with 46 (index 1) → <code>[9, 13, 24, 52, 20, 46]</code></p>
 
 <p>End of Step 2: <code>[9, 13, 24, 52, 20, 46]</code></p>
 
-<pre><code>[ 9, 13, 24, 52, 20, 46]
- ┌─────┐
- │9, 13│  ← sorted
- └─────┘</code></pre>
-
-<h3>Step 3</h3><pre><code>[ 9, 13, 24, 52, 20, 46]
-  0   1   2   3   4   5
-          ↑       ↑
-          └─ swap ┘</code></pre>
+<h3>Step 3</h3>
 
 <p>20 is the minimum of indices 2-5, so it swaps with 24 (index 2) → <code>[9, 13, 20, 52, 24, 46]</code></p>
 
 <p>End of Step 3: <code>[9, 13, 20, 52, 24, 46]</code></p>
 
-<pre><code>[ 9, 13, 20, 52, 24, 46]
- ┌─────────┐
- │9, 13, 20│  ← sorted
- └─────────┘</code></pre>
-
-<h3>Step 4</h3><pre><code>[ 9, 13, 20, 52, 24, 46]
-  0   1   2   3   4   5
-              ↑   ↑
-              └swap┘</code></pre>
+<h3>Step 4</h3>
 
 <p>24 is the minimum of indices 3-5, so it swaps with 52 (index 3) → <code>[9, 13, 20, 24, 52, 46]</code></p>
 
 <p>End of Step 4: <code>[9, 13, 20, 24, 52, 46]</code></p>
 
-<pre><code>[ 9, 13, 20, 24, 52, 46]
- ┌─────────────┐
- │9, 13, 20, 24│  ← sorted
- └─────────────┘</code></pre>
-
-<h3>Step 5</h3><pre><code>[ 9, 13, 20, 24, 52, 46]
-  0   1   2   3   4   5
-                  ↑   ↑
-                  └swap┘</code></pre>
+<h3>Step 5</h3>
 
 <p>46 is the minimum of indices 4-5, so it swaps with 52 (index 4) → <code>[9, 13, 20, 24, 46, 52]</code></p>
 
 <p>End of Step 5: <code>[9, 13, 20, 24, 46, 52]</code></p>
-
-<pre><code>[ 9, 13, 20, 24, 46, 52]
- ┌─────────────────┐
- │9, 13, 20, 24, 46│  ← sorted ✓
- └─────────────────┘</code></pre>
 
 <h2>Basic Working → Select minimum &amp; swap</h2><ul><li><strong>1st step</strong> → swap happens at index 0 with the minimum in the array</li><li><strong>2nd step</strong> → swap happens at index 1 with the minimum in the array</li><li><strong>3rd step</strong> → swap happens at index 2 with the minimum in the array</li><li>It continues until the array is sorted.</li></ul>
 
@@ -2916,7 +3356,9 @@ if (arr[j] &lt; arr[minIndex])
 
 <h2>Core Idea</h2><ol><li>Start at <code>i = 1</code>, because the first element is already in place on its own.</li><li>Set <code>j = i - 1</code>, the index just behind <code>i</code>.</li><li>While <code>j &gt;= 0</code> and <code>arr[j] &gt; arr[j + 1]</code>, swap the pair and step <code>j</code> one index left.</li><li>Stop when <code>j</code> falls below 0, or when the pair is already in order — the card is now in place.</li></ol>
 
-<h2>Algorithm Dry Run</h2><p>Array:</p><pre><code>[ 5,  3,  8,  1,  2]
+<h2>Algorithm Dry Run</h2>
+<div class="viz-card" data-viz="insertion-mechanics"></div>
+<p>Array:</p><pre><code>[ 5,  3,  8,  1,  2]
   0   1   2   3   4</code></pre>
 
 <h3>Step 1 (i = 1, j = i - 1 = 0)</h3>
@@ -2935,11 +3377,6 @@ if (arr[j] &lt; arr[minIndex])
 
 <p>End of Step 1: <code>[3, 5, 8, 1, 2]</code></p>
 
-<pre><code>[ 3,  5,  8,  1,  2]
- ┌─────┐
- │3,  5│  ← sorted
- └─────┘</code></pre>
-
 <h3>Step 2 (i = 2, j = i - 1 = 1)</h3>
 
 <pre><code>[ 3,  5,  8,  1,  2]
@@ -2955,11 +3392,6 @@ if (arr[j] &lt; arr[minIndex])
 <p>5 is smaller than 8, so the walk stops at once and nothing moves → <code>[3, 5, 8, 1, 2]</code></p>
 
 <p>End of Step 2: <code>[3, 5, 8, 1, 2]</code></p>
-
-<pre><code>[ 3,  5,  8,  1,  2]
- ┌─────────┐
- │3,  5,  8│  ← sorted
- └─────────┘</code></pre>
 
 <h3>Step 3 (i = 3, j = i - 1 = 2)</h3>
 
@@ -2986,11 +3418,6 @@ if (arr[j] &lt; arr[minIndex])
 <p>8, 5 and 3 are all bigger than 1, so every swap steps j one index left until 1 sits at index 0 → <code>[1, 3, 5, 8, 2]</code></p>
 
 <p>End of Step 3: <code>[1, 3, 5, 8, 2]</code></p>
-
-<pre><code>[ 1,  3,  5,  8,  2]
- ┌─────────────┐
- │1,  3,  5,  8│  ← sorted
- └─────────────┘</code></pre>
 
 <h3>Step 4 (i = 4, j = i - 1 = 3)</h3>
 
@@ -3023,11 +3450,6 @@ if (arr[j] &lt; arr[minIndex])
 
 <p>End of Step 4: <code>[1, 2, 3, 5, 8]</code></p>
 
-<pre><code>[ 1,  2,  3,  5,  8]
- ┌─────────────────┐
- │1,  2,  3,  5,  8│  ← sorted ✓
- └─────────────────┘</code></pre>
-
 <h2>Basic Working → Both <code>i</code> and <code>j</code> are indexes</h2><ul><li><strong>i = 1</strong> → <code>j = i - 1 = 0</code>, only arr[0] and arr[1] are compared</li><li><strong>i = 2</strong> → <code>j = 1</code>, the sorted part on the left is now [3, 5]</li><li><strong>i = 3</strong> → <code>j = 2</code>, the whole left part is swapped right one at a time</li><li>It continues until every index has been placed and the array is sorted.</li></ul>
 
 <h2>C Code</h2><pre><code>void insertionSort(int arr[], int n)
@@ -3057,6 +3479,7 @@ if (arr[j] &lt; arr[minIndex])
 
 <p>Quick sort picks one element as the <strong>pivot</strong>, then rearranges the array so that everything smaller sits on its left and everything bigger on its right. Once the pivot is in the middle with its final index, the same job is repeated on the left part and the right part.</p>
 
+<div class="viz-card" data-viz="quick-tree"></div>
 <h2>Core Idea</h2><ol><li><strong>Pick</strong> a pivot — here <code>a[low]</code>.</li><li><strong>Walk</strong> <code>i</code> right and <code>j</code> left until they meet or cross.</li><li><strong>Swap</strong> every out-of-order pair, then swap the pivot into the spot <code>j</code> landed on.</li><li><strong>Recurse</strong> on the left part and the right part, which are both shorter.</li></ol>
 
 <h2>Algorithm Dry Run</h2><p>Array:</p><pre><code>[65, 34, 99, 18, 78, 25, 84]
@@ -3108,11 +3531,6 @@ if (arr[j] &lt; arr[minIndex])
 
 <p>End of Step 1: <code>[18, 34, 25, 65, 78, 99, 84]</code></p>
 
-<pre><code>[18, 34, 25, 65, 78, 99, 84]
-            ┌──┐
-            │65│  ← final position
-            └──┘</code></pre>
-
 <h3>Step 2 → partition(0, 2) pivot 18</h3>
 
 <pre><code>[18, 34, 25, 65, 78, 99, 84]
@@ -3144,11 +3562,6 @@ if (arr[j] &lt; arr[minIndex])
 
 <p>End of Step 2: <code>[18, 34, 25, 65, 78, 99, 84]</code></p>
 
-<pre><code>[18, 34, 25, 65, 78, 99, 84]
-┌──┐
-│18│  ← final position
-└──┘</code></pre>
-
 <h3>Step 3 → partition(1, 2) pivot 34</h3>
 
 <pre><code>[18, 34, 25, 65, 78, 99, 84]
@@ -3164,11 +3577,6 @@ if (arr[j] &lt; arr[minIndex])
 <p>the main loop never runs, because i = 2 is not less than j = 2, and the final swap puts 34 at index 2 → <code>[18, 25, 34, 65, 78, 99, 84]</code></p>
 
 <p>End of Step 3: <code>[18, 25, 34, 65, 78, 99, 84]</code></p>
-
-<pre><code>[18, 25, 34, 65, 78, 99, 84]
-        ┌──┐
-        │34│  ← final position
-        └──┘</code></pre>
 
 <h3>Step 4 → partition(4, 6) pivot 78</h3>
 
@@ -3201,11 +3609,6 @@ if (arr[j] &lt; arr[minIndex])
 
 <p>End of Step 4: <code>[18, 25, 34, 65, 78, 99, 84]</code></p>
 
-<pre><code>[18, 25, 34, 65, 78, 99, 84]
-                ┌──┐
-                │78│  ← final position
-                └──┘</code></pre>
-
 <h3>Step 5 → partition(5, 6) pivot 99</h3>
 
 <pre><code>[18, 25, 34, 65, 78, 99, 84]
@@ -3222,14 +3625,9 @@ if (arr[j] &lt; arr[minIndex])
 
 <p>End of Step 5: <code>[18, 25, 34, 65, 78, 84, 99]</code></p>
 
-<pre><code>[18, 25, 34, 65, 78, 84, 99]
-┌──────────────────────────┐
-│18, 25, 34, 65, 78, 84, 99│  ← sorted ✓
-└──────────────────────────┘</code></pre>
-
 <h2>Basic Working → every <code>partition()</code> call</h2><ul><li><code>partition(0, 6)</code> → puts 65 at index 3</li><li><code>partition(0, 2)</code> → puts 18 at index 0</li><li><code>partition(1, 2)</code> → puts 34 at index 2</li><li><code>partition(4, 6)</code> → puts 78 at index 4</li><li><code>partition(5, 6)</code> → puts 99 at index 6</li></ul>
 
-<h2>Partition Tree</h2><p>Each node is one <code>partition()</code> call, and the tree splits exactly where the pivot landed:</p><div class="st2-wrap"><div class="st2-canvas" style="width:693px;height:668px;"><svg class="st2-lines st2-lines-split" width="693" height="668" viewBox="0 0 693 668" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><line x1="304.5" y1="72.0" x2="304.5" y2="100.0"/><line x1="136.5" y1="100.0" x2="472.5" y2="100.0"/><line x1="136.5" y1="100.0" x2="136.5" y2="128.0"/><line x1="472.5" y1="100.0" x2="472.5" y2="128.0"/><line x1="136.5" y1="240.0" x2="136.5" y2="268.0"/><line x1="52.5" y1="268.0" x2="220.5" y2="268.0"/><line x1="52.5" y1="268.0" x2="52.5" y2="332.0"/><line x1="220.5" y1="268.0" x2="220.5" y2="296.0"/><line x1="220.5" y1="408.0" x2="220.5" y2="454.0"/><line x1="164.5" y1="454.0" x2="276.5" y2="454.0"/><line x1="164.5" y1="454.0" x2="164.5" y2="500.0"/><line x1="276.5" y1="454.0" x2="276.5" y2="500.0"/><line x1="472.5" y1="240.0" x2="472.5" y2="268.0"/><line x1="388.5" y1="268.0" x2="556.5" y2="268.0"/><line x1="388.5" y1="268.0" x2="388.5" y2="332.0"/><line x1="556.5" y1="268.0" x2="556.5" y2="296.0"/><line x1="556.5" y1="408.0" x2="556.5" y2="454.0"/><line x1="500.5" y1="454.0" x2="612.5" y2="454.0"/><line x1="500.5" y1="454.0" x2="500.5" y2="500.0"/><line x1="612.5" y1="454.0" x2="612.5" y2="500.0"/><line x1="304.5" y1="556.0" x2="304.5" y2="592.0"/><path class="st2-arrow" d="M298.5 578.0 L 304.5 592.0 L 310.5 578.0"/></svg><div class="st2-node" style="width:261.9px;height:112px;left:173.6px;top:-40.0px;"><span class="st2-label">[65, 34, 99, 18, 78, 25, 84]</span><span class="st2-meta">partition(0, 6) · pivot 65 → index 3</span><span class="st2-ranges">left (0, 2) · right (4, 6)</span><span class="st2-tag">After partition</span><span class="st2-result">[18, 34, 25] [65] [78, 99, 84]</span></div><div class="st2-node" style="width:241.0px;height:112px;left:16.0px;top:128.0px;"><span class="st2-label">[18, 34, 25]</span><span class="st2-meta">partition(0, 2) · pivot 18 → index 0</span><span class="st2-ranges">left ∅ · right (1, 2)</span><span class="st2-tag">After partition</span><span class="st2-result">[18] [34, 25]</span></div><div class="st2-node" style="width:44.2px;height:40px;left:30.4px;top:332.0px;"><span class="st2-label">[∅]</span></div><div class="st2-node" style="width:241.0px;height:112px;left:100.0px;top:296.0px;"><span class="st2-label">[34, 25]</span><span class="st2-meta">partition(1, 2) · pivot 34 → index 2</span><span class="st2-ranges">left (1, 1) · right ∅</span><span class="st2-tag">After partition</span><span class="st2-result">[25] [34]</span></div><div class="st2-node" style="width:52.2px;height:40px;left:138.4px;top:500.0px;"><span class="st2-label">[25]</span></div><div class="st2-node" style="width:44.2px;height:40px;left:254.4px;top:500.0px;"><span class="st2-label">[∅]</span></div><div class="st2-node" style="width:241.0px;height:112px;left:352.0px;top:128.0px;"><span class="st2-label">[78, 99, 84]</span><span class="st2-meta">partition(4, 6) · pivot 78 → index 4</span><span class="st2-ranges">left ∅ · right (5, 6)</span><span class="st2-tag">After partition</span><span class="st2-result">[78] [99, 84]</span></div><div class="st2-node" style="width:44.2px;height:40px;left:366.4px;top:332.0px;"><span class="st2-label">[∅]</span></div><div class="st2-node" style="width:241.0px;height:112px;left:436.0px;top:296.0px;"><span class="st2-label">[99, 84]</span><span class="st2-meta">partition(5, 6) · pivot 99 → index 6</span><span class="st2-ranges">left (5, 5) · right ∅</span><span class="st2-tag">After partition</span><span class="st2-result">[84] [99]</span></div><div class="st2-node" style="width:52.2px;height:40px;left:474.4px;top:500.0px;"><span class="st2-label">[84]</span></div><div class="st2-node" style="width:44.2px;height:40px;left:590.4px;top:500.0px;"><span class="st2-label">[∅]</span></div><div class="st2-node" style="width:245.8px;height:56px;left:181.6px;top:596.0px;"><span class="st2-label">[18, 25, 34, 65, 78, 84, 99]</span><span class="st2-tag">Sorted Array</span></div></div></div>
+<h2>Partition Tree</h2><p>Each node is one <code>partition()</code> call, and the tree splits exactly where the pivot landed:</p>
 
 <p><code>[ ∅ ]</code> is the empty side of the split: when a pivot lands at the very edge of its range (18 → index 0, 78 → index 4, 99 → index 6), one half has no elements left, so no recursive call is made for it.</p>
 
@@ -3274,6 +3672,8 @@ int partition(int a[], int low, int high)
 <h2>Divide &amp; Merge</h2><p>The recursion splits the range at its middle: halving gives <code>log2(n)</code> levels and each level costs <code>O(n)</code>, so the total is <strong>O(n log n)</strong>. Here is the array:</p><pre><code>[13,  9,  7, 12,  6,  9, 12]
   0   1   2   3   4   5   6</code></pre>
 
+<div class="viz-card" data-viz="merge-tree"></div>
+
 <p>To find the middle we use <code>low + (high - low) / 2</code> — the subtraction keeps the mid safe from integer overflow:</p>
 <pre><code>mid = low + (high - low) / 2
 mid = 0 + (6 - 0) / 2 = 0 + 3 → 3</code></pre>
@@ -3300,11 +3700,6 @@ temp = [9, 13]</code></pre>
 
 <p>End of Step 1: <code>[9, 13, 7, 12, 6, 9, 12]</code></p>
 
-<pre><code>[ 9, 13,  7, 12,  6,  9, 12]
- ┌─────┐
- │9, 13│  ← merged region
- └─────┘</code></pre>
-
 <h3>Step 2 → merge(2, 2, 3): [7] and [12]</h3>
 
 <pre><code>left:  [7]              right: [12]
@@ -3317,11 +3712,6 @@ temp = [7, 12]</code></pre>
 <p>7 ≤ 12 sends the left element first, then the leftover 12 is copied — the two single elements come back as one sorted pair → <code>[7, 12]</code></p>
 
 <p>End of Step 2: <code>[9, 13, 7, 12, 6, 9, 12]</code></p>
-
-<pre><code>[ 9, 13,  7, 12,  6,  9, 12]
-         ┌─────┐
-         │7, 12│  ← merged region
-         └─────┘</code></pre>
 
 <h3>Step 3 → merge(0, 1, 3): [9, 13] and [7, 12]</h3>
 
@@ -3338,11 +3728,6 @@ temp = [7, 9, 12, 13]</code></pre>
 
 <p>End of Step 3: <code>[7, 9, 12, 13, 6, 9, 12]</code></p>
 
-<pre><code>[ 7,  9, 12, 13,  6,  9, 12]
- ┌─────────────┐
- │7,  9, 12, 13│  ← merged region
- └─────────────┘</code></pre>
-
 <h3>Step 4 → merge(4, 4, 5): [6] and [9]</h3>
 
 <pre><code>left:  [6]              right: [9]
@@ -3355,11 +3740,6 @@ temp = [6, 9]</code></pre>
 <p>6 ≤ 9 sends the left element first, then the leftover 9 is copied — the two single elements come back as one sorted pair → <code>[6, 9]</code></p>
 
 <p>End of Step 4: <code>[7, 9, 12, 13, 6, 9, 12]</code></p>
-
-<pre><code>[ 7,  9, 12, 13,  6,  9, 12]
-                 ┌─────┐
-                 │6,  9│  ← merged region
-                 └─────┘</code></pre>
 
 <h3>Step 5 → merge(4, 5, 6): [6, 9] and [12]</h3>
 
@@ -3374,11 +3754,6 @@ temp = [6, 9, 12]</code></pre>
 <p>both left elements win, then the leftover 12 from the right is copied → <code>[6, 9, 12]</code></p>
 
 <p>End of Step 5: <code>[7, 9, 12, 13, 6, 9, 12]</code></p>
-
-<pre><code>[ 7,  9, 12, 13,  6,  9, 12]
-                 ┌─────────┐
-                 │6,  9, 12│  ← merged region
-                 └─────────┘</code></pre>
 
 <h3>Step 6 → merge(0, 3, 6): [7, 9, 12, 13] and [6, 9, 12]</h3>
 
@@ -3398,14 +3773,9 @@ temp = [6, 7, 9, 9, 12, 12, 13]  ← sorted ✓</code></pre>
 
 <p>End of Step 6: <code>[6, 7, 9, 9, 12, 12, 13]</code></p>
 
-<pre><code>[ 6,  7,  9,  9, 12, 12, 13]
- ┌─────────────────────────┐
- │6,  7,  9,  9, 12, 12, 13│  ← sorted ✓
- └─────────────────────────┘</code></pre>
-
 <h2>Basic Working → every <code>merge()</code> call</h2><ul><li><code>merge(0, 0, 1)</code> → merges [13] and [9] into [9, 13]</li><li><code>merge(2, 2, 3)</code> → merges [7] and [12] into [7, 12]</li><li><code>merge(0, 1, 3)</code> → merges [9, 13] and [7, 12] into [7, 9, 12, 13]</li><li><code>merge(4, 4, 5)</code> → merges [6] and [9] into [6, 9]</li><li><code>merge(4, 5, 6)</code> → merges [6, 9] and [12] into [6, 9, 12]</li><li><code>merge(0, 3, 6)</code> → merges [7, 9, 12, 13] and [6, 9, 12] into [6, 7, 9, 9, 12, 12, 13]</li></ul>
 
-<h2>Merge Sort Tree</h2><p><code>mergeSort()</code> plays both sides of the recursion in one figure below. The top half is the <strong>divide</strong> phase: the original array splits range by range (the <code>mergeSort(low, high) &rarr; mid</code> captions) down to seven single-element leaves in the middle. The bottom half, read on upward after the middle, is the <strong>conquer</strong> phase: the leaves merge in pairs (<code>merge(low, mid, high)</code> captions) until the root holds the final sorted array:</p><div class="st2-wrap"><div class="st2-canvas" style="width:710px;height:681px;"><svg class="st2-lines" width="710" height="680" viewBox="0 0 710 680" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><g class="st2-lines-split"><line x1="395.6" y1="40.0" x2="395.6" y2="68.0"/><line x1="200.6" y1="68.0" x2="590.6" y2="68.0"/><line x1="200.6" y1="68.0" x2="200.6" y2="96.0"/><line x1="590.6" y1="68.0" x2="590.6" y2="96.0"/><line x1="200.6" y1="144.0" x2="200.6" y2="172.0"/><line x1="96.6" y1="172.0" x2="304.6" y2="172.0"/><line x1="96.6" y1="172.0" x2="96.6" y2="200.0"/><line x1="304.6" y1="172.0" x2="304.6" y2="200.0"/><line x1="590.6" y1="144.0" x2="590.6" y2="172.0"/><line x1="512.6" y1="172.0" x2="668.6" y2="172.0"/><line x1="512.6" y1="172.0" x2="512.6" y2="200.0"/><line x1="668.6" y1="172.0" x2="668.6" y2="200.0"/><line x1="96.6" y1="248.0" x2="96.6" y2="276.0"/><line x1="44.6" y1="276.0" x2="148.6" y2="276.0"/><line x1="44.6" y1="276.0" x2="44.6" y2="304.0"/><line x1="148.6" y1="276.0" x2="148.6" y2="304.0"/><line x1="304.6" y1="248.0" x2="304.6" y2="276.0"/><line x1="252.6" y1="276.0" x2="356.6" y2="276.0"/><line x1="252.6" y1="276.0" x2="252.6" y2="304.0"/><line x1="356.6" y1="276.0" x2="356.6" y2="304.0"/><line x1="512.6" y1="248.0" x2="512.6" y2="276.0"/><line x1="460.6" y1="276.0" x2="564.6" y2="276.0"/><line x1="460.6" y1="276.0" x2="460.6" y2="304.0"/><line x1="564.6" y1="276.0" x2="564.6" y2="304.0"/><g class="st2-lines-merge"><line x1="200.6" y1="560.0" x2="200.6" y2="588.0"/><line x1="590.6" y1="560.0" x2="590.6" y2="588.0"/><line x1="200.6" y1="588.0" x2="590.6" y2="588.0"/><line x1="395.6" y1="588.0" x2="395.6" y2="616.0"/><line x1="96.6" y1="456.0" x2="96.6" y2="484.0"/><line x1="304.6" y1="456.0" x2="304.6" y2="484.0"/><line x1="96.6" y1="484.0" x2="304.6" y2="484.0"/><line x1="200.6" y1="484.0" x2="200.6" y2="512.0"/><line x1="512.6" y1="456.0" x2="512.6" y2="484.0"/><line x1="668.6" y1="456.0" x2="668.6" y2="484.0"/><line x1="512.6" y1="484.0" x2="668.6" y2="484.0"/><line x1="590.6" y1="484.0" x2="590.6" y2="512.0"/><line x1="44.6" y1="352.0" x2="44.6" y2="380.0"/><line x1="148.6" y1="352.0" x2="148.6" y2="380.0"/><line x1="44.6" y1="380.0" x2="148.6" y2="380.0"/><line x1="96.6" y1="380.0" x2="96.6" y2="408.0"/><line x1="252.6" y1="352.0" x2="252.6" y2="380.0"/><line x1="356.6" y1="352.0" x2="356.6" y2="380.0"/><line x1="252.6" y1="380.0" x2="356.6" y2="380.0"/><line x1="304.6" y1="380.0" x2="304.6" y2="408.0"/><line x1="460.6" y1="352.0" x2="460.6" y2="380.0"/><line x1="564.6" y1="352.0" x2="564.6" y2="380.0"/><line x1="460.6" y1="380.0" x2="564.6" y2="380.0"/><line x1="512.6" y1="380.0" x2="512.6" y2="408.0"/></svg><div class="st2-node" style="width:213.5px;height:48px;left:288.8px;top:-8.0px;"><span class="st2-label">[13, 9, 7, 12, 6, 9, 12]</span><span class="st2-cap">mergeSort(0, 6) → mid 3</span></div><div class="st2-node" style="width:161.2px;height:48px;left:120.0px;top:96.0px;"><span class="st2-label">[13, 9, 7, 12]</span><span class="st2-cap">mergeSort(0, 3) → mid 1</span></div><div class="st2-node" style="width:161.2px;height:48px;left:510.0px;top:96.0px;"><span class="st2-label">[6, 9, 12]</span><span class="st2-cap">mergeSort(4, 6) → mid 5</span></div><div class="st2-node" style="width:161.2px;height:48px;left:16.0px;top:200.0px;"><span class="st2-label">[13, 9]</span><span class="st2-cap">mergeSort(0, 1) → mid 0</span></div><div class="st2-node" style="width:161.2px;height:48px;left:224.0px;top:200.0px;"><span class="st2-label">[7, 12]</span><span class="st2-cap">mergeSort(2, 3) → mid 2</span></div><div class="st2-node" style="width:161.2px;height:48px;left:432.0px;top:200.0px;"><span class="st2-label">[6, 9]</span><span class="st2-cap">mergeSort(4, 5) → mid 4</span></div><div class="st2-node" style="width:52.2px;height:48px;left:642.5px;top:200.0px;"><span class="st2-label">[12]</span></div><div class="st2-node" style="width:52.2px;height:48px;left:18.5px;top:304.0px;"><span class="st2-label">[13]</span></div><div class="st2-node" style="width:44.2px;height:48px;left:126.5px;top:304.0px;"><span class="st2-label">[9]</span></div><div class="st2-node" style="width:44.2px;height:48px;left:230.5px;top:304.0px;"><span class="st2-label">[7]</span></div><div class="st2-node" style="width:52.2px;height:48px;left:330.5px;top:304.0px;"><span class="st2-label">[12]</span></div><div class="st2-node" style="width:44.2px;height:48px;left:438.5px;top:304.0px;"><span class="st2-label">[6]</span></div><div class="st2-node" style="width:44.2px;height:48px;left:542.5px;top:304.0px;"><span class="st2-label">[9]</span></div><div class="st2-node" style="width:213.5px;height:48px;left:288.8px;top:616.0px;"><span class="st2-label">[6, 7, 9, 9, 12, 12, 13]</span><span class="st2-cap">merge(0, 3, 6)</span></div><div class="st2-node" style="width:132.9px;height:48px;left:134.2px;top:512.0px;"><span class="st2-label">[7, 9, 12, 13]</span><span class="st2-cap">merge(0, 1, 3)</span></div><div class="st2-node" style="width:105.9px;height:48px;left:537.6px;top:512.0px;"><span class="st2-label">[6, 9, 12]</span><span class="st2-cap">merge(4, 5, 6)</span></div><div class="st2-node" style="width:105.9px;height:48px;left:43.6px;top:408.0px;"><span class="st2-label">[9, 13]</span><span class="st2-cap">merge(0, 0, 1)</span></div><div class="st2-node" style="width:105.9px;height:48px;left:251.6px;top:408.0px;"><span class="st2-label">[7, 12]</span><span class="st2-cap">merge(2, 2, 3)</span></div><div class="st2-node" style="width:105.9px;height:48px;left:459.6px;top:408.0px;"><span class="st2-label">[6, 9]</span><span class="st2-cap">merge(4, 4, 5)</span></div><div class="st2-node" style="width:52.2px;height:48px;left:642.5px;top:408.0px;"><span class="st2-label">[12]</span></div></div></div><p>Every internal node has two children, because a mid always leaves at least one element on each side. The six merges run in exactly the reverse order of the first tree: <code>[13] + [9]</code>, <code>[7] + [12]</code>, then <code>[9, 13] + [7, 12]</code>, and so on upward to <code>[7, 9, 12, 13] + [6, 9, 12]</code> at the root &mdash; the exact calls listed in <strong>Basic Working</strong> above.</p>
+<h2>Merge Sort Tree</h2><p><code>mergeSort()</code> plays both sides of the recursion in one figure below. The top half is the <strong>divide</strong> phase: the original array splits range by range (the <code>mergeSort(low, high) &rarr; mid</code> captions) down to seven single-element leaves in the middle. The bottom half, read on upward after the middle, is the <strong>conquer</strong> phase: the leaves merge in pairs (<code>merge(low, mid, high)</code> captions) until the root holds the final sorted array:</p><p>Every internal node has two children, because a mid always leaves at least one element on each side. The six merges run in exactly the reverse order of the first tree: <code>[13] + [9]</code>, <code>[7] + [12]</code>, then <code>[9, 13] + [7, 12]</code>, and so on upward to <code>[7, 9, 12, 13] + [6, 9, 12]</code> at the root &mdash; the exact calls listed in <strong>Basic Working</strong> above.</p>
 
 <h2>C Code</h2><p>The <code>merge()</code> function — the comparison lives in the first <code>while</code> loop, and the two leftover loops copy whatever remains:</p>
 <pre><code>void merge(int arr[], int low, int mid, int high) {
@@ -3464,7 +3834,6 @@ temp = [6, 7, 9, 9, 12, 12, 13]  ← sorted ✓</code></pre>
 
 <blockquote>Merge sort trades extra memory for a guaranteed, stable O(n log n): it always needs O(n) extra space instead of sorting in place.</blockquote>` },
 
-
                   { id: "sort-08", title: "Radix Sort", difficulty: "intermediate", time: "6 min", desc: "Ten FIFO buckets, one digit at a time, no comparisons needed.",
                     content: `<h1>Radix Sort</h1><span class="step-badge">Chapter 7</span>
 
@@ -3479,6 +3848,8 @@ temp = [6, 7, 9, 9, 12, 12, 13]  ← sorted ✓</code></pre>
       → pass 1 reads this O digit
 </code></pre>
 
+<h2>Bucket Distribution Per Pass</h2>
+<div class="viz-card" data-viz="radix-buckets"></div>
 <h2>Visualizer</h2><p>Stepping forward one move at a time is the clearest way to see the FIFO rule: a number drops out of the <strong>input</strong>, lands on top of its bucket&rsquo;s stack, and during collection leaves from the <em>bottom</em> of the stack &mdash; the earliest value in exits first &mdash; bucket 0 first, bucket 9 last.</p><div class="bs-wrap" id="bs-wrap" data-array="[9,45,802,3,67,100]"></div><p class="bs-guide">Tip: <strong>Step</strong> shows one move at a time, <strong>Reset</strong> rewinds, and <strong>Play</strong> runs all three passes at a comfortable speed. Watch the <code>O</code>/<code>T</code>/<code>H</code> highlight above the buckets &mdash; it marks the digit each pass is reading.</p>
 
 <h2>Radix Sort &mdash; Pass by Pass</h2><p>Initial array: <code>[9, 45, 802, 3, 67, 100]</code></p>
@@ -3510,7 +3881,9 @@ bucket 08  [802]</code></pre><p>Collecting every non-empty bucket from 0 to 9 &m
 
 <blockquote>Radix sort trades ten extra lists for a sort that runs in near-linear time &mdash; but it can only sort keys that can be split into digits or ranks.</blockquote>` },
       { id: "sort-09", title: "Bucket Sort", difficulty: "intermediate", time: "8 min", desc: "Range buckets, insertion sort inside, left-to-right concatenation.",
-        content: `<h1>Bucket Sort</h1><span class="step-badge">Chapter 8</span><p><strong>Bucket sort</strong> never compares two values directly. It uses arithmetic to work out which <strong>range</strong> a value falls into, drops every value into the bucket for that range, sorts each bucket&rsquo;s few values with a simple sort, and finally walks the buckets from left to right to produce one sorted array.</p><h2>Key Idea</h2><blockquote><p>Bucket sort replaces one hard problem with many tiny ones: scatter the values into ordered range-sized buckets, sort every bucket&rsquo;s short list, then concatenate the buckets left to right. It is fast when the values spread out evenly, so that nearly every bucket stays tiny.</p></blockquote><h2>How Bucket Sort Works</h2><ol><li><strong>Input</strong> &mdash; take the unsorted array.</li><li><strong>Bucket distribution</strong> &mdash; compute each value&rsquo;s bucket from a range formula and insert the value inside that bucket. Buckets are ordered: every value in bucket <code>i</code> is smaller than every value in bucket <code>i + 1</code>.</li><li><strong>Sort each bucket</strong> &mdash; every non-empty bucket is sorted internally (here with insertion sort).</li><li><strong>Concatenation</strong> &mdash; copy the buckets back into one array, bucket 0 first, then bucket 1, and so on.</li><li><strong>Sorted array</strong> &mdash; because each bucket was already ordered and the buckets come out in order, the concatenated result is fully sorted.</li></ol><h2>Bucket Index Formula</h2><p>Every value must land in <em>exactly one</em> bucket, and never outside the last bucket. The two methods differ only in how the ranges are chosen:</p><pre><code>Fixed-width:   bucket = floor((value - min) / width)      where  width = ceil((max - min) / k)</code></pre><pre><code>Fixed-count:   bucket = floor((value - min) * k / (max - min + 1))     for k buckets</code></pre><p>Both formulas subtract <code>min</code> first, so the smallest value lands exactly in <strong>bucket 0</strong> and the largest value can never spill past the last bucket &mdash; the index is never <code>k</code> and never negative. The visualizer above and below uses exactly these formulas on the array you choose.</p><h2>Interactive Visualizer</h2><p>Step forwards one move at a time. The pipeline reads left to right: an <strong>Input</strong> value leaves the array and enters the <strong>Bucket</strong> whose range it fits, that bucket is <strong>sorted</strong> internally, and the buckets are <strong>concatenated</strong> into the <strong>Output</strong>. The two method buttons rebuild the same array under the other bucket formula.</p><div class="bs-wrap" id="bucket-wrap" data-array="[7,45,250,4790]"></div><p class="bs-guide">Tip: <strong>Step</strong> shows one move at a time &mdash; during distribution every value first shows its index calculation, then enters its bucket. <strong>Reset</strong> rewinds to the input, <strong>Play</strong> runs the whole pipeline, and try the other presets &mdash; a shuffled array makes the insertion-sort step inside each bucket visible.</p><h2>Fixed-Width Bucket Method</h2><p>Pick a bucket <strong>width</strong> and split the whole value range into ranges of that width. This page picks the width dynamically from the data so that the number of buckets stays small and readable, but the rule is the same for any width:</p><ol><li>Compute <code>min</code> and <code>max</code> of the array.</li><li>Choose a bucket width so that <code>width = ceil((max - min) / k)</code> for a small <code>k</code>.</li><li>Index every value with <code>floor((value - min) / width)</code>.</li><li>Insert each value into its bucket.</li><li>Sort each bucket (insertion sort).</li><li>Concatenate the buckets from left to right.</li><li>The result is the sorted array.</li></ol><pre><code>min = 7   max = 4790   width = 1196            (ceil(4783 / 4))</code></pre><pre><code>value  (value - min)  bucket   range→
+        content: `<h1>Bucket Sort</h1><span class="step-badge">Chapter 8</span><p><strong>Bucket sort</strong> never compares two values directly. It uses arithmetic to work out which <strong>range</strong> a value falls into, drops every value into the bucket for that range, sorts each bucket&rsquo;s few values with a simple sort, and finally walks the buckets from left to right to produce one sorted array.</p><h2>Key Idea</h2><blockquote><p>Bucket sort replaces one hard problem with many tiny ones: scatter the values into ordered range-sized buckets, sort every bucket&rsquo;s short list, then concatenate the buckets left to right. It is fast when the values spread out evenly, so that nearly every bucket stays tiny.</p></blockquote><h2>How Bucket Sort Works</h2><ol><li><strong>Input</strong> &mdash; take the unsorted array.</li><li><strong>Bucket distribution</strong> &mdash; compute each value&rsquo;s bucket from a range formula and insert the value inside that bucket. Buckets are ordered: every value in bucket <code>i</code> is smaller than every value in bucket <code>i + 1</code>.</li><li><strong>Sort each bucket</strong> &mdash; every non-empty bucket is sorted internally (here with insertion sort).</li><li><strong>Concatenation</strong> &mdash; copy the buckets back into one array, bucket 0 first, then bucket 1, and so on.</li><li><strong>Sorted array</strong> &mdash; because each bucket was already ordered and the buckets come out in order, the concatenated result is fully sorted.</li></ol><h2>Bucket Index Formula</h2><p>Every value must land in <em>exactly one</em> bucket, and never outside the last bucket. The two methods differ only in how the ranges are chosen:</p><pre><code>Fixed-width:   bucket = floor((value - min) / width)      where  width = ceil((max - min) / k)</code></pre><pre><code>Fixed-count:   bucket = floor((value - min) * k / (max - min + 1))     for k buckets</code></pre><p>Both formulas subtract <code>min</code> first, so the smallest value lands exactly in <strong>bucket 0</strong> and the largest value can never spill past the last bucket &mdash; the index is never <code>k</code> and never negative. The visualizer above and below uses exactly these formulas on the array you choose.</p><h2>Interactive Visualizer</h2>
+<div class="viz-card" data-viz="bucket-containers"></div>
+<p>Step forwards one move at a time. The pipeline reads left to right: an <strong>Input</strong> value leaves the array and enters the <strong>Bucket</strong> whose range it fits, that bucket is <strong>sorted</strong> internally, and the buckets are <strong>concatenated</strong> into the <strong>Output</strong>. The two method buttons rebuild the same array under the other bucket formula.</p><div class="bs-wrap" id="bucket-wrap" data-array="[7,45,250,4790]"></div><p class="bs-guide">Tip: <strong>Step</strong> shows one move at a time &mdash; during distribution every value first shows its index calculation, then enters its bucket. <strong>Reset</strong> rewinds to the input, <strong>Play</strong> runs the whole pipeline, and try the other presets &mdash; a shuffled array makes the insertion-sort step inside each bucket visible.</p><h2>Fixed-Width Bucket Method</h2><p>Pick a bucket <strong>width</strong> and split the whole value range into ranges of that width. This page picks the width dynamically from the data so that the number of buckets stays small and readable, but the rule is the same for any width:</p><ol><li>Compute <code>min</code> and <code>max</code> of the array.</li><li>Choose a bucket width so that <code>width = ceil((max - min) / k)</code> for a small <code>k</code>.</li><li>Index every value with <code>floor((value - min) / width)</code>.</li><li>Insert each value into its bucket.</li><li>Sort each bucket (insertion sort).</li><li>Concatenate the buckets from left to right.</li><li>The result is the sorted array.</li></ol><pre><code>min = 7   max = 4790   width = 1196            (ceil(4783 / 4))</code></pre><pre><code>value  (value - min)  bucket   range→
      7          0         0      7–1202→
     45         38         0      7–1202→
    250        243         0      7–1202→
@@ -3525,7 +3898,9 @@ Bucket 3 → [4790]→
 Output   → [7, 45, 250, 4790]</code></pre><h2>Complexity</h2><table><thead><tr><th>Case</th><th>Time</th><th>When</th></tr></thead><tbody><tr><td>Best</td><td>O(n + k)</td><td>Values spread evenly &mdash; every bucket holds only a few</td></tr><tr><td>Average</td><td>O(n + k)</td><td>Rounding error in the distribution stays small</td></tr><tr><td>Worst</td><td>O(n²)</td><td>All values fall into the same bucket (insertion sort)</td></tr></tbody></table><p><strong>Space:</strong> O(n + k) extra buckets. <strong>Stable:</strong> yes &mdash; a stable sort runs inside each bucket and concatenation keeps bucket order.</p><h2>When Bucket Sort Works Well</h2><ul><li>Values that are <strong>uniformly distributed</strong> over a bounded range &mdash; grades, scores, percentages, uniformly spread floats.</li><li>When the number of buckets is close to the number of keys, so each bucket holds almost nothing.</li><li>Sorting keys whose range arithmetic is cheap (no comparisons needed just to distribute them).</li><li>As a first pass before inserting, when the data is known to spread evenly.</li><li>Not for heavily skewed data &mdash; if every value stacks into one bucket you pay insertion sort&rsquo;s O(n²) on the whole array.</li></ul>` },
       { id: "sort-10", title: "Shell Sort", difficulty: "intermediate", time: "8 min", desc: "Gap-driven groups, insertion sort inside each group, shrink the gap to 1.",
         content: `<h1>Shell Sort</h1><span class="step-badge">Chapter 9</span><p><strong>Shell sort</strong> is insertion sort taken to extremes: instead of comparing every element with its immediate neighbour, it first compares elements that are far apart, using a <strong>gap</strong>. It divides the array into <strong>groups</strong> of elements separated by that gap, insertion-sorts each group, writes the groups back, and reduces the gap. The final gap of 1 is an ordinary insertion sort &mdash; but by then the array is almost sorted, so it finishes in a few moves.</p><h2>Key Idea</h2><blockquote><p>Shell sort makes the array <em>almost sorted</em> first. A large gap lets a misplaced element travel a long distance in one move, and every smaller gap refines the order a little more. When the gap reaches 1, plain insertion sort has almost nothing left to do.</p></blockquote><h2>How Shell Sort Works</h2><ol><li>Start with a gap &mdash; for the simple halving sequence, <code>gap = floor(n / 2)</code>.</li><li>Form the <strong>groups</strong>: every element halves apart, indices <code>i</code>, <code>i + gap</code>, <code>i + 2·gap</code>, &hellip;, join the same group.</li><li><strong>Insertion-sort each group</strong> using the gap (compare an element with the one <code>gap</code> positions before it).</li><li><strong>Reconstruct</strong> the array by writing every sorted group back to its original indices.</li><li>Halve the gap and repeat.</li><li>Stop after the <code>gap = 1</code> pass &mdash; the array is sorted.</li></ol><h2>The Gap Sequence</h2><p>The classic halving sequence used here is the one taught with Shell sort:</p><pre><code>gap = floor(n / 2)
-gap = floor(gap / 2)   repeat until gap = 1</code></pre><p>For the running example <code>[7, 3, 4, 8, 13, 11, 9, 1]</code> with <code>n = 8</code>, the passes are <strong>gap = 4</strong>, then <strong>gap = 2</strong>, then <strong>gap = 1</strong>. Every pass with a larger gap fixes far-apart disorder cheaply, so the final gap-1 pass is nearly free.</p><h2>Interactive Visualizer</h2><p>Step forwards one move at a time. The flow is always the same: <strong>Array</strong> &rarr; <strong>Gap</strong> &rarr; <strong>Groups</strong> &rarr; <strong>Insertion sort inside each group</strong> &rarr; <strong>Reconstruct</strong> the array at the original indices &rarr; <strong>reduce the gap</strong> &rarr; next pass &rarr; final sorted array. The bracket under the array shows the current gap; the active group is highlighted in the array and in its group card, and the operation strip explains every compare, shift and insert. Change the array preset and the whole pipeline recomputes from the algorithm.</p><div class="bs-wrap" id="shell-wrap" data-array="[7,3,4,8,13,11,9,1]"></div><p class="bs-guide">Tip: watch Group 4 of Pass 1 &mdash; <code>8 and 1</code> swap through a shift, the only real work of the first pass. By Pass 3 the gap is 1, the array is almost sorted, and insertion sort glides through it.</p><h2>Groups, Not Subarrays</h2><p>The biggest trap is confusing a group with a contiguous slice. For <code>gap = 4</code>, <strong>Group 1 is NOT [7, 3, 4, 8]</strong>. Elements join a group by <em>index step</em>, stepping through the array by the gap:</p><pre><code>Index:  [0] [1] [2] [3] [4]  [5]  [6] [7]
+gap = floor(gap / 2)   repeat until gap = 1</code></pre><p>For the running example <code>[7, 3, 4, 8, 13, 11, 9, 1]</code> with <code>n = 8</code>, the passes are <strong>gap = 4</strong>, then <strong>gap = 2</strong>, then <strong>gap = 1</strong>. Every pass with a larger gap fixes far-apart disorder cheaply, so the final gap-1 pass is nearly free.</p><h2>Interactive Visualizer</h2>
+<div class="viz-card" data-viz="shell-groups"></div>
+<p>Step forwards one move at a time. The flow is always the same: <strong>Array</strong> &rarr; <strong>Gap</strong> &rarr; <strong>Groups</strong> &rarr; <strong>Insertion sort inside each group</strong> &rarr; <strong>Reconstruct</strong> the array at the original indices &rarr; <strong>reduce the gap</strong> &rarr; next pass &rarr; final sorted array. The bracket under the array shows the current gap; the active group is highlighted in the array and in its group card, and the operation strip explains every compare, shift and insert. Change the array preset and the whole pipeline recomputes from the algorithm.</p><div class="bs-wrap" id="shell-wrap" data-array="[7,3,4,8,13,11,9,1]"></div><p class="bs-guide">Tip: watch Group 4 of Pass 1 &mdash; <code>8 and 1</code> swap through a shift, the only real work of the first pass. By Pass 3 the gap is 1, the array is almost sorted, and insertion sort glides through it.</p><h2>Groups, Not Subarrays</h2><p>The biggest trap is confusing a group with a contiguous slice. For <code>gap = 4</code>, <strong>Group 1 is NOT [7, 3, 4, 8]</strong>. Elements join a group by <em>index step</em>, stepping through the array by the gap:</p><pre><code>Index:  [0] [1] [2] [3] [4]  [5]  [6] [7]
 Array:  [7] [3] [4] [8] [13] [11] [9] [1]
 
 Gap = 4  →  4 groups, each picking every 4th index
@@ -3567,7 +3942,9 @@ Array becomes  [7, 3, 4, 1, 13, 11, 9, 8]</code></pre><p>The next gap is then co
 
 <h2>When Heap Sort Works Well</h2><ul><li>Worst-case-safe O(n log n) sorting without needing extra memory.</li><li>Priority-queue style tasks, because the heap is the underlying structure.</li><li>Embedded systems where quicksort&rsquo;s recursion and mergesort&rsquo;s extra array are not acceptable.</li><li>Not when stability matters, and often beaten in practice by quicksort&rsquo;s better cache behaviour.</li></ul>` },
       { id: "sort-07", title: "Sorting Quick Reference", difficulty: "beginner", time: "4 min", desc: "All sorting algorithms compared, plus how to choose one.",
-        content: `<h1>Sorting Quick Reference</h1><span class="step-badge">Chapter 11</span><h2>Complexity Table</h2><table><thead><tr><th>Algorithm</th><th>Best</th><th>Average</th><th>Worst</th><th>Space</th><th>Stable</th></tr></thead><tbody><tr><td>Bubble Sort</td><td>O(n)</td><td>O(n²)</td><td>O(n²)</td><td>O(1)</td><td>Yes</td></tr><tr><td>Selection Sort</td><td>O(n²)</td><td>O(n²)</td><td>O(n²)</td><td>O(1)</td><td>No</td></tr><tr><td>Insertion Sort</td><td>O(n)</td><td>O(n²)</td><td>O(n²)</td><td>O(1)</td><td>Yes</td></tr><tr><td>Quick Sort</td><td>O(n log n)</td><td>O(n log n)</td><td>O(n²)</td><td>O(log n)</td><td>No</td></tr><tr><td>Merge Sort</td><td>O(n log n)</td><td>O(n log n)</td><td>O(n log n)</td><td>O(n)</td><td>Yes</td></tr><tr><td>Counting Sort</td><td>O(n + k)</td><td>O(n + k)</td><td>O(n + k)</td><td>O(k)</td><td>Yes</td></tr></tbody></table><p>where <code>n</code> = number of elements and <code>k</code> = range of values (for counting sort).</p><h2>Which Sort Should You Use?</h2><table><thead><tr><th>Situation</th><th>Use</th></tr></thead><tbody><tr><td>Very small array</td><td>Insertion sort</td></tr><tr><td>Nearly sorted data</td><td>Insertion sort</td></tr><tr><td>Few swaps needed / big records</td><td>Selection sort</td></tr><tr><td>Fastest general purpose, in place</td><td>Quick sort</td></tr><tr><td>Stability required, or linked list</td><td>Merge sort</td></tr><tr><td>Small value range (marks, grades)</td><td>Counting sort</td></tr></tbody></table><h2>Formulas To Remember</h2><ul><li>Comparisons in selection sort: <code>n(n-1)/2</code></li><li>Maximum swaps in selection sort: <code>n - 1</code></li><li>Height of the recursion tree (merge/quick): <code>log2(n)</code></li><li>Levels of merge sort: <code>log2(n)</code>, work per level: <code>O(n)</code>, total: <code>O(n log n)</code></li></ul><h2>Comparison vs Non-Comparison</h2><pre><code>Comparison based  &#8594; compares two elements
+        content: `<h1>Sorting Quick Reference</h1><span class="step-badge">Chapter 11</span><h2>Complexity Table</h2>
+<div class="viz-card" data-viz="sorting-comparison"></div>
+<p>where <code>n</code> = number of elements, <code>k</code> = range of values (bucket and counting sort), and <code>d</code> = number of digits (radix sort).</p><h2>Which Sort Should You Use?</h2><table><thead><tr><th>Situation</th><th>Use</th></tr></thead><tbody><tr><td>Very small array</td><td>Insertion sort</td></tr><tr><td>Nearly sorted data</td><td>Insertion sort</td></tr><tr><td>Few swaps needed / big records</td><td>Selection sort</td></tr><tr><td>Fastest general purpose, in place</td><td>Quick sort</td></tr><tr><td>Stability required, or linked list</td><td>Merge sort</td></tr><tr><td>Small value range (marks, grades)</td><td>Counting sort</td></tr></tbody></table><h2>Formulas To Remember</h2><ul><li>Comparisons in selection sort: <code>n(n-1)/2</code></li><li>Maximum swaps in selection sort: <code>n - 1</code></li><li>Height of the recursion tree (merge/quick): <code>log2(n)</code></li><li>Levels of merge sort: <code>log2(n)</code>, work per level: <code>O(n)</code>, total: <code>O(n log n)</code></li></ul><h2>Comparison vs Non-Comparison</h2><pre><code>Comparison based  &#8594; compares two elements
                     bubble, selection, insertion,
                     quick, merge
                     lower bound: O(n log n)
