@@ -644,42 +644,41 @@ function initBucketSortViz(root) {
     const span = max - min;
     const kTarget = clampNum(Math.round(Math.sqrt(2 * array.length)), 4, 10);
     let nb, width, idxOf, ranges;
-    if (span === 0) {
+    if (span === 0 && min === 0) {
       nb = 1;
       width = 1;
-      ranges = [{ lo: min, hi: max }];
+      ranges = [{ lo: 0, hi: 0 }];
       idxOf = () => 0;
     } else if (m === "width") {
-      width = Math.max(1, Math.ceil(span / kTarget));
-      const last = Math.floor(span / width);
-      nb = last + 1;
+      width = Math.max(1, Math.ceil((max + 1) / kTarget));
+      nb = Math.floor(max / width) + 1;
       ranges = [];
       for (let b = 0; b < nb; b++) {
         ranges.push({
-          lo: min + b * width,
-          hi: b === nb - 1 ? max : min + (b + 1) * width - 1
+          lo: b * width,
+          hi: b === nb - 1 ? max : (b + 1) * width - 1
         });
       }
-      idxOf = (v) => Math.floor((v - min) / width);
+      idxOf = (v) => Math.floor(v / width);
     } else {
-      nb = kTarget;
-      const den = span + 1;
+      nb = Math.min(kTarget, max + 1);
+      const den = max + 1;
       ranges = [];
       for (let b = 0; b < nb; b++) {
         ranges.push({
-          lo: min + Math.ceil((b * den) / nb),
-          hi: b === nb - 1 ? max : min + Math.ceil(((b + 1) * den) / nb) - 1
+          lo: Math.ceil((b * den) / nb),
+          hi: b === nb - 1 ? max : Math.ceil(((b + 1) * den) / nb) - 1
         });
       }
-      idxOf = (v) => Math.floor(((v - min) * nb) / den);
+      idxOf = (v) => Math.floor((nb * v) / den);
     }
     return { m, min, max, span, width, nb, ranges, idxOf };
   }
 
   const formula = (pl, v, b) =>
     pl.m === "width"
-      ? "\u230a(" + v + " \u2212 " + pl.min + ") \u00f7 " + pl.width + "\u230b = " + b
-      : "\u230a(" + v + " \u2212 " + pl.min + ") \u00d7 " + pl.nb + " \u00f7 " + (pl.span + 1) + "\u230b = " + b;
+      ? "\u230a" + v + " \u00f7 " + pl.width + "\u230b = " + b
+      : "\u230a" + pl.nb + " \u00d7 " + v + " \u00f7 (" + pl.max + " + 1)\u230b = " + b;
 
   // ── one REST snapshot per logical move, straight from the run ────
   function buildBeats(pl) {
@@ -694,8 +693,8 @@ function initBucketSortViz(root) {
     snap("plan", { type: "minmax" }, "Step 1/2 of the bucket plan \u2014 Minimum = " + pl.min + " \u00b7 Maximum = " + pl.max);
     snap("plan", { type: "plan" },
       pl.m === "width"
-        ? "Bucket ranges \u2014 " + pl.nb + " buckets, width " + pl.width + " each: min/min\u2192bucket 0, max\u2192bucket " + (pl.nb - 1)
-        : "Bucket ranges \u2014 " + pl.nb + " equally sized buckets over " + (pl.span + 1) + " distinct values");
+        ? "Bucket ranges \u2014 width " + pl.width + " gives " + pl.nb + " buckets: " + pl.min + "\u2192bucket " + pl.idxOf(pl.min) + ", " + pl.max + "\u2192bucket " + pl.idxOf(pl.max)
+        : "Bucket ranges \u2014 k = " + pl.nb + " buckets over the values 0 \u2013 " + pl.max + " (" + (pl.max + 1) + " values in the range)");
 
     // distribution: every value one at a time (calculation beat, then entry)
     for (const v of data) {
@@ -931,7 +930,7 @@ function initBucketSortViz(root) {
       focusEl.appendChild(mk("bk-focus-op", "\u2192 Output"));
     } else if (beat.phase === "plan") {
       focusEl.appendChild(mk("bk-focus-tag", methodLabel(plan.m).toUpperCase()));
-      focusEl.appendChild(mk("bk-focus-op", "Buckets: " + plan.nb + (plan.m === "width" ? " \u00b7 width " + plan.width : " \u00b7 " + (plan.span + 1) + " values across " + plan.nb + " ranges")));
+      focusEl.appendChild(mk("bk-focus-op", "Buckets: " + plan.nb + (plan.m === "width" ? " \u00b7 width " + plan.width : " \u00b7 k = " + plan.nb + " over 0 \u2013 " + plan.max)));
     } else if (beat.phase === "done") {
       focusEl.appendChild(mk("bk-focus-tag", "\u2713 DONE"));
       focusEl.appendChild(mk("bk-focus-op", "Bucket Sort Complete"));
@@ -952,7 +951,7 @@ function initBucketSortViz(root) {
     wrap.querySelector(".bk-params-max").innerHTML = "Max <b>" + plan.max + "</b>";
     wrap.querySelector(".bk-params-count").innerHTML = "Buckets <b>" + plan.nb + "</b>";
     wrap.querySelector(".bk-params-method").innerHTML =
-      plan.m === "width" ? "Width <b>" + plan.width + "</b>" : "Range <b>" + (plan.span + 1) + "</b>";
+      plan.m === "width" ? "Width <b>" + plan.width + "</b>" : "k <b>" + plan.nb + "</b>";
 
     wrap.querySelector('[data-bs="prev"]').disabled = idx === 0;
     wrap.querySelector('[data-bs="next"]').disabled = idx === beats.length - 1;
