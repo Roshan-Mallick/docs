@@ -3184,25 +3184,14 @@ code {
   color: #FFFFFF;
 }
 
-/* Sorted | unsorted divider shared by selection / insertion / shell */
+/* Sorted | unsorted marker shared by selection / insertion / shell.
+   Only the label is drawn: the vertical rule was removed on request. */
 .viz-sep {
   flex: 0 0 auto;
   align-self: stretch;
   width: 0;
   margin: 0 8px;
   position: relative;
-}
-
-.viz-sep::before {
-  content: "";
-  position: absolute;
-  left: -1px;
-  top: -6px;
-  bottom: -6px;
-  width: 2px;
-  border-radius: 1px;
-  background: var(--accent);
-  opacity: 0.55;
 }
 
 .viz-sep-label {
