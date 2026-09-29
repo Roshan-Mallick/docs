@@ -1868,493 +1868,1918 @@ asyncio.run(fetch_all(urls))</code></pre><h2>Learning Roadmap</h2><table><thead>
     ]
   },
   {
-    id: "oop", label: "Object Oriented Programming", icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg>`,
-    desc: "Classes, objects, encapsulation, abstraction, inheritance, and polymorphism.",
-    tags: ["oop", "classes", "design"],
+    id: "oop", label: "C++ OOP", icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="13" rx="2"/><path d="m8 17-4-5 4-5M16 7l4 5-4 5"/></svg>`,
+    desc: "C++ with OOP, constructors and destructors, shallow and deep copy, static members, and inheritance.",
+    tags: ["c++", "oop", "inheritance"],
+    ui: "course",
     articles: [
-      { id: "oop-01", title: "What is OOP?", difficulty: "beginner", time: "4 min", desc: "Objects, why they exist, and procedural vs OOP.",
-        content: `<h1>What is OOP?</h1><p><strong>Object-Oriented Programming (OOP)</strong> is a way of organizing a program around <strong>objects</strong> — a bundle of data (attributes) plus the functions that work on that data (methods).</p><h2>Why OOP?</h2><ul><li><strong>Reuse</strong> — write once, use it everywhere</li><li><strong>Maintainability</strong> — a change lives in one place</li><li><strong>Real-world modelling</strong> — code reads like the problem</li><li><strong>Clear boundaries</strong> — each object owns its own data</li></ul><h2>Procedural vs OOP</h2><p>Procedural code passes raw data into standalone functions:</p><pre><code># Procedural — data and logic are separate
-def deposit(account, amount):
-    account["balance"] += amount
-
-alice = {"balance": 100}
-deposit(alice, 50)</code></pre><p>Any function can modify any dictionary. Nothing stops a typo from setting a negative balance.</p><p>OOP attaches the data and the behaviour together, so the object keeps itself valid:</p><pre><code># Object-oriented — data + behaviour in one place
-class BankAccount:
-    def __init__(self, balance=0):
-        self.balance = balance
-
-    def deposit(self, amount):
-        self.balance += amount
-
-alice = BankAccount(100)
-alice.deposit(50)</code></pre><h2>Core Concepts</h2><table><thead><tr><th>Concept</th><th>Meaning</th><th>Example</th></tr></thead><tbody><tr><td>Class</td><td>Blueprint / template</td><td><code>BankAccount</code></td></tr><tr><td>Object</td><td>Instance of a class</td><td><code>alice</code></td></tr><tr><td>Attribute</td><td>Data stored on the object</td><td><code>alice.balance</code></td></tr><tr><td>Method</td><td>Function that belongs to the class</td><td><code>alice.deposit(50)</code></td></tr><tr><td>Encapsulation</td><td>Hide internal data</td><td><code>balance</code> is not edited directly</td></tr><tr><td>Abstraction</td><td>Hide complexity behind a simple API</td><td>Call <code>withdraw()</code> without seeing the checks</td></tr><tr><td>Inheritance</td><td>Reuse and extend a class</td><td><code>SavingsAccount</code> is a <code>BankAccount</code></td></tr><tr><td>Polymorphism</td><td>Same call, different behaviour</td><td><code>dog.speak()</code> and <code>cat.speak()</code></td></tr></tbody></table><h2>Where OOP Shows Up</h2><ul><li>Every object in Python (lists, dicts, files are all class instances)</li><li>Game entities, GUI widgets, and DOM elements in JavaScript</li><li>Exceptions, streams, and collections in C++ / Java / C#</li></ul><blockquote>OOP is a tool, not a religion. Use it when your program models things with behaviour and state — not for every problem.</blockquote>` },
-      { id: "oop-02", title: "Classes & Objects", difficulty: "beginner", time: "5 min", desc: "Blueprints, instances, attributes, methods, self and this.",
-        content: `<h1>Classes &amp; Objects</h1><p>A <strong>class</strong> describes what every object of that kind will contain. An <strong>object</strong> is one real thing built from that description.</p><h2>Anatomy</h2><pre><code>class Car:
-    def __init__(self, brand, speed):   # constructor
-        self.brand = brand               # attribute
-        self.speed = speed               # attribute
-
-    def accelerate(self, amount):       # method
-        self.speed += amount
-        return self.speed</code></pre><ul><li><code>__init__</code> runs once, right when the object is created</li><li><code>self</code> means <strong>this particular object</strong></li><li>Everything before the dot is the object; everything after is its data or behaviour</li></ul><pre><code>my_car = Car("Toyota", 0)
-my_car.accelerate(50)     # 50
-your_car = Car("Tesla", 100)
-
-my_car.speed     # 50   — each object keeps its OWN copy
-your_car.speed   # 100</code></pre><h2>The Same Thing in JavaScript</h2><pre><code>class Car {
-  constructor(brand, speed) {
-    this.brand = brand;
-    this.speed = speed;
-  }
-
-  accelerate(amount) {
-    this.speed += amount;
-    return this.speed;
-  }
-}
-
-const myCar = new Car("Toyota", 0);
-myCar.accelerate(50);   // 50</code></pre><h2>Methods Shared, Data Separate</h2><p>Attributes live on each object. Methods live once on the class and are shared by every object — that is why methods are memory-cheap.</p><h2>Inspecting Objects</h2><pre><code>type(my_car)                  # &lt;class '__main__.Car'&gt;
-isinstance(my_car, Car)      # True
-my_car.__dict__              # {'brand': 'Toyota', 'speed': 50}
-Car.count                    # every object knows its class</code></pre><h2>Objects Are Everywhere</h2><pre><code>print(type(42))          # &lt;class 'int'&gt;
-print(type([1, 2]))      # &lt;class 'list'&gt;
-print(type("hi"))        # &lt;class 'str'&gt;
-
-[1, 2, 3].append(4)      # calling a method on a list object
-"name".upper()           # calling a method on a str object</code></pre><blockquote>If you have used Python or JavaScript, you have already used OOP — you just have not written a class yet.</blockquote>` },
-      { id: "oop-03", title: "Encapsulation", difficulty: "beginner", time: "5 min", desc: "Keep data private and control how it changes.",
-        content: `<h1>Encapsulation</h1><p><strong>Encapsulation</strong> means: keep an object's data private and let the object itself decide how that data is read or changed.</p><h2>Why It Matters</h2><p>Without protection, any code anywhere can set an invalid value:</p><pre><code>account.balance = -500     # nonsense, and nothing stops it</code></pre><p>With encapsulation, the object validates every change:</p><pre><code>class BankAccount:
-    def __init__(self, owner, balance=0):
-        self.owner = owner
-        self.__balance = balance      # __ = private (name-mangled)
-
-    def get_balance(self):
-        return self.__balance
-
-    def deposit(self, amount):
-        if amount &lt;= 0:
-            raise ValueError("Deposit must be positive")
-        self.__balance += amount
-
-    def set_balance(self, value):
-        if value &lt; 0:
-            raise ValueError("Balance cannot be negative")
-        self.__balance = value</code></pre><h2>Python Naming Conventions</h2><table><thead><tr><th>Prefix</th><th>Meaning</th><th>Accessible outside?</th></tr></thead><tbody><tr><td><code>name</code></td><td>Public</td><td>Yes</td></tr><tr><td><code>_name</code></td><td>Protected (internal hint)</td><td>Yes, but don't</td></tr><tr><td><code>__name</code></td><td>Private (mangled to <code>_Class__name</code>)</td><td>No</td></tr></tbody></table><h2>Private Fields in JavaScript</h2><pre><code>class BankAccount {
-  #balance;                       // truly private — no access from outside
-
-  constructor(balance = 0) {
-    this.#balance = balance;
-  }
-
-  deposit(amount) {
-    if (amount &lt;= 0) throw new Error("Deposit must be positive");
-    this.#balance += amount;
-  }
-
-  get balance() { return this.#balance; }
-}
-
-const a = new BankAccount(100);
-a.balance          // 100  — through the getter
-a.#balance         // SyntaxError — not allowed
-a.balance = 500    // ignored (getter only)</code></pre><h2>Getters and Setters</h2><p>Properties let you expose a clean interface while still running validation behind the scenes.</p><pre><code>class Temperature:
-    def __init__(self, celsius):
-        self.set_celsius(celsius)
-
-    @property
-    def fahrenheit(self):
-        return self.celsius * 9 / 5 + 32
-
-    @fahrenheit.setter
-    def fahrenheit(self, value):
-        self.celsius = (value - 32) * 5 / 9
-
-t = Temperature(100)
-t.fahrenheit        # 212</code></pre><blockquote>Encapsulation protects <em>invariants</em> — the rules that must always be true about your object. If a rule can be broken from outside, it is not really a rule.</blockquote>` },
-      { id: "oop-04", title: "Abstraction", difficulty: "intermediate", time: "5 min", desc: "Expose what an object does, hide how it does it.",
-        content: `<h1>Abstraction</h1><p><strong>Abstraction</strong> is the idea of showing <em>what</em> an object can do while hiding <em>how</em> it does it. The user of your code should not need to know the internals.</p><h2>Example: Sending Messages</h2><p>Bad design — every caller must know the internals:</p><pre><code>import smtplib
-from twilio.rest import Client
-
-def notify_user(user, message):
-    if user.channel == "email":
-        smtplib.SMTP("smtp.gmail.com").send_message(message)   # details leak
-    else:
-        Client(token).messages.create(body=message)            # details leak</code></pre><p>Good design — the caller only knows the contract:</p><pre><code>class Notifier(ABC):
-    @abstractmethod
-    def send(self, message):
-        """Every notifier must be able to send a message."""
-
-
-class EmailNotifier(Notifier):
-    def __init__(self, smtp_server):
-        self.server = smtp_server
-
-    def send(self, message):
-        print(f"email sent via {self.server}: {message}")
-
-
-class SMSNotifier(Notifier):
-    def __init__(self, token):
-        self.token = token
-
-    def send(self, message):
-        print(f"sms sent with token {self.token}: {message}")
-
-
-def notify_user(notifier, message):
-    notifier.send(message)          # same call, any notifier</code></pre><h2>Abstract Class vs Interface</h2><table><thead><tr><th>Language</th><th>Mechanism</th></tr></thead><tbody><tr><td>Python</td><td><code>abc.ABC</code> + <code>@abstractmethod</code></td></tr><tr><td>JavaScript</td><td>No keyword — just document the shape, or check <code>typeof</code></td></tr><tr><td>Java / C#</td><td><code>abstract class</code> or <code>interface</code></td></tr><tr><td>C</td><td>Function-pointer struct (a vtable in disguise)</td></tr></tbody></table><h2>Rules of Thumb</h2><ul><li>Abstraction is a <strong>boundary</strong>, not an extra layer to add everywhere</li><li>If there is only one implementation and no plan for a second, skip the abstract class</li><li>Depend on the interface, not on the concrete class</li></ul><h2>Abstraction vs Encapsulation</h2><table><thead><tr><th>Pillar</th><th>Hides</th><th>Question it answers</th></tr></thead><tbody><tr><td>Encapsulation</td><td>Data</td><td>Who can change this value?</td></tr><tr><td>Abstraction</td><td>Implementation</td><td>What can this object do?</td></tr></tbody></table>` },
-      { id: "oop-05", title: "Inheritance", difficulty: "intermediate", time: "5 min", desc: "Reuse a parent class, override behaviour, call super.",
-        content: `<h1>Inheritance</h1><p><strong>Inheritance</strong> creates a new class from an existing one. The child gets everything the parent has and can change or add to it.</p><h2>Is-a, Not Has-a</h2><p>Use inheritance only when the child really <em>is</em> a kind of the parent. A <code>SavingsAccount</code> <strong>is a</strong> <code>BankAccount</code>. An <code>AccountManager</code> does <strong>not</strong> is-a <code>BankAccount</code> — it has one.</p><pre><code>class BankAccount:
-    def __init__(self, owner, balance=0):
-        self.owner = owner
-        self.balance = balance
-
-    def deposit(self, amount):
-        self.balance += amount
-
-    def summary(self):
-        return f"{self.owner}: {self.balance}"
-
-
-class SavingsAccount(BankAccount):        # inherits everything
-    def __init__(self, owner, balance=0, rate=0.05):
-        super().__init__(owner, balance)   # call the parent constructor
-        self.rate = rate
-
-    def add_interest(self):
-        self.balance *= (1 + self.rate)
-
-    def summary(self):                      # overriding the parent
-        return f"{super().summary()} (rate {self.rate})"</code></pre><h2>What super() Does</h2><p><code>super()</code> calls the parent version of a method, so you extend behaviour instead of rewriting it.</p><pre><code>class SavingsAccount(BankAccount):
-    def deposit(self, amount):
-        if amount &lt;= 0:
-            raise ValueError("Deposit must be positive")
-        super().deposit(amount)      # reuse parent logic
-        self.last_deposit = amount    # then add your own</code></pre><h2>The is-a Test</h2><table><thead><tr><th>Relationship</th><th>Use</th></tr></thead><tbody><tr><td><code>SavingsAccount</code> <strong>is a</strong> <code>BankAccount</code></td><td>Inheritance</td></tr><tr><td><code>Car</code> <strong>has a</strong> <code>Engine</code></td><td>Composition (see next article)</td></tr></tbody></table><h2>Single Inheritance Rule of Thumb</h2><ul><li>Prefer <strong>one</strong> parent. Deep chains get fragile fast.</li><li>Every override should be compatible with the parent signature (LSP).</li><li>Use <code>isinstance(child, Parent)</code> to check the relationship.</li><li>In C, you get inheritance by embedding a struct inside a struct.</li></ul><pre><code>typedef struct { int wheels; } Vehicle;
-typedef struct { Vehicle base;   /* acts like inheritance */ int doors; } Car;</code></pre><blockquote>Inheritance is for genuine <em>is-a</em> reuse. For everything else, use composition.</blockquote>` },
-      { id: "oop-06", title: "Polymorphism", difficulty: "intermediate", time: "5 min", desc: "One call, different behaviour — the point of OOP.",
-        content: `<h1>Polymorphism</h1><p><strong>Polymorphism</strong> means "many shapes". You call the same method on different objects, and each one responds in its own way.</p><h2>Run-Time Polymorphism (Overriding)</h2><pre><code>class Animal:
-    def speak(self):
-        return "..."
-
-
-class Dog(Animal):
-    def speak(self):
-        return "Woof"
-
-
-class Cat(Animal):
-    def speak(self):
-        return "Meow"
-
-
-animals = [Dog(), Cat(), Animal()]
-for animal in animals:
-    print(animal.speak())     # Woof / Meow / ...</code></pre><p>The loop never asks what type each object is. It just calls <code>speak()</code> and each object handles it. This is also called <strong>dynamic dispatch</strong>.</p><h2>Compile-Time Polymorphism (Overloading)</h2><p>Overloading means the same method name with different parameter types or counts, resolved before the program runs. Java, C++, and C# have it; Python and JavaScript do not.</p><table><thead><tr><th>Kind</th><th>Resolved</th><th>Example</th></tr></thead><tbody><tr><td>Overloading</td><td>Compile time</td><td><code>add(int, int)</code> vs <code>add(double, double)</code></td></tr><tr><td>Overriding</td><td>Run time</td><td>A child class replaces the parent method</td></tr></tbody></table><h2>Python Simulates Overloading</h2><pre><code>class Adder:
-    def add(self, a, b=None):
-        if b is None:                 # called with one list argument
-            return sum(a)
-        return a + b                  # called with two numbers
-
-Adder().add(2, 3)      # 5
-Adder().add([1, 2, 3])  # 6</code></pre><h2>Operator Overloading Is Polymorphism Too</h2><p>You already use polymorphism when you write <code>+</code> — the operator calls a different method depending on the object types.</p><pre><code>print(2 + 3)          # int.__add__
-print("a" + "b")      # str.__add__
-print([1] + [2])      # list.__add__</code></pre><h2>Duck Typing (Python)</h2><p>Python does not need a declared base class. If an object has the method, it works:</p><pre><code>class Robot:
-    def speak(self):
-        return "Beep"
-
-
-def make_it_speak(thing):
-    return thing.speak()      # no type check, no inheritance
-
-make_it_speak(Dog())      # Woof
-make_it_speak(Robot())    # Beep</code></pre><h2>JavaScript Does It Too</h2><pre><code>const animals = [new Dog(), new Cat()];
-animals.forEach((a) =&gt; console.log(a.speak()));
-// same call, each object uses its own method</code></pre><blockquote>Code that depends on behaviour instead of type is the whole point of OOP — it lets you add new classes without touching old code.</blockquote>` },
-      { id: "oop-07", title: "Constructors & Destructors", difficulty: "intermediate", time: "4 min", desc: "Set up valid state on creation, clean up on destruction.",
-        content: `<h1>Constructors &amp; Destructors</h1><p>A <strong>constructor</strong> runs when an object is created. Its job is to leave the object in a valid state. A <strong>destructor</strong> (or cleanup method) runs when the object goes away.</p><h2>Python</h2><pre><code>class Rectangle:
-    def __init__(self, width, height):
-        if width &lt;= 0 or height &lt;= 0:
-            raise ValueError("Sides must be positive")
-        self.width = width          # private-ish with _ prefix
-        self.height = height
-
-    @property
-    def area(self):
-        return self.width * self.height
-
-    def __del__(self):              # rarely used in Python
-        print("rectangle destroyed")</code></pre><p>Python normally frees memory for you. Prefer an explicit <code>close()</code> or a context manager over <code>__del__</code>.</p><pre><code>class File:
-    def __enter__(self):
-        self.handle = open("data.txt")
-        return self
-
-    def __exit__(self, *args):
-        self.handle.close()</code></pre><h2>JavaScript</h2><pre><code>class Rectangle {
-  #width;                       // class fields
-  #height;
-
-  constructor(width, height) {
-    if (width &lt;= 0) throw new Error("Sides must be positive");
-    this.#width = width;
-    this.#height = height;
-  }
-
-  get area() { return this.#width * this.#height; }
-}
-
-const r = new Rectangle(4, 5);   // constructor runs here</code></pre><h2>C — No Constructors, So You Write One</h2><pre><code>typedef struct { double width, height; } Rectangle;
-
-void rect_init(Rectangle *r, double w, double h) {
-    if (w &lt;= 0 || h &lt;= 0) return;   /* refuse invalid state */
-    r-&gt;width = w;
-    r-&gt;height = h;
-}
-
-void rect_free(Rectangle *r) {          /* cleanup */
-    (void)r;
-}</code></pre><h2>Constructor Chaining</h2><p>A child constructor usually calls the parent first, then adds its own fields:</p><pre><code>class SavingsAccount(BankAccount):
-    def __init__(self, owner, balance=0, rate=0.05):
-        if rate &lt; 0 or rate &gt; 1:
-            raise ValueError("rate must be between 0 and 1")
-        super().__init__(owner, balance)   # 1. parent first
-        self.rate = rate                    # 2. then child fields</code></pre><h2>Rules</h2><ul><li>Do heavy setup in the constructor, not at every call site</li><li>Validate arguments in the constructor so the object is never half-built</li><li>Avoid work in constructors that can fail later (network calls, file reads)</li><li>Pair every resource you acquire with a method that releases it</li></ul>` },
-      { id: "oop-08", title: "Static & Class Members", difficulty: "intermediate", time: "4 min", desc: "Data and functions that belong to the class, not the object.",
-        content: `<h1>Static &amp; Class Members</h1><p>Sometimes data belongs to the <strong>class as a whole</strong>, not to each object. Class-level members are shared by every instance.</p><h2>Class Variable vs Instance Variable</h2><pre><code>class Dog:
-    species = "Canis familiaris"    # class variable — ONE copy, shared
-
-    def __init__(self, name):
-        self.name = name            # instance variable — one per object
-
-
-rex = Dog("Rex")
-fido = Dog("Fido")
-
-Dog.species        # 'Canis familiaris'
-rex.name           # 'Rex'
-fido.name          # 'Fido'  — separate</code></pre><h2>The Classic Shared-State Bug</h2><pre><code>class Team:
-    members = []                 # BUG: shared by every instance
-
-    def __init__(self, name):
-        self.name = name
-
-    def add(self, member):
-        self.members.append(member)
-
-
-a = Team("Alpha")
-b = Team("Beta")
-a.add("Rex")
-len(b.members)     # 1 — "Rex" leaked into Beta!</code></pre><p>The fix is to create the list per object:</p><pre><code>    def __init__(self, name):
-        self.name = name
-        self.members = []        # each team gets its own list</code></pre><h2>Class Methods and Static Methods</h2><table><thead><tr><th>Type</th><th>Receives</th><th>Use for</th></tr></thead><tbody><tr><td>Instance method</td><td><code>self</code></td><td>Behaviour that uses the object's data</td></tr><tr><td>Class method</td><td><code>cls</code></td><td>Alternative constructors / factories</td></tr><tr><td>Static method</td><td>Nothing</td><td>Helper functions that belong to the class</td></tr></tbody></table><pre><code>class Date:
-    def __init__(self, y, m, d):
-        self.y, self.m, self.d = y, m, d
-
-    @classmethod
-    def from_string(cls, s):
-        return cls(*map(int, s.split("-")))   # alternative constructor
-
-    @staticmethod
-    def is_valid(y, m, d):
-        return 1 &lt;= m &lt;= 12 and 1 &lt;= d &lt;= 31
-
-Date.from_string("2026-01-31")
-Date.is_valid(2026, 2, 30)</code></pre><h2>JavaScript</h2><pre><code>class Counter {
-  static instances = 0;          // shared across all objects
-  #count = 0;
-
-  constructor() {
-    Counter.instances++;
-  }
-
-  increment() { this.#count++; }
-  get count() { return this.#count; }
-}
-
-new Counter();
-Counter.instances;   // 1</code></pre><h2>C</h2><pre><code>static int instances = 0;   /* shared by the whole program */
-
-int counter_create(void) {
-    instances++;
-    return instances;
-}</code></pre><blockquote>Shared mutable state is the number one source of bugs in object-oriented programs. Keep it read-only or keep it local.</blockquote>` },
-      { id: "oop-09", title: "Magic Methods (Dunder)", difficulty: "intermediate", time: "5 min", desc: "Make your objects work with built-in operators and functions.",
-        content: `<h1>Magic Methods</h1><p>Some methods Python calls <strong>for you</strong> when you use an operator or a built-in function. They are called <strong>dunder</strong> methods (double underscore).</p><h2>Common Dunder Methods</h2><table><thead><tr><th>Method</th><th>Called by</th><th>Purpose</th></tr></thead><tbody><tr><td><code>__init__</code></td><td><code>Obj()</code></td><td>Set up a new object</td></tr><tr><td><code>__str__</code></td><td><code>print(obj)</code>, <code>str(obj)</code></td><td>Human-readable text</td></tr><tr><td><code>__repr__</code></td><td><code>repr(obj)</code>, the REPL</td><td>Unambiguous debug form</td></tr><tr><td><code>__len__</code></td><td><code>len(obj)</code></td><td>Size of the object</td></tr><tr><td><code>__eq__</code></td><td><code>a == b</code></td><td>Value equality</td></tr><tr><td><code>__lt__</code></td><td><code>a &lt; b</code>, <code>sorted()</code></td><td>Comparison</td></tr><tr><td><code>__add__</code></td><td><code>a + b</code></td><td>Operator overloading</td></tr><tr><td><code>__getitem__</code></td><td><code>obj[i]</code></td><td>Indexing</td></tr><tr><td><code>__iter__</code></td><td><code>for x in obj</code></td><td>Iteration</td></tr><tr><td><code>__enter__</code> / <code>__exit__</code></td><td><code>with obj:</code></td><td>Resource management</td></tr></tbody></table><h2>A Complete Example</h2><pre><code>class Vector:
-    def __init__(self, x, y):
-        self.x, self.y = x, y
-
-    def __add__(self, other):
-        return Vector(self.x + other.x, self.y + other.y)
-
-    def __eq__(self, other):
-        return self.x == other.x and self.y == other.y
-
-    def __repr__(self):
-        return f"Vector({self.x}, {self.y})"
-
-
-a = Vector(1, 2)
-b = Vector(3, 4)
-
-print(a + b)     # Vector(4, 6)   -> uses __add__
-a == Vector(1, 2)  # True        -> uses __eq__</code></pre><h2>JavaScript Equivalents</h2><pre><code>class Vector {
-  constructor(x, y) { this.x = x; this.y = y; }
-
-  toString() { return "Vector(" + this.x + ", " + this.y + ")"; }
-  valueOf()  { return Math.hypot(this.x, this.y); }   // enables arithmetic
-
-  *[Symbol.iterator]() {          // makes the object for...of-able
-    yield this.x;
-    yield this.y;
-  }
-}
-
-const v = new Vector(3, 4);
-console.log(String(v));        // Vector(3, 4)
-for (const n of v) console.log(n);</code></pre><h2>Rules</h2><ul><li>Implement <code>__str__</code> for humans, <code>__repr__</code> for developers</li><li>If you define <code>__eq__</code>, consider defining <code>__hash__</code> too</li><li>Keep magic methods small and predictable — they should feel like the built-in types</li></ul><blockquote>Operator overloading should be intuitive. If <code>a + b</code> on your class is surprising, remove it.</blockquote>` },
-      { id: "oop-10", title: "SOLID Principles", difficulty: "advanced", time: "6 min", desc: "Five rules that keep object-oriented code from rotting.",
-        content: `<h1>SOLID Principles</h1><p>SOLID is a set of five design principles for object-oriented code. They are guidelines, not laws.</p><table><thead><tr><th>Letter</th><th>Principle</th><th>In one line</th></tr></thead><tbody><tr><td><strong>S</strong></td><td>Single Responsibility</td><td>A class should do one job — one reason to change</td></tr><tr><td><strong>O</strong></td><td>Open/Closed</td><td>Open for extension, closed for modification</td></tr><tr><td><strong>L</strong></td><td>Liskov Substitution</td><td>A child class must be usable wherever the parent is</td></tr><tr><td><strong>I</strong></td><td>Interface Segregation</td><td>Many small interfaces beat one big interface</td></tr><tr><td><strong>D</strong></td><td>Dependency Inversion</td><td>Depend on abstractions, not on concrete classes</td></tr></tbody></table><h2>S — Single Responsibility</h2><pre><code>class User:
-    def save_to_db(self): ...      # BAD: user now knows about SQL
-    def send_welcome_email(self): ...  # and about SMTP
-    def to_json(self): ...</code></pre><p>Split into <code>UserRepository</code> and <code>Mailer</code>.</p><h2>O — Open/Closed</h2><p>To add a new payment type, add a new class — do not edit the old <code>if/elif</code> chain.</p><pre><code>class PaymentMethod(ABC):
-    @abstractmethod
-    def charge(self, amount): ...
-
-
-class Card(PaymentMethod):
-    def charge(self, amount): ...
-
-
-class Upi(PaymentMethod):          # new type, no existing code changed
-    def charge(self, amount): ...
-
-
-class Checkout:
-    def __init__(self, method: PaymentMethod):
-        self.method = method      # depends on the abstraction</code></pre><h2>L — Liskov Substitution</h2><p>Overriding must not break the parent's contract.</p><pre><code>class FileWriter:
-    def write(self, data): ...
-
-
-class ReadOnlyWriter(FileWriter):     # BAD: cannot honour the contract
-    def write(self, data):
-        raise NotImplementedError</code></pre><h2>I — Interface Segregation</h2><p>Do not force a class to implement methods it does not need.</p><pre><code>class Printer:                      # BAD: report() is irrelevant for printing
-    def print(self, doc): ...
-    def scan(self, doc): ...
-    def fax(self, doc): ...
-
-
-class SimplePrinter:                 # GOOD: only what it needs
-    def print(self, doc): ...</code></pre><h2>D — Dependency Inversion</h2><pre><code>class OrderService:
-    def __init__(self, repository):     # receives a dependency
-        self.repo = repository
-
-    def place(self, item):
-        self.repo.save(item)</code></pre><p>The caller chooses the implementation, so tests can inject a fake:</p><pre><code>class FakeRepo:
-    def save(self, item):
-        self.saved = item
-
-OrderService(FakeRepo()).place("book")   # no database needed</code></pre><h2>How to Use These</h2><ul><li>Not every class needs all five — apply the rule that fixes the problem you actually have</li><li>Start with SRP; the rest follows naturally</li><li>If a change forces you to touch five files, one of them probably has too many responsibilities</li></ul>` },
-      { id: "oop-11", title: "Composition vs Inheritance", difficulty: "intermediate", time: "4 min", desc: "Prefer has-a over is-a, and keep hierarchies flat.",
-        content: `<h1>Composition vs Inheritance</h1><p>Two ways to reuse code. <strong>Inheritance</strong> is <em>is-a</em>. <strong>Composition</strong> is <em>has-a</em>. Composition is almost always the safer choice.</p><h2>Side by Side</h2><table><thead><tr><th>Aspect</th><th>Inheritance</th><th>Composition</th></tr></thead><tbody><tr><td>Relationship</td><td>is-a</td><td>has-a</td></tr><tr><td>Tight coupling</td><td>Very</td><td>Loose</td></tr><tr><td>Change at runtime</td><td>Hard</td><td>Easy — swap the part</td></tr><tr><td>Depth limit</td><td>Keep it to 2–3 levels</td><td>No limit</td></tr><tr><td>Best for</td><td>Genuine subtypes</td><td>Almost everything else</td></tr></tbody></table><h2>Composition Example</h2><pre><code>class Engine:
-    def __init__(self, power):
-        self.power = power
-
-    def start(self):
-        return "engine running"
-
-
-class Car:
-    def __init__(self, engine):
-        self.engine = engine          # Car has an Engine
-
-    def start(self):
-        return self.engine.start()
-
-
-car = Car(Engine(120))
-car.start()        # 'engine running'
-
-# Swap the part at any time
-car.engine = Engine(200)</code></pre><p>With inheritance you would have needed a <code>ElectricCar</code> subclass, then a <code>DieselCar</code>, then combinations of both...</p><h2>Composition With Roles</h2><pre><code>class Logger:
-    def write(self, msg):
-        print(f"[file] {msg}")
-
-
-class Service:
-    def __init__(self, logger=None):     # injected, not inherited
-        self.logger = logger or Logger()
-
-    def run(self):
-        self.logger.write("service started")</code></pre><h2>The Diamond Problem</h2><p>Multiple inheritance makes the shared base ambiguous. Prefer composition:</p><pre><code>class A: pass
-class B(A): pass
-class C(A): pass
-class D(B, C): pass       # D().run() — which run() from A?</code></pre><h2>Rule of Thumb</h2><ul><li>Use inheritance for real subtypes (<code>SavingsAccount</code> is a <code>BankAccount</code>)</li><li>Use composition for everything else</li><li>If you say "has a" in a sentence, do not use inheritance</li><li>A hierarchy deeper than three levels is usually a design smell</li></ul><blockquote>Ask "is-a" for inheritance, "has-a" for composition. When in doubt, compose.</blockquote>` },
-      { id: "oop-12", title: "OOP in C", difficulty: "advanced", time: "6 min", desc: "Structs, function pointers, and a hand-rolled vtable.",
-        content: `<h1>OOP in C</h1><p>C has no <code>class</code> keyword and no built-in inheritance, but the object-oriented ideas are all expressible with structs and function pointers.</p><h2>Struct + Functions = Object</h2><pre><code>#include &lt;stdio.h&gt;
-
-typedef struct {
-    int wheels;
-    int speed;
-} Car;
-
-void car_accelerate(Car *car, int amount) {
-    car-&gt;speed += amount;
-}
-
-int main(void) {
-    Car my_car = {4, 0};
-    car_accelerate(&amp;my_car, 50);
-    printf("%d\\n", my_car.speed);      /* 50 */
-    return 0;
-}</code></pre><p>Convention: functions that take a <code>Type *</code> as their first argument belong to that type. This is the <code>self</code>/<code>this</code> pointer in disguise.</p><h2>Encapsulation With an Opaque Struct</h2><p>Declare the struct in the header, define it only in the .c file. Callers can use the type but cannot touch its fields.</p><pre><code>/* counter.h */
-typedef struct Counter Counter;      /* incomplete type — fields hidden */
-Counter *counter_create(int start);
-void counter_add(Counter *c, int amount);
-int  counter_value(const Counter *c);
-void counter_destroy(Counter *c);</code></pre><h2>Polymorphism With Function Pointers</h2><p>A struct of function pointers is a <strong>vtable</strong>. This is exactly what C++ and Java implement behind the scenes.</p><pre><code>typedef struct Shape Shape;
-
-struct Shape {
-    const char *name;
-    double (*area)(const Shape *self);
+      { id: "oop-01", title: "C++ OOP Foundations", difficulty: "beginner", time: "18 min", phase: "Basics",
+        desc: "Classes and objects, access specifiers, encapsulation, abstraction, the scope resolution operator, and the four kinds of functions in a class.",
+        content: `<p class="cpp-lead">C++ with OOP.</p>
+
+<h2>C++ with OOP</h2>
+
+<h3>Header File and <code>namespace std</code></h3>
+<pre data-lang="C++"><code>#include &lt;iostream&gt;
+using namespace std;</code></pre>
+<ul>
+  <li><code>#include &lt;iostream&gt;</code> &rarr; header file.</li>
+  <li><code>using namespace std;</code> tells the compiler that names such as <code>cout</code>, <code>cin</code>, <code>endl</code>, and <code>string</code> belong to the <code>std</code> namespace.</li>
+  <li>Without <code>using namespace std</code>, we can write:</li>
+</ul>
+<pre data-lang="C++"><code>std::cout &lt;&lt; "Hello";
+std::endl;
+std::string name;</code></pre>
+<ul>
+  <li>With <code>using namespace std</code>, we can write:</li>
+</ul>
+<pre data-lang="C++"><code>cout &lt;&lt; "Hello";
+endl;
+string name;</code></pre>
+
+<h2>Object-Oriented Programming</h2>
+<div class="cpp-infocard cpp-infocard--info"><div class="cpp-infocard-title">Definition</div><div class="cpp-infocard-body">A <b>class</b> is a user-defined data type that groups data members and member functions into a single unit.</div></div>
+<pre data-lang="C++"><code>class Student
+{
+    // members
+};</code></pre>
+<p>The class is a blueprint/template.</p>
+
+<div class="cpp-infocard cpp-infocard--info"><div class="cpp-infocard-title">Definition</div><div class="cpp-infocard-body">An <b>object</b> is an instance of a class.</div></div>
+<pre data-lang="C++"><code>class Student
+{
+public:
+    string name;
+    int marks;
 };
 
-typedef struct { Shape base; double w, h; } Rectangle;
+Student s1;</code></pre>
+<p>Here:</p>
+<pre data-lang="text"><code>Student class -&gt; Blueprint
+s1            -&gt; Actual object</code></pre>
 
-static double rect_area(const Shape *self) {
-    const Rectangle *r = (const Rectangle *)self;   /* cast back */
-    return r-&gt;w * r-&gt;h;
-}
+<h3>Multiple Objects from One Class</h3>
+<p>From a single class/blueprint, multiple objects can be created.</p>
+<pre data-lang="C++"><code>Student s1;
+Student s2;
+Student s3;</code></pre>
+<p>All three objects are created from the same <code>Student</code> class.</p>
+<p>Each object has its own memory for the class's non-static data members.</p>
+<pre data-lang="text"><code>Student class
+     |
+     +---- s1
+     |
+     +---- s2
+     |
+     +---- s3</code></pre>
+<p>Changing one object's non-static data does not change another object's corresponding data.</p>
 
-void print_area(const Shape *s) {
-    printf("%s: %.2f\\n", s-&gt;name, s-&gt;area(s));    /* dynamic dispatch */
-}</code></pre><h2>One Virtual Method Is Enough for Polymorphism</h2><pre><code>typedef struct { Shape base; double r; } Circle;
+<h4>Example</h4>
+<pre data-lang="C++"><code>class Student
+{
+public:
+    int roll;
+    string name;
+};
 
-static double circle_area(const Shape *self) {
-    const Circle *c = (const Circle *)self;
-    return 3.14159 * c-&gt;r * c-&gt;r;
-}
+Student s1;</code></pre>
+<p>The class contains data members, while <code>s1</code> is an object of the class.</p>
 
+<h2>Object-Based vs Object-Oriented Programming</h2>
 
-int main(void) {
-    Rectangle rect = { { "rectangle", rect_area }, 4, 5 };
-    Circle   circ = { { "circle",   circle_area }, 2 };
+<h3>Object-Based Programming</h3>
+<p>Object-based programming uses objects to organize data and functions, but may not support all major object-oriented features, especially inheritance.</p>
 
-    print_area(&rect.base);
-    print_area(&circ.base);      /* same function, different behaviour */
+<h3>Object-Oriented Programming</h3>
+<p>OOP organizes a program around objects and classes and supports concepts such as:</p>
+<ul>
+  <li>Encapsulation</li>
+  <li>Abstraction</li>
+  <li>Inheritance</li>
+  <li>Polymorphism</li>
+</ul>
+<p>Inheritance is an especially important feature distinguishing full OOP from simpler object-based approaches.</p>
+
+<h2>C vs C++</h2>
+<table>
+  <thead><tr><th>C</th><th>C++</th></tr></thead>
+  <tbody>
+    <tr><td>Procedural programming language</td><td>Object-oriented programming language</td></tr>
+    <tr><td>Function-oriented</td><td>Object/class-oriented</td></tr>
+    <tr><td>Does not provide C++ access-control model</td><td>Supports <code>public</code>, <code>private</code>, <code>protected</code></td></tr>
+    <tr><td>Data is commonly handled through functions</td><td>Data and functions can be grouped inside classes</td></tr>
+    <tr><td>Less suitable for OOP concepts such as inheritance</td><td>Supports OOP concepts</td></tr>
+    <tr><td>C++ can also support procedural programming</td><td>C++ supports both procedural and object-oriented programming</td></tr>
+  </tbody>
+</table>
+
+<h2>Access Specifiers</h2>
+<p>C++ provides:</p>
+<ol>
+  <li><code>private</code></li>
+  <li><code>public</code></li>
+  <li><code>protected</code></li>
+</ol>
+
+<h3>Private</h3>
+<div class="cpp-infocard cpp-infocard--info"><div class="cpp-infocard-title">Definition</div><div class="cpp-infocard-body">Private members are hidden from outside access. They can normally be accessed directly only from member functions/friends with permission.</div></div>
+
+<h4>Example: Bank Account</h4>
+<pre data-lang="C++"><code>class Bank
+{
+private:
+    int balance;
+    double accountNumber;
+
+public:
+    void deposit(int amount)
+    {
+        balance += amount;
+    }
+
+    void withdraw(int amount)
+    {
+        balance -= amount;
+    }
+
+    void checkBalance()
+    {
+        cout &lt;&lt; balance;
+    }
+};</code></pre>
+<p>The balance and account number are private.</p>
+<p>The user cannot directly modify them from outside the class.</p>
+<pre data-lang="C++"><code>Bank b;
+
+b.deposit(6000);
+b.withdraw(2000);
+b.checkBalance();</code></pre>
+<p>The class controls how the data is changed.</p>
+
+<h4>Private access</h4>
+<div class="cpp-keypoints"><div class="cpp-keypoints-title">Key Points</div><ul><li>Private data/functions are hidden from outside the class.</li><li>They can be accessed inside the class.</li><li>Outside code cannot directly access private members.</li></ul></div>
+
+<h3>Public</h3>
+<div class="cpp-infocard cpp-infocard--info"><div class="cpp-infocard-title">Definition</div><div class="cpp-infocard-body">Public members can be accessed both inside and outside the class.</div></div>
+<pre data-lang="C++"><code>class Bank
+{
+public:
+    void deposit(int amount)
+    {
+        // ...
+    }
+
+    void withdraw(int amount)
+    {
+        // ...
+    }
+};</code></pre>
+
+<h3>Protected</h3>
+<div class="cpp-infocard cpp-infocard--info"><div class="cpp-infocard-title">Definition</div><div class="cpp-infocard-body">Protected members are accessible inside the class and in derived classes, but not directly from unrelated outside code.</div></div>
+
+<h2>Encapsulation</h2>
+<div class="cpp-infocard cpp-infocard--info"><div class="cpp-infocard-title">Definition</div><div class="cpp-infocard-body"><b>Encapsulation</b> is the process of wrapping data variables and functions/methods into a single unit (class) and restricting direct access to the data.</div></div>
+
+<h3>Basic idea</h3>
+<ol>
+  <li>Put data and functions together inside a class.</li>
+  <li>Protect data using <code>private</code>.</li>
+  <li>Allow controlled access using <code>public</code> functions.</li>
+</ol>
+
+<h3>Example</h3>
+<pre data-lang="C++"><code>class Student
+{
+private:
+    int marks;
+
+public:
+    void setMarks(int m)
+    {
+        marks = m;
+    }
+};</code></pre>
+<pre data-lang="C++"><code>int main()
+{
+    Student s;
+    s.setMarks(90);
+}</code></pre>
+<p>The outside code does not directly modify <code>marks</code>.</p>
+
+<h3>Encapsulation</h3>
+<pre data-lang="text"><code>Data
+  +
+Functions
+  |
+  v
+Class
+  |
+  v
+Controlled access</code></pre>
+
+<h2>Abstraction</h2>
+<div class="cpp-infocard cpp-infocard--info"><div class="cpp-infocard-title">Definition</div><div class="cpp-infocard-body"><b>Abstraction</b> means showing only the necessary information and hiding the internal implementation details.</div></div>
+
+<h3>Example</h3>
+<p>ATM:</p>
+<pre data-lang="text"><code>User
+ |
+ +--&gt; Withdraw money
+ +--&gt; Check balance
+ |
+ v
+Internal implementation is hidden</code></pre>
+<p>The user knows what operation to perform but does not need to know the internal implementation of the banking system.</p>
+
+<h3>Encapsulation vs Abstraction</h3>
+<pre data-lang="text"><code>Encapsulation
+-&gt; Binding data and functions into one unit
+-&gt; Restricting direct access
+
+Abstraction
+-&gt; Showing necessary information
+-&gt; Hiding internal implementation</code></pre>
+
+<h2>Scope Resolution Operator <code>::</code></h2>
+<p>The scope resolution operator <code>::</code> is used to:</p>
+<ul>
+  <li>Define a member function outside the class.</li>
+  <li>Access a global variable when a local variable has the same name.</li>
+  <li>Access class/static members using the class name.</li>
+</ul>
+
+<h3>Defining a Member Function Outside the Class</h3>
+<pre data-lang="C++"><code>class Student
+{
+public:
+    int roll;
+
+    void display();
+};
+
+void Student::display()
+{
+    cout &lt;&lt; "Hello";
+}</code></pre>
+<p>The function is declared inside the class but defined outside using:</p>
+<pre data-lang="C++"><code>Student::display()</code></pre>
+
+<h3>Global and Local Variables with <code>::</code></h3>
+<pre data-lang="C++"><code>#include &lt;iostream&gt;
+using namespace std;
+
+int x = 20;       // global variable
+
+int main()
+{
+    int x = 90;   // local variable
+
+    cout &lt;&lt; x &lt;&lt; endl;     // 90
+    cout &lt;&lt; ::x &lt;&lt; endl;   // 20
+
     return 0;
-}</code></pre><h2>Inheritance by Embedding</h2><pre><code>typedef struct { int wheels; } Vehicle;
-typedef struct {
-    Vehicle base;      /* first member = acts like a parent */
-    int doors;
-} Car;
+}</code></pre>
 
-Car my_car = { { 4 }, 5 };
-my_car.base.wheels      /* access the "inherited" field */
-my_car.wheels           /* works too — no real inheritance in C */</code></pre><h2>Summary Table</h2><table><thead><tr><th>OOP concept</th><th>C equivalent</th></tr></thead><tbody><tr><td>Class</td><td><code>struct</code></td></tr><tr><td>Object</td><td><code>struct</code> instance</td></tr><tr><td>Method</td><td>Function taking a pointer to the struct</td></tr><tr><td>Encapsulation</td><td>Opaque struct defined in the .c file</td></tr><tr><td>Inheritance</td><td>Embedding a struct as the first member</td></tr><tr><td>Polymorphism</td><td>Struct of function pointers (vtable)</td></tr><tr><td>Constructor / Destructor</td><td><code>_create()</code> / <code>_destroy()</code> pair</td></tr></tbody></table><blockquote>Write this once in C and C++ classes feel familiar. Every object is a pointer to a struct whose first member may be a vtable.</blockquote>` },
-      { id: "oop-13", title: "Quick Reference", difficulty: "beginner", time: "3 min", desc: "One-page cheat sheet across Python, JavaScript, and C.",
-        content: `<h1>OOP Quick Reference</h1><h2>Same Idea, Three Languages</h2><table><thead><tr><th>Concept</th><th>Python</th><th>JavaScript</th><th>C</th></tr></thead><tbody><tr><td>Class</td><td><code>class A:</code></td><td><code>class A {}</code></td><td><code>typedef struct {...} A;</code></td></tr><tr><td>Object</td><td><code>A()</code></td><td><code>new A()</code></td><td><code>A a;</code></td></tr><tr><td>Constructor</td><td><code>__init__</code></td><td><code>constructor()</code></td><td><code>a_init(&amp;a)</code></td></tr><tr><td>Instance field</td><td><code>self.x</code></td><td><code>this.x</code></td><td><code>a.x</code></td></tr><tr><td>Private field</td><td><code>self.__x</code></td><td><code>this.#x</code></td><td>opaque struct</td></tr><tr><td>Class / static</td><td><code>@classmethod</code></td><td><code>static</code></td><td><code>static</code></td></tr><tr><td>Inheritance</td><td><code>class B(A)</code></td><td><code>class B extends A</code></td><td>embed struct</td></tr><tr><td>Call parent</td><td><code>super().__init__()</code></td><td><code>super()</code></td><td>call the function</td></tr><tr><td>Polymorphism</td><td>duck typing</td><td>duck typing</td><td>function pointers</td></tr></tbody></table><h2>The Four Pillars</h2><table><thead><tr><th>Pillar</th><th>One-line definition</th></tr></thead><tbody><tr><td>Encapsulation</td><td>Bundle data with the code that guards it</td></tr><tr><td>Abstraction</td><td>Show what, hide how</td></tr><tr><td>Inheritance</td><td>Reuse a parent (is-a)</td></tr><tr><td>Polymorphism</td><td>One interface, many behaviours</td></tr></tbody></table><h2>Checklist Before You Ship</h2><ul><li>Is the object's state always valid, whatever the caller does?</li><li>Does each class have one clear reason to change?</li><li>Would a new subclass work without editing existing code?</li><li>Have you used composition where the relationship is "has a"?</li><li>Are shared mutable class variables really needed?</li></ul><h2>Next Steps</h2><ul><li>Python: see <code>python-11</code> for the syntax in depth</li><li>C: <code>c-11</code> covers structs, typedef, and the arrow operator</li><li>JavaScript: <code>js-11</code> covers ES6 classes</li><li>Next topics: design patterns (singleton, factory, observer, strategy)</li></ul>` }
+<h4>Important points</h4>
+<ol>
+  <li>A global variable can be used anywhere in the program.</li>
+  <li>A local variable can have the same name as a global variable.</li>
+  <li>The local variable hides the global variable in its scope.</li>
+  <li><code>::variableName</code> accesses the global variable.</li>
+  <li>C++ searches for a variable in the nearest scope first, then wider scopes.</li>
+</ol>
+
+<h4>Scope search idea</h4>
+<pre data-lang="text"><code>Current/nearest scope
+        |
+        v
+Outer block
+        |
+        v
+Global scope</code></pre>
+
+<h2>Scope Rules</h2>
+<p>Important points from the notes:</p>
+<ol>
+  <li>A global variable can be used anywhere in the program.</li>
+  <li>A local variable may have the same name as a global variable.</li>
+  <li>If the local variable has the same name, it hides the global variable.</li>
+  <li>An inner block can hide a variable from an outer block if both have the same name.</li>
+  <li>C++ looks for a variable from the nearest scope outward.</li>
+  <li><code>::variableName</code> accesses the global variable.</li>
+</ol>
+
+<h2>Member Function</h2>
+<div class="cpp-infocard cpp-infocard--info"><div class="cpp-infocard-title">Definition</div><div class="cpp-infocard-body">A member function is a function defined as a member of a class.</div></div>
+<pre data-lang="C++"><code>class Student
+{
+public:
+    int roll;
+
+    void display()
+    {
+        cout &lt;&lt; roll;
+    }
+};</code></pre>
+<p>The function <code>display()</code> belongs to the <code>Student</code> class.</p>
+<p>It can directly access the class's members.</p>
+
+<h2>Inline Function</h2>
+<div class="cpp-infocard cpp-infocard--info"><div class="cpp-infocard-title">Definition</div><div class="cpp-infocard-body">An inline function is a function where the compiler may replace the function call with the function body at the call location.</div></div>
+<p>The purpose is to reduce function-call overhead, especially for small functions.</p>
+
+<h3>Example</h3>
+<pre data-lang="C++"><code>#include &lt;iostream&gt;
+using namespace std;
+
+inline float mul(float x, float y)
+{
+    return x * y;
+}
+
+inline double div(double p, double q)
+{
+    return p / q;
+}
+
+int main()
+{
+    float a = 2.2, b = 9.9;
+
+    cout &lt;&lt; "Multiplication = " &lt;&lt; mul(a, b) &lt;&lt; endl;
+    cout &lt;&lt; "Division = " &lt;&lt; div(a, b) &lt;&lt; endl;
+}</code></pre>
+
+<h3>Advantages of Inline Functions</h3>
+<ol>
+  <li>Eliminates/reduces function-call overhead.</li>
+  <li>Can improve execution speed for small functions.</li>
+  <li>Suitable for frequently called simple functions.</li>
+  <li>Makes the program more efficient when used appropriately.</li>
+</ol>
+
+<h3>Disadvantages</h3>
+<ol>
+  <li>May increase program size if used with large functions.</li>
+  <li>The compiler may ignore the inline request.</li>
+  <li>Excessive inlining can increase instruction-cache pressure and may make performance worse.</li>
+  <li>Not suitable for every large/complex function.</li>
+</ol>
+
+<h3>Normal Function vs Inline Function</h3>
+<table>
+  <thead><tr><th>Normal Function</th><th>Inline Function</th></tr></thead>
+  <tbody>
+    <tr><td>Separate function-call mechanism</td><td>Function body may be expanded at call site</td></tr>
+    <tr><td>Function call creates call overhead</td><td>Call overhead can be reduced</td></tr>
+    <tr><td>Control transfers to function and returns</td><td>No separate call mechanism may be needed</td></tr>
+    <tr><td>Better for large functions</td><td>Better for small frequently used functions</td></tr>
+  </tbody>
+</table>
+
+<h2>Non-Member Function</h2>
+<div class="cpp-infocard cpp-infocard--info"><div class="cpp-infocard-title">Definition</div><div class="cpp-infocard-body">A non-member function is a function defined outside a class and is not a member of that class.</div></div>
+
+<h3>Characteristics</h3>
+<div class="cpp-keypoints"><div class="cpp-keypoints-title">Key Points</div><ul><li>It is not a member of the class.</li><li>It cannot directly access private members.</li><li>It cannot directly access protected members.</li><li>It can access public members.</li><li>It can work with class objects passed to it.</li></ul></div>
+<p>Example pattern:</p>
+<pre data-lang="C++"><code>class Student
+{
+public:
+    int roll;
+};
+
+void display(Student s)
+{
+    cout &lt;&lt; s.roll;
+}</code></pre>
+<p>The <code>display()</code> function is not a member of <code>Student</code>.</p>
+
+<h2>Friend Function</h2>
+<div class="cpp-infocard cpp-infocard--info"><div class="cpp-infocard-title">Definition</div><div class="cpp-infocard-body">A <b>friend function</b> is a non-member function that is allowed to access the private and protected members of a class.</div></div>
+
+<h3>Key points</h3>
+<div class="cpp-keypoints"><div class="cpp-keypoints-title">Key Points</div><ul><li>It is not a member function of the class.</li><li>It can access private members.</li><li>It can access protected members.</li><li>It is declared using the <code>friend</code> keyword inside the class.</li><li>It can be defined outside the class.</li><li>It is called like a normal function.</li><li>It does not use the <code>this</code> pointer because it is not a member function.</li><li>It is defined without the class scope resolution operator.</li></ul></div>
+
+<h3>Example</h3>
+<pre data-lang="C++"><code>#include &lt;iostream&gt;
+using namespace std;
+
+class Student
+{
+private:
+    int marks = 50;
+
+public:
+    friend void show(Student s);
+};
+
+void show(Student s)
+{
+    cout &lt;&lt; s.marks;
+}
+
+int main()
+{
+    Student s;
+    show(s);
+}</code></pre>
+<p>Here <code>show()</code> is not a member of <code>Student</code>, but it has permission to access <code>marks</code>.</p>
+
+<h2>Why Do We Need a Friend Function?</h2>
+<p>The notes list these reasons:</p>
+<ol>
+  <li>Private members cannot normally be accessed outside the class.</li>
+  <li>Sometimes an external function needs to work directly with private data.</li>
+  <li>Sometimes one function needs access to private members of a class.</li>
+</ol>
+<p>A friend function provides controlled permission for such access.</p>
+
+<h2>Characteristics of a Friend Function</h2>
+<ol>
+  <li>It is not a member of the class.</li>
+  <li>It can access private and protected members.</li>
+  <li>It is declared using the <code>friend</code> keyword inside the class.</li>
+  <li>It can be declared in the public, protected, or private section.</li>
+  <li>It is called like a normal function.</li>
+  <li>It does not use the <code>this</code> pointer.</li>
+  <li>It can receive class objects as parameters.</li>
+  <li>A single friend function can be a friend of multiple classes.</li>
+  <li>It is not automatically inherited like a normal member function.</li>
+</ol>
+
+<h3>Syntax</h3>
+<pre data-lang="C++"><code>class A
+{
+    friend void show(A);
+};</code></pre>
+
+<h2>Friend Function vs Member Function</h2>
+<table>
+  <thead><tr><th>Friend Function</th><th>Member Function</th></tr></thead>
+  <tbody>
+    <tr><td>Not a member of the class</td><td>Member of the class</td></tr>
+    <tr><td>Declared using <code>friend</code></td><td>Declared normally</td></tr>
+    <tr><td>Can access private/protected if friendship is granted</td><td>Can access members according to normal class access</td></tr>
+    <tr><td>Called like a normal function</td><td>Usually called through an object</td></tr>
+    <tr><td>Does not have <code>this</code> pointer</td><td>Has <code>this</code> pointer</td></tr>
+    <tr><td>Defined without <code>ClassName::</code></td><td>Can be defined using <code>ClassName::</code></td></tr>
+  </tbody>
+</table>
+
+<h2>Friend Function with a Class</h2>
+<p>Example pattern from the notes:</p>
+<pre data-lang="C++"><code>class Student
+{
+private:
+    int marks = 50;
+
+public:
+    friend void show(Student);
+};
+
+void show(Student s)
+{
+    cout &lt;&lt; s.marks;
+}</code></pre>
+<p>The friend function can access the private member directly.</p>
+
+<h2>Friend Function Accessing Two Classes</h2>
+<p>A friend function can be declared as a friend in multiple classes.</p>
+<p>Example pattern:</p>
+<pre data-lang="C++"><code>class XYZ;
+class ABC;
+
+class XYZ
+{
+    int x;
+
+public:
+    void setValue(int n)
+    {
+        x = n;
+    }
+
+    friend void max(XYZ, ABC);
+};
+
+class ABC
+{
+    int y;
+
+public:
+    void setValue(int n)
+    {
+        y = n;
+    }
+
+    friend void max(XYZ, ABC);
+};
+
+void max(XYZ a, ABC b)
+{
+    if (a.x &gt; b.y)
+        cout &lt;&lt; "Maximum = " &lt;&lt; a.x;
+    else
+        cout &lt;&lt; "Maximum = " &lt;&lt; b.y;
+}</code></pre>
+<p>Usage:</p>
+<pre data-lang="C++"><code>XYZ x;
+ABC a;
+
+x.setValue(20);
+a.setValue(10);
+
+max(x, a);</code></pre>
+<p>The same friend function can access private data from both classes.</p>
+
+<h2>Friend Class</h2>
+<div class="cpp-infocard cpp-infocard--info"><div class="cpp-infocard-title">Definition</div><div class="cpp-infocard-body">A <b>friend class</b> is a class that is allowed to access the private and protected members of another class.</div></div>
+
+<h3>Example</h3>
+<pre data-lang="C++"><code>class Student
+{
+private:
+    int marks = 90;
+
+    friend class Teacher;
+};
+
+class Teacher
+{
+public:
+    void showMarks(Student s)
+    {
+        cout &lt;&lt; s.marks;
+    }
+};</code></pre>
+
+<h3>Characteristics</h3>
+<ol>
+  <li>A friend class can access private members.</li>
+  <li>A friend class can access protected members.</li>
+  <li>Friendship is explicitly declared.</li>
+  <li>Friendship is not mutual automatically.</li>
+  <li>Friendship is not transitive.</li>
+  <li>A friend class is not the same as an inherited class.</li>
+  <li>A friend class can be declared using:</li>
+</ol>
+<pre data-lang="C++"><code>friend class ClassName;</code></pre>
+
+<h3>Example from the notes</h3>
+<pre data-lang="C++"><code>class Student
+{
+private:
+    int marks = 90;
+
+    friend class Teacher;
+};
+
+class Teacher
+{
+public:
+    void showMarks(Student s)
+    {
+        cout &lt;&lt; "Marks = " &lt;&lt; s.marks &lt;&lt; endl;
+    }
+};
+
+int main()
+{
+    Student s;
+    Teacher t;
+
+    t.showMarks(s);
+}</code></pre>
+
+<h2>Friend Class vs Friend Function</h2>
+<table>
+  <thead><tr><th>Friend Function</th><th>Friend Class</th></tr></thead>
+  <tbody>
+    <tr><td>Gives permission to one function</td><td>Gives permission to a whole class</td></tr>
+    <tr><td>Can access private/protected members</td><td>Member functions of friend class can access private/protected members</td></tr>
+    <tr><td>Declared with <code>friend void ...</code></td><td>Declared with <code>friend class ...</code></td></tr>
+  </tbody>
+</table>
+
+<h2>Advantages of Friend Functions</h2>
+<ol>
+  <li>A friend function can access private members when required.</li>
+  <li>It can work with data from multiple classes.</li>
+  <li>It can reduce repeated code when the same operation works with different classes.</li>
+  <li>Friend functions are useful in some operator-overloading situations.</li>
+</ol>
+
+<h2>Disadvantages of Friend Functions</h2>
+<ol>
+  <li>Gives an external function access to private data.</li>
+  <li>Can weaken data hiding and encapsulation.</li>
+  <li>Excessive use can make a program harder to maintain.</li>
+  <li>Too much friendship can reduce the benefits of encapsulation.</li>
+</ol>
+
+<h2>Encapsulation Example</h2>
+<pre data-lang="C++"><code>class Student
+{
+private:
+    int marks;
+
+public:
+    void setMarks(int m)
+    {
+        marks = m;
+    }
+};
+
+int main()
+{
+    Student s;
+    s.setMarks(90);
+}</code></pre>
+<p>The data is hidden and access is controlled through a public function.</p>
+
+<h2>Abstraction Example</h2>
+<pre data-lang="text"><code>ATM
+ |
+ +--&gt; Withdraw money
+ +--&gt; Check balance
+ +--&gt; Deposit money
+
+User sees:
+    required operations
+
+User does not see:
+    internal banking implementation</code></pre>` },
+
+      { id: "oop-02", title: "Constructor", difficulty: "beginner", time: "12 min", phase: "Basics",
+        desc: "A special member function that is automatically called when an object is created.",
+        content: `<p class="cpp-lead">A <b>constructor</b> is a special member function that is automatically called when an object is created.</p>
+
+<h2>Constructor</h2>
+<div class="cpp-infocard cpp-infocard--info"><div class="cpp-infocard-title">Definition</div><div class="cpp-infocard-body">A <b>constructor</b> is a special member function that is automatically called when an object is created.</div></div>
+
+<h3>Syntax</h3>
+<pre data-lang="C++"><code>ClassName()
+{
+    // initialization
+}</code></pre>
+
+<h3>Example</h3>
+<pre data-lang="C++"><code>class Student
+{
+public:
+    Student()
+    {
+        cout &lt;&lt; "Constructor";
+    }
+};</code></pre>
+
+<h2>Constructor Characteristics / Rules</h2>
+<ol>
+  <li>Constructor name must be the same as the class name.</li>
+  <li>It has no return type, not even <code>void</code>.</li>
+  <li>It is called automatically when an object is created.</li>
+  <li>A class can have multiple constructors through constructor overloading.</li>
+  <li>Constructors can have different parameters.</li>
+  <li>A constructor cannot be <code>static</code>.</li>
+  <li>A constructor cannot be <code>virtual</code>.</li>
+  <li>Constructors are not inherited in the normal sense.</li>
+  <li>A constructor can be overloaded.</li>
+  <li>Constructors are used to initialize objects.</li>
+</ol>
+
+<h3>Example</h3>
+<pre data-lang="C++"><code>class Student
+{
+public:
+    Student()
+    {
+        cout &lt;&lt; "Default constructor";
+    }
+
+    Student(int roll)
+    {
+        cout &lt;&lt; "Roll: " &lt;&lt; roll &lt;&lt; endl;
+    }
+
+    Student(int roll, int marks)
+    {
+        cout &lt;&lt; "Roll: " &lt;&lt; roll &lt;&lt; endl;
+        cout &lt;&lt; "Marks: " &lt;&lt; marks &lt;&lt; endl;
+    }
+};</code></pre>
+<p>Usage:</p>
+<pre data-lang="C++"><code>Student s1;
+Student s2(10);
+Student s3(10, 90);</code></pre>
+
+<h2>Constructor Overloading</h2>
+<div class="cpp-infocard cpp-infocard--info"><div class="cpp-infocard-title">Definition</div><div class="cpp-infocard-body">Constructor overloading means having more than one constructor in the same class with different parameter lists.</div></div>
+<pre data-lang="C++"><code>class Student
+{
+public:
+    Student()
+    {
+        cout &lt;&lt; "Default constructor";
+    }
+
+    Student(int roll)
+    {
+        cout &lt;&lt; "Roll = " &lt;&lt; roll;
+    }
+
+    Student(int roll, int marks)
+    {
+        cout &lt;&lt; "Roll = " &lt;&lt; roll &lt;&lt; endl;
+        cout &lt;&lt; "Marks = " &lt;&lt; marks;
+    }
+};</code></pre>
+
+<h3>Main</h3>
+<pre data-lang="C++"><code>int main()
+{
+    Student s1;
+    Student s2(10);
+    Student s3(10, 90);
+
+    return 0;
+}</code></pre>
+
+<h2>Default Constructor</h2>
+<div class="cpp-infocard cpp-infocard--info"><div class="cpp-infocard-title">Definition</div><div class="cpp-infocard-body">A default constructor is a constructor that takes no parameters.</div></div>
+<pre data-lang="C++"><code>class Student
+{
+public:
+    Student()
+    {
+        cout &lt;&lt; "Default constructor called";
+    }
+};
+
+int main()
+{
+    Student s1;
+}</code></pre>
+<p>When <code>s1</code> is created, the constructor is automatically called.</p>
+
+<h2>Compiler-Provided Default Constructor</h2>
+<p>If a class has no user-declared constructor, the compiler can provide a default constructor.</p>
+<p>Example:</p>
+<pre data-lang="C++"><code>class Student
+{
+public:
+    int roll;
+};
+
+int main()
+{
+    Student s1;
+}</code></pre>
+<p>If no constructor is declared by the programmer, the compiler provides a default constructor.</p>
+
+<h2>Parameterized Constructor</h2>
+<div class="cpp-infocard cpp-infocard--info"><div class="cpp-infocard-title">Definition</div><div class="cpp-infocard-body">A parameterized constructor accepts one or more parameters.</div></div>
+<pre data-lang="C++"><code>class Student
+{
+private:
+    int roll;
+    int marks;
+
+public:
+    Student(int r, int m)
+    {
+        roll = r;
+        marks = m;
+    }
+
+    void display()
+    {
+        cout &lt;&lt; "Roll: " &lt;&lt; roll &lt;&lt; endl;
+        cout &lt;&lt; "Marks: " &lt;&lt; marks &lt;&lt; endl;
+    }
+};
+
+int main()
+{
+    Student s1(10, 90);
+    s1.display();
+}</code></pre>
+
+<h2>Parameterized Constructor with Default Value</h2>
+<p>A constructor parameter can have a default value.</p>
+<pre data-lang="C++"><code>class A
+{
+public:
+    A(int x = 10)
+    {
+        cout &lt;&lt; "Value = " &lt;&lt; x;
+    }
+};
+
+int main()
+{
+    A obj1;       // Uses x = 10
+    A obj2(50);   // Uses x = 50
+}</code></pre>
+
+<h2>Copy Constructor</h2>
+<div class="cpp-infocard cpp-infocard--info"><div class="cpp-infocard-title">Definition</div><div class="cpp-infocard-body">A copy constructor creates a new object by copying another object of the same class.</div></div>
+
+<h3>General form</h3>
+<pre data-lang="C++"><code>ClassName(const ClassName &amp;obj)
+{
+    // copy data
+}</code></pre>
+
+<h3>Example</h3>
+<pre data-lang="C++"><code>class A
+{
+public:
+    A()
+    {
+        cout &lt;&lt; "Default constructor called";
+    }
+
+    A(const A &amp;obj)
+    {
+        cout &lt;&lt; "Copy constructor called";
+    }
+};
+
+int main()
+{
+    A obj1;
+    A obj2 = obj1;
+}</code></pre>
+
+<h3>Copy constructor flow</h3>
+<pre data-lang="text"><code>obj1 -&gt; existing object
+
+obj2 = obj1
+      |
+      v
+copy constructor
+      |
+      v
+obj2 -&gt; newly created copy</code></pre>
+<p>The notes emphasize:</p>
+<ol>
+  <li>Create object.</li>
+  <li>Call the copy constructor.</li>
+  <li>Create the new object as a copy.</li>
+  <li>Copy constructor receives the source object by reference.</li>
+</ol>` },
+
+      { id: "oop-03", title: "Destructor", difficulty: "beginner", time: "3 min", phase: "Basics",
+        desc: "A special member function that is automatically called when an object is destroyed.",
+        content: `<p class="cpp-lead">A destructor is a special member function that is automatically called when an object is destroyed.</p>
+
+<h2>Destructor</h2>
+<div class="cpp-infocard cpp-infocard--info"><div class="cpp-infocard-title">Definition</div><div class="cpp-infocard-body">A destructor is a special member function that is automatically called when an object is destroyed.</div></div>
+
+<h3>Syntax</h3>
+<pre data-lang="C++"><code>~ClassName()
+{
+    // cleanup code
+}</code></pre>
+
+<h3>Example</h3>
+<pre data-lang="C++"><code>class Demo
+{
+public:
+    Demo()
+    {
+        cout &lt;&lt; "Constructor";
+    }
+
+    ~Demo()
+    {
+        cout &lt;&lt; "Destructor";
+    }
+};</code></pre>` },
+
+      { id: "oop-04", title: "Constructor vs Destructor", difficulty: "beginner", time: "2 min", phase: "Basics",
+        desc: "Initializes object, cleans up object.",
+        content: `<p class="cpp-lead">Constructor vs Destructor.</p>
+
+<h2>Constructor vs Destructor</h2>
+<table>
+  <thead><tr><th>Constructor</th><th>Destructor</th></tr></thead>
+  <tbody>
+    <tr><td>Initializes object</td><td>Cleans up object</td></tr>
+    <tr><td>Same name as class</td><td>Same name as class with <code>~</code></td></tr>
+    <tr><td>Can have parameters</td><td>Cannot have parameters</td></tr>
+    <tr><td>Can be overloaded</td><td>Cannot be overloaded</td></tr>
+    <tr><td>Called when object is created</td><td>Called when object is destroyed</td></tr>
+    <tr><td>Multiple constructors can exist</td><td>Only one destructor per class</td></tr>
+    <tr><td>No return type</td><td>No return type</td></tr>
+  </tbody>
+</table>` },
+
+      { id: "oop-05", title: "Constructor and Destructor Order", difficulty: "beginner", time: "8 min", phase: "Basics",
+        desc: "FIFO constructors, LIFO destructors, and an object is destroyed when it goes out of its scope.",
+        content: `<p class="cpp-lead">An object is destroyed when it goes out of its scope.</p>
+
+<h2>Constructor/Destructor Execution Example</h2>
+<pre data-lang="C++"><code>#include &lt;iostream&gt;
+using namespace std;
+
+class Demo
+{
+public:
+    Demo()
+    {
+        cout &lt;&lt; "Constructor\\n";
+    }
+
+    ~Demo()
+    {
+        cout &lt;&lt; "Destructor\\n";
+    }
+};
+
+int main()
+{
+    Demo D1;
+}</code></pre>
+
+<h3>Flow</h3>
+<pre data-lang="text"><code>Demo D1;
+   |
+   v
+Object created
+   |
+   v
+Constructor called
+   |
+   v
+main() ends
+   |
+   v
+D1 goes out of scope
+   |
+   v
+Destructor called</code></pre>
+
+<h2>Constructor and Destructor Order with Nested Blocks</h2>
+<pre data-lang="C++"><code>#include &lt;iostream&gt;
+using namespace std;
+
+class Alpha
+{
+public:
+    Alpha()
+    {
+        cout &lt;&lt; "Constructor called\\n";
+    }
+
+    ~Alpha()
+    {
+        cout &lt;&lt; "Destructor called\\n";
+    }
+};
+
+int main()
+{
+    cout &lt;&lt; "Enter main\\n";
+
+    Alpha A1, A2, A3, A4;
+
+    {
+        cout &lt;&lt; "Enter block 1\\n";
+        Alpha A5;
+
+        {
+            cout &lt;&lt; "Enter block 2\\n";
+            Alpha A6;
+        }
+
+        cout &lt;&lt; "Exit block 1\\n";
+    }
+
+    cout &lt;&lt; "Return from main\\n";
+
+    return 0;
+}</code></pre>
+
+<h2>Exact execution order</h2>
+
+<h3>Constructors</h3>
+<pre data-lang="text"><code>1. A1 -&gt; constructor
+2. A2 -&gt; constructor
+3. A3 -&gt; constructor
+4. A4 -&gt; constructor
+5. Enter block 1
+6. A5 -&gt; constructor
+7. Enter block 2
+8. A6 -&gt; constructor</code></pre>
+
+<h3>Destructors</h3>
+<p>When block 2 ends:</p>
+<pre data-lang="text"><code>9.  A6 -&gt; destructor</code></pre>
+<p>When block 1 ends:</p>
+<pre data-lang="text"><code>10. Exit block 1
+11. A5 -&gt; destructor</code></pre>
+<p>When <code>main()</code> returns:</p>
+<pre data-lang="text"><code>12. Return from main
+13. A4 -&gt; destructor
+14. A3 -&gt; destructor
+15. A2 -&gt; destructor
+16. A1 -&gt; destructor</code></pre>
+
+<h3>Rule</h3>
+<pre data-lang="text"><code>Constructor order  -&gt; FIFO
+Destructor order   -&gt; LIFO</code></pre>
+<p>An object is destroyed when it goes out of its scope.</p>` },
+
+      { id: "oop-06", title: "Shallow Copy", difficulty: "intermediate", time: "5 min", phase: "Copying",
+        desc: "A shallow copy copies the address stored by a pointer.",
+        content: `<p class="cpp-lead">A shallow copy copies the address stored by a pointer.</p>
+
+<h2>Shallow Copy</h2>
+<div class="cpp-infocard cpp-infocard--info"><div class="cpp-infocard-title">Definition</div><div class="cpp-infocard-body">A shallow copy copies the address stored by a pointer. If two objects contain the same pointer address, both objects refer to the same dynamically allocated memory.</div></div>
+<pre data-lang="text"><code>Object 1 ----\\
+              \\
+               ---&gt; [DATA]
+              /
+Object 2 ----/</code></pre>
+<p>Both objects point to the same data.</p>
+
+<h3>Example</h3>
+<pre data-lang="C++"><code>class Student
+{
+public:
+    int *marks;
+
+    Student(int m)
+    {
+        marks = new int(m);
+    }
+
+    Student(const Student &amp;s)
+    {
+        marks = s.marks;
+    }
+};</code></pre>
+<p>Here the copy constructor copies the address.</p>
+
+<h3>Characteristics</h3>
+<div class="cpp-keypoints"><div class="cpp-keypoints-title">Key Points</div><ul><li>Copies memory address.</li><li>Shares dynamically allocated memory.</li><li>A change through one object can affect the other.</li><li>Can create a double-deletion problem when both objects try to delete the same dynamically allocated memory.</li></ul></div>` },
+
+      { id: "oop-07", title: "Deep Copy", difficulty: "intermediate", time: "5 min", phase: "Copying",
+        desc: "A deep copy copies the actual value into newly allocated memory.",
+        content: `<p class="cpp-lead">A deep copy copies the actual value into newly allocated memory.</p>
+
+<h2>Deep Copy</h2>
+<div class="cpp-infocard cpp-infocard--info"><div class="cpp-infocard-title">Definition</div><div class="cpp-infocard-body">A deep copy copies the actual value into newly allocated memory.</div></div>
+<pre data-lang="text"><code>Object 1 -&gt; [DATA1] -&gt; address 1000
+Object 2 -&gt; [DATA2] -&gt; address 2000</code></pre>
+<p>The addresses are different.</p>
+
+<h3>Example</h3>
+<pre data-lang="C++"><code>class Student
+{
+public:
+    int *marks;
+
+    Student(int m)
+    {
+        marks = new int(m);
+    }
+
+    Student(const Student &amp;s)
+    {
+        marks = new int(*s.marks);
+    }
+};</code></pre>
+<p>The expression:</p>
+<pre data-lang="C++"><code>new int(*s.marks)</code></pre>
+<p>allocates new memory and copies the actual value.</p>
+
+<h3>Characteristics</h3>
+<div class="cpp-keypoints"><div class="cpp-keypoints-title">Key Points</div><ul><li>Copies actual data.</li><li>Allocates new memory.</li><li>Each object has separate memory.</li><li>Changes in one object do not affect the other.</li><li>Safer for dynamic memory.</li></ul></div>` },
+
+      { id: "oop-08", title: "Shallow Copy vs Deep Copy", difficulty: "intermediate", time: "2 min", phase: "Copying",
+        desc: "Copies address versus copies actual data.",
+        content: `<p class="cpp-lead">Shallow Copy vs Deep Copy.</p>
+
+<h2>Shallow Copy vs Deep Copy</h2>
+<table>
+  <thead><tr><th>Shallow Copy</th><th>Deep Copy</th></tr></thead>
+  <tbody>
+    <tr><td>Copies address</td><td>Copies actual data</td></tr>
+    <tr><td>Shares dynamic memory</td><td>Creates separate dynamic memory</td></tr>
+    <tr><td>Same pointed-to memory</td><td>Different memory locations</td></tr>
+    <tr><td>Changes may affect both objects</td><td>Changes do not affect the other object</td></tr>
+    <tr><td>Can cause double-deletion problems</td><td>Safer for dynamic memory</td></tr>
+  </tbody>
+</table>` },
+
+      { id: "oop-09", title: "Explicit vs Implicit Calls", difficulty: "intermediate", time: "3 min", phase: "Copying",
+        desc: "You write the call yourself, or the compiler calls the constructor as part of object creation.",
+        content: `<p class="cpp-lead">Explicit vs Implicit Calls in C++.</p>
+
+<h2>Explicit vs Implicit Calls in C++</h2>
+
+<h3>Explicit Call</h3>
+<p>You write the function/constructor call yourself.</p>
+<pre data-lang="C++"><code>Student s2 = Student(1178);</code></pre>
+
+<h3>Implicit Call</h3>
+<p>The compiler automatically calls the constructor/function without an explicit function-name call.</p>
+<p>Example:</p>
+<pre data-lang="C++"><code>Student s1(1177);</code></pre>
+<p>The constructor is invoked as part of object creation.</p>
+
+<h3>Example</h3>
+<pre data-lang="C++"><code>#include &lt;iostream&gt;
+using namespace std;
+
+class Student
+{
+    int rollno;
+
+public:
+    Student(int x)
+    {
+        rollno = x;
+    }
+
+    void display()
+    {
+        cout &lt;&lt; rollno &lt;&lt; endl;
+    }
+};
+
+int main()
+{
+    Student s1(1177);             // constructor call during object creation
+    s1.display();
+
+    Student s2 = Student(1178);   // explicit construction
+    s2.display();
+}</code></pre>` },
+
+      { id: "oop-10", title: "Static Data Member", difficulty: "intermediate", time: "6 min", phase: "Static Members",
+        desc: "A class-level variable shared among all objects.",
+        content: `<p class="cpp-lead">A static data member is a class-level variable shared among all objects. It is declared using <code>static</code>.</p>
+
+<h2>Static Data Member</h2>
+
+<h3>Definition</h3>
+<div class="cpp-infocard cpp-infocard--info"><div class="cpp-infocard-title">Definition</div><div class="cpp-infocard-body">A static data member is a class-level variable shared among all objects. It is declared using <code>static</code>.</div></div>
+<ul>
+  <li>A class-level variable shared among all objects.</li>
+  <li>Declared using the <code>static</code> keyword.</li>
+  <li>Used to store data common to all objects.</li>
+  <li>Can be accessed using the class name and scope resolution operator.</li>
+</ul>
+
+<h3>Characteristics</h3>
+<ol>
+  <li>Belongs to the class rather than a particular object.</li>
+  <li>Only one copy is created.</li>
+  <li>The copy is shared by all objects.</li>
+  <li>If the value changes through one object, the updated value is visible to all objects.</li>
+  <li>It is initialized once.</li>
+  <li>Its existence does not depend on creating objects.</li>
+  <li>It can be accessed as:</li>
+</ol>
+<pre data-lang="C++"><code>ClassName::variableName</code></pre>
+<ol start="8">
+  <li>It is generally defined outside the class.</li>
+</ol>
+
+<h3>Example</h3>
+<pre data-lang="C++"><code>class Counter
+{
+    static int count;
+
+public:
+    Counter()
+    {
+        count++;
+    }
+
+    void show()
+    {
+        cout &lt;&lt; "Count = " &lt;&lt; count;
+    }
+};
+
+int Counter::count = 0;</code></pre>
+
+<h2>Static Data Member Example --- Object Counter</h2>
+<pre data-lang="C++"><code>class Student
+{
+    static int count;
+
+public:
+    Student()
+    {
+        count++;
+    }
+
+    static void display()
+    {
+        cout &lt;&lt; "No. of objects created = " &lt;&lt; count;
+    }
+};
+
+int Student::count = 0;
+
+int main()
+{
+    cout &lt;&lt; "Initially: ";
+    Student::display();
+
+    Student s1, s2, s3;
+
+    cout &lt;&lt; "After 3 objects created: ";
+    Student::display();
+
+    return 0;
+}</code></pre>
+<p>Expected idea:</p>
+<pre data-lang="text"><code>Initially:
+0
+
+After 3 objects created:
+3</code></pre>` },
+
+      { id: "oop-11", title: "Static Member Function", difficulty: "intermediate", time: "5 min", phase: "Static Members",
+        desc: "A static member function belongs to the class rather than to a particular object.",
+        content: `<p class="cpp-lead">A static member function belongs to the class rather than to a particular object.</p>
+
+<h2>Static Member Function</h2>
+
+<h3>Definition</h3>
+<div class="cpp-infocard cpp-infocard--info"><div class="cpp-infocard-title">Definition</div><div class="cpp-infocard-body">A static member function belongs to the class rather than to a particular object.</div></div>
+<ul>
+  <li>Belongs to the class.</li>
+  <li>Can be called directly using the class name and <code>::</code>.</li>
+  <li>Does not have an implicit <code>this</code> pointer.</li>
+  <li>Can directly access static data members and static functions.</li>
+  <li>Cannot directly access non-static data members or non-static member functions.</li>
+  <li>Provides functionality common to the class.</li>
+</ul>
+
+<h3>Syntax</h3>
+<pre data-lang="C++"><code>class ClassName
+{
+public:
+    static void functionName();
+};
+
+ClassName::functionName();</code></pre>
+
+<h3>Example: Math Class</h3>
+<pre data-lang="C++"><code>class MATH
+{
+public:
+    static int Square(int num)
+    {
+        return num * num;
+    }
+};
+
+int main()
+{
+    cout &lt;&lt; "Square of 5 = " &lt;&lt; MATH::Square(5);
+    return 0;
+}</code></pre>` },
+
+      { id: "oop-12", title: "Normal vs Static Member Function", difficulty: "intermediate", time: "2 min", phase: "Static Members",
+        desc: "Associated with a particular object versus associated with the class.",
+        content: `<p class="cpp-lead">Normal Member Function vs Static Member Function.</p>
+
+<h2>Normal Member Function vs Static Member Function</h2>
+<table>
+  <thead><tr><th>Normal Member Function</th><th>Static Member Function</th></tr></thead>
+  <tbody>
+    <tr><td>Associated with a particular object</td><td>Associated with the class</td></tr>
+    <tr><td>Normally called using an object</td><td>Can be called using class name</td></tr>
+    <tr><td>Has access to <code>this</code> pointer</td><td>Does not have <code>this</code> pointer</td></tr>
+    <tr><td>Can access non-static members</td><td>Cannot directly access non-static members</td></tr>
+    <tr><td>Can access static members</td><td>Can directly access static members</td></tr>
+    <tr><td>Called as <code>obj.function()</code></td><td>Called as <code>ClassName::function()</code></td></tr>
+  </tbody>
+</table>` },
+
+      { id: "oop-13", title: "Inheritance", difficulty: "intermediate", time: "3 min", phase: "Inheritance",
+        desc: "Inheritance allows a class to be defined in terms of another class.",
+        content: `<p class="cpp-lead">Inheritance allows a class to be defined in terms of another class. It provides code reusability and establishes a relationship between classes.</p>
+
+<h2>Inheritance</h2>
+<div class="cpp-infocard cpp-infocard--info"><div class="cpp-infocard-title">Definition</div><div class="cpp-infocard-body">Inheritance allows a class to be defined in terms of another class. It provides code reusability and establishes a relationship between classes.</div></div>
+<pre data-lang="text"><code>Base Class (Parent)
+        |
+        v
+Derived Class (Child)</code></pre>
+
+<h3>Key points</h3>
+<div class="cpp-keypoints"><div class="cpp-keypoints-title">Key Points</div><ul><li>Promotes code reusability.</li><li>Establishes a relationship between classes.</li><li>Base class = parent.</li><li>Derived class = child.</li></ul></div>
+
+<h3>Syntax</h3>
+<pre data-lang="C++"><code>class Derived : public Base
+{
+};</code></pre>
+<p>The inheritance mode determines how base-class members are exposed in the derived class.</p>` },
+
+      { id: "oop-14", title: "Inheritance Access Modes", difficulty: "intermediate", time: "7 min", phase: "Inheritance",
+        desc: "Public, protected and private inheritance, and how each mode exposes the base class members.",
+        content: `<p class="cpp-lead">There are three inheritance modes.</p>
+
+<h2>Inheritance Access Modes</h2>
+<p>There are three inheritance modes:</p>
+<ol>
+  <li>Public inheritance</li>
+  <li>Protected inheritance</li>
+  <li>Private inheritance</li>
+</ol>
+
+<h2>Public Inheritance</h2>
+<pre data-lang="C++"><code>class Derived : public Base
+{
+};</code></pre>
+
+<h3>Access table</h3>
+<table>
+  <thead><tr><th>Base class member</th><th>In derived class</th></tr></thead>
+  <tbody>
+    <tr><td>Public</td><td>Public</td></tr>
+    <tr><td>Protected</td><td>Protected</td></tr>
+    <tr><td>Private</td><td>Not directly accessible</td></tr>
+  </tbody>
+</table>
+
+<h3>Example</h3>
+<pre data-lang="C++"><code>class Student
+{
+public:
+    int age;
+
+protected:
+    int weight;
+
+private:
+    int id;
+};
+
+class Boy : public Student
+{
+public:
+    void show()
+    {
+        age = 5;       // Allowed
+        weight = 20;   // Allowed
+        // id = 10;    // Not allowed
+    }
+};</code></pre>
+
+<h3>Key points</h3>
+<div class="cpp-keypoints"><div class="cpp-keypoints-title">Key Points</div><ul><li>Public members remain public.</li><li>Protected members remain protected.</li><li>Private members are not directly accessible in the derived class.</li></ul></div>
+
+<h2>Protected Inheritance</h2>
+<pre data-lang="C++"><code>class Derived : protected Base
+{
+};</code></pre>
+
+<h3>Access table</h3>
+<table>
+  <thead><tr><th>Base class member</th><th>In derived class</th></tr></thead>
+  <tbody>
+    <tr><td>Public</td><td>Protected</td></tr>
+    <tr><td>Protected</td><td>Protected</td></tr>
+    <tr><td>Private</td><td>Not directly accessible</td></tr>
+  </tbody>
+</table>
+
+<h3>Example</h3>
+<pre data-lang="C++"><code>class Student
+{
+public:
+    int age;
+
+protected:
+    int weight;
+
+private:
+    int id;
+};
+
+class Boy : protected Student
+{
+public:
+    void show()
+    {
+        age = 5;       // Allowed
+        weight = 20;   // Allowed
+        // id = 10;    // Not allowed
+    }
+};</code></pre>
+
+<h3>Key points</h3>
+<div class="cpp-keypoints"><div class="cpp-keypoints-title">Key Points</div><ul><li>Public base members become protected in the derived class.</li><li>Protected base members remain protected.</li><li>Private base members are not directly accessible.</li><li>Outside the derived class, inherited members are not directly accessible as public members.</li></ul></div>
+
+<h2>Private Inheritance</h2>
+<pre data-lang="C++"><code>class Derived : private Base
+{
+};</code></pre>
+
+<h3>Access table</h3>
+<table>
+  <thead><tr><th>Base class member</th><th>In derived class</th></tr></thead>
+  <tbody>
+    <tr><td>Public</td><td>Private</td></tr>
+    <tr><td>Protected</td><td>Private</td></tr>
+    <tr><td>Private</td><td>Not directly accessible</td></tr>
+  </tbody>
+</table>
+
+<h3>Example</h3>
+<pre data-lang="C++"><code>class Student
+{
+public:
+    int age;
+
+protected:
+    int weight;
+
+private:
+    int id;
+};
+
+class Boy : private Student
+{
+public:
+    void show()
+    {
+        age = 5;       // Allowed
+        weight = 20;   // Allowed
+        // id = 10;    // Not allowed
+    }
+};</code></pre>
+
+<h3>Key points</h3>
+<div class="cpp-keypoints"><div class="cpp-keypoints-title">Key Points</div><ul><li>Public base members become private.</li><li>Protected base members become private.</li><li>Private base members are not directly accessible.</li><li>Outside the derived class, inherited members cannot be accessed directly because they are private.</li></ul></div>
+
+<h2>Public, Protected and Private Inheritance --- Summary</h2>
+<table>
+  <thead><tr><th>Base member</th><th><code>public</code> inheritance</th><th><code>protected</code> inheritance</th><th><code>private</code> inheritance</th></tr></thead>
+  <tbody>
+    <tr><td>Public</td><td>Public</td><td>Protected</td><td>Private</td></tr>
+    <tr><td>Protected</td><td>Protected</td><td>Protected</td><td>Private</td></tr>
+    <tr><td>Private</td><td>Not directly accessible</td><td>Not directly accessible</td><td>Not directly accessible</td></tr>
+  </tbody>
+</table>
+
+<h3>Important idea</h3>
+<blockquote><p>The inheritance mode is selected by the programmer depending on how the base-class interface should be exposed through the derived class.</p></blockquote>` },
+
+      { id: "oop-15", title: "Types of Inheritance", difficulty: "advanced", time: "10 min", phase: "Inheritance",
+        desc: "Five structural types of inheritance, and separately three modes of inheritance.",
+        content: `<p class="cpp-lead">C++ has five main structural types of inheritance.</p>
+
+<h2>Types of Inheritance</h2>
+<p>C++ has five main structural types of inheritance:</p>
+<ol>
+  <li>Single inheritance</li>
+  <li>Multiple inheritance</li>
+  <li>Multilevel inheritance</li>
+  <li>Hierarchical inheritance</li>
+  <li>Hybrid inheritance</li>
+</ol>
+<p>Separately, based on access mode, inheritance has three modes:</p>
+<ol>
+  <li>Public</li>
+  <li>Protected</li>
+  <li>Private</li>
+</ol>
+<pre data-lang="text"><code>Types of inheritance = 5
+Modes of inheritance = 3</code></pre>
+
+<h2>Single Inheritance</h2>
+<div class="cpp-infocard cpp-infocard--info"><div class="cpp-infocard-title">Definition</div><div class="cpp-infocard-body">Single inheritance is a type of inheritance in which one derived class inherits from one base class.</div></div>
+<pre data-lang="text"><code>Base Class
+     |
+     v
+Derived Class</code></pre>
+
+<h3>Example</h3>
+<pre data-lang="C++"><code>class Student
+{
+public:
+    int age;
+};
+
+class Boy : public Student
+{
+public:
+    void show()
+    {
+        age = 20;       // Allowed
+    }
+};</code></pre>
+
+<h3>Key points</h3>
+<div class="cpp-keypoints"><div class="cpp-keypoints-title">Key Points</div><ul><li>One base class -&gt; one derived class.</li><li>Establishes a simple parent-child relationship.</li><li>Promotes code reusability.</li><li>It is the most basic form of inheritance.</li></ul></div>
+
+<h2>Multiple Inheritance</h2>
+<div class="cpp-infocard cpp-infocard--info"><div class="cpp-infocard-title">Definition</div><div class="cpp-infocard-body">Multiple inheritance is a type of inheritance in which one derived class inherits from two or more base classes.</div></div>
+<pre data-lang="text"><code>Base Class 1       Base Class 2
+       \\               /
+        \\             /
+         v           v
+           Derived</code></pre>
+
+<h3>Example</h3>
+<pre data-lang="C++"><code>class Student
+{
+public:
+    int age;
+};
+
+class Sports
+{
+public:
+    int score;
+};
+
+class Boy : public Student, public Sports
+{
+public:
+    void show()
+    {
+        age = 20;
+        score = 90;
+    }
+};</code></pre>
+
+<h3>Key points</h3>
+<ol>
+  <li>One derived class has multiple base classes.</li>
+  <li>It combines features of different classes.</li>
+  <li>Syntax:</li>
+</ol>
+<pre data-lang="C++"><code>class Boy : public Student, public Sports
+{
+};</code></pre>
+
+<h3>Ambiguity</h3>
+<p>If both base classes have a member with the same name, the compiler can become confused about which member is intended.</p>
+
+<h2>Multilevel Inheritance</h2>
+<div class="cpp-infocard cpp-infocard--info"><div class="cpp-infocard-title">Definition</div><div class="cpp-infocard-body">Multilevel inheritance is a type of inheritance in which a derived class becomes the base class for another class.</div></div>
+<pre data-lang="text"><code>A (Base)
+ |
+ v
+B (Derived)
+ |
+ v
+C (Derived)</code></pre>
+
+<h3>Example</h3>
+<pre data-lang="C++"><code>class Student
+{
+public:
+    int age;
+};
+
+class Boy : public Student
+{
+public:
+    int weight;
+};
+
+class Child : public Boy
+{
+public:
+    void show()
+    {
+        age = 20;
+        weight = 50;
+    }
+};</code></pre>
+
+<h3>Direct and Indirect Base Class</h3>
+<p>For:</p>
+<pre data-lang="text"><code>A -&gt; B -&gt; C</code></pre>
+<ul>
+  <li><code>B</code> directly inherits from <code>A</code>.</li>
+  <li><code>C</code> directly inherits from <code>B</code>.</li>
+  <li><code>A</code> is an indirect base class of <code>C</code>.</li>
+</ul>
+
+<h3>Key points</h3>
+<ol>
+  <li>Inheritance occurs at multiple levels.</li>
+  <li>Example: <code>Student -&gt; Boy -&gt; Child</code>.</li>
+  <li>The child can use members inherited through the chain according to access rules.</li>
+  <li>Promotes code reusability at different levels.</li>
+</ol>
+
+<h2>Hierarchical Inheritance</h2>
+<div class="cpp-infocard cpp-infocard--info"><div class="cpp-infocard-title">Definition</div><div class="cpp-infocard-body">Hierarchical inheritance is a type of inheritance in which multiple derived classes inherit from the same base class.</div></div>
+<pre data-lang="text"><code>              Base Class
+              /        \\
+             /          \\
+            v            v
+       Derived 1     Derived 2</code></pre>
+
+<h3>Example</h3>
+<pre data-lang="C++"><code>class Student
+{
+public:
+    int age;
+};
+
+class Boy : public Student
+{
+public:
+    void showBoy()
+    {
+        age = 20;
+    }
+};
+
+class Girl : public Student
+{
+public:
+    void showGirl()
+    {
+        age = 18;
+    }
+};</code></pre>
+
+<h3>Key points</h3>
+<ol>
+  <li>One base class -&gt; multiple derived classes.</li>
+  <li>Common properties can be placed in the base class.</li>
+  <li>Each derived class can have additional features.</li>
+  <li>Promotes code reusability.</li>
+</ol>
+
+<h2>Hybrid Inheritance</h2>
+<div class="cpp-infocard cpp-infocard--info"><div class="cpp-infocard-title">Definition</div><div class="cpp-infocard-body">Hybrid inheritance is a combination of two or more types of inheritance. The notebook combines <b>hierarchical inheritance + multiple inheritance</b>.</div></div>
+<pre data-lang="text"><code>             Base Class
+             /        \\
+            v          v
+        Derived 1   Derived 2
+            \\          /
+             \\        /
+              v      v
+              Child</code></pre>
+
+<h3>Example</h3>
+<pre data-lang="C++"><code>class Student
+{
+public:
+    int age;
+};
+
+class Boy : public Student
+{
+public:
+    int weight;
+};
+
+class Girl : public Student
+{
+public:
+    int height;
+};
+
+class Child : public Boy, public Girl
+{
+public:
+    void show()
+    {
+        // age = 10;   // Error: ambiguous
+
+        Boy::age = 20;
+        Girl::age = 20;
+
+        weight = 50;
+        height = 20;
+    }
+};</code></pre>` },
+
+      { id: "oop-16", title: "Diamond Problem", difficulty: "advanced", time: "4 min", phase: "Inheritance",
+        desc: "The child reaches the common base through two paths, so the common member can be ambiguous.",
+        content: `<p class="cpp-lead">Diamond Problem.</p>
+
+<h2>Diamond Problem</h2>
+<p>The hybrid structure:</p>
+<pre data-lang="text"><code>             Student
+             /     \\
+            /       \\
+          Boy       Girl
+            \\       /
+             \\     /
+              Child</code></pre>
+<p>means <code>Child</code> reaches <code>Student</code> through two paths.</p>
+<p>Therefore, <code>Child</code> may have ambiguity regarding the common <code>Student</code> member.</p>
+<p>For example:</p>
+<pre data-lang="C++"><code>age = 10;</code></pre>
+<p>can be ambiguous because the compiler may not know whether the programmer means:</p>
+<pre data-lang="C++"><code>Boy::age</code></pre>
+<p>or:</p>
+<pre data-lang="C++"><code>Girl::age</code></pre>
+
+<h3>Notebook key points</h3>
+<div class="cpp-keypoints"><div class="cpp-keypoints-title">Key Points</div><ul><li>Hybrid inheritance combines two or more inheritance types.</li><li>It can create a complex inheritance structure.</li><li>It may cause the diamond problem.</li><li>Virtual inheritance can be used to solve the diamond problem.</li></ul></div>
+
+<h2>Virtual Inheritance</h2>
+<div class="cpp-infocard cpp-infocard--info"><div class="cpp-infocard-title">Definition</div><div class="cpp-infocard-body">Virtual inheritance is used to avoid multiple copies of a common base class in a diamond-shaped inheritance hierarchy.</div></div>
+<p>Conceptually:</p>
+<pre data-lang="text"><code>              Student
+              /     \\
+             /       \\
+        virtual     virtual
+           Boy       Girl
+             \\       /
+              \\     /
+               Child</code></pre>
+<p>The common base class can then be shared rather than duplicated.</p>` },
+
+      { id: "oop-17", title: "Overall Inheritance Structure", difficulty: "advanced", time: "2 min", phase: "Inheritance",
+        desc: "Single, multiple, multilevel, hierarchical and hybrid, all five shapes together.",
+        content: `<p class="cpp-lead">Complete Inheritance Diagram Summary.</p>
+
+<h2>Complete Inheritance Diagram Summary</h2>
+
+<h3>Single</h3>
+<pre data-lang="text"><code>A
+|
+B</code></pre>
+
+<h3>Multiple</h3>
+<pre data-lang="text"><code>A   B
+ \\ /
+  C</code></pre>
+
+<h3>Multilevel</h3>
+<pre data-lang="text"><code>A
+|
+B
+|
+C</code></pre>
+
+<h3>Hierarchical</h3>
+<pre data-lang="text"><code>  A
+ / \\
+B   C</code></pre>
+
+<h3>Hybrid</h3>
+<pre data-lang="text"><code>   A
+  / \\
+ B   C
+  \\ /
+   D</code></pre>` },
+
+      { id: "oop-18", title: "Quick Revision", difficulty: "advanced", time: "6 min", phase: "Revision",
+        desc: "Core OOP concepts, operators, functions, constructors, copying, static members, inheritance types, modes and one-line rules.",
+        content: `<p class="cpp-lead">Quick Revision --- C++ OOP.</p>
+
+<h2>Quick Revision --- C++ OOP</h2>
+
+<h3>Core OOP Concepts</h3>
+<pre data-lang="text"><code>Class
+Object
+Encapsulation
+Abstraction
+Inheritance
+Polymorphism</code></pre>
+
+<h3>Access Specifiers</h3>
+<pre data-lang="text"><code>public
+protected
+private</code></pre>
+
+<h3>Important Operators</h3>
+<pre data-lang="text"><code>::   -&gt; Scope resolution</code></pre>
+
+<h3>Functions</h3>
+<pre data-lang="text"><code>Member function
+Non-member function
+Inline function
+Friend function
+Static member function</code></pre>
+
+<h3>Constructors</h3>
+<pre data-lang="text"><code>Default constructor
+Parameterized constructor
+Parameterized constructor with default value
+Copy constructor
+Constructor overloading</code></pre>
+
+<h3>Destructor</h3>
+<pre data-lang="text"><code>~ClassName()</code></pre>
+
+<h3>Copying</h3>
+<pre data-lang="text"><code>Shallow copy
+Deep copy</code></pre>
+
+<h3>Static Members</h3>
+<pre data-lang="text"><code>Static data member
+Static member function</code></pre>
+
+<h3>Inheritance Types</h3>
+<pre data-lang="text"><code>Single
+Multiple
+Multilevel
+Hierarchical
+Hybrid</code></pre>
+
+<h3>Inheritance Modes</h3>
+<pre data-lang="text"><code>Public
+Protected
+Private</code></pre>
+
+<h2>Important One-Line Rules</h2>
+
+<h3>Class and Object</h3>
+<pre data-lang="text"><code>Class = Blueprint
+Object = Instance of class</code></pre>
+
+<h3>Encapsulation</h3>
+<pre data-lang="text"><code>Binding data + functions into one class and controlling access.</code></pre>
+
+<h3>Abstraction</h3>
+<pre data-lang="text"><code>Show essential information and hide implementation details.</code></pre>
+
+<h3>Inline Function</h3>
+<pre data-lang="text"><code>Small function whose body may be expanded at the call site.</code></pre>
+
+<h3>Friend Function</h3>
+<pre data-lang="text"><code>Non-member function with permission to access private/protected members.</code></pre>
+
+<h3>Friend Class</h3>
+<pre data-lang="text"><code>Class whose member functions are given access to another class's private/protected members.</code></pre>
+
+<h3>Constructor</h3>
+<pre data-lang="text"><code>Called when an object is created.</code></pre>
+
+<h3>Destructor</h3>
+<pre data-lang="text"><code>Called when an object is destroyed/goes out of scope.</code></pre>
+
+<h3>Constructor/Destructor Order</h3>
+<pre data-lang="text"><code>Constructor -&gt; FIFO
+Destructor  -&gt; LIFO</code></pre>
+
+<h3>Shallow Copy</h3>
+<pre data-lang="text"><code>Copies address.</code></pre>
+
+<h3>Deep Copy</h3>
+<pre data-lang="text"><code>Copies data into separate memory.</code></pre>
+
+<h3>Static Data Member</h3>
+<pre data-lang="text"><code>One shared copy for the class.</code></pre>
+
+<h3>Static Member Function</h3>
+<pre data-lang="text"><code>Class-level function; no this pointer.</code></pre>
+
+<h3>Inheritance</h3>
+<pre data-lang="text"><code>Derived class reuses/extends the base class.</code></pre>
+
+<h2>Final Exam-Oriented Table</h2>
+<table>
+  <thead><tr><th>Topic</th><th>Main idea</th></tr></thead>
+  <tbody>
+    <tr><td>Class</td><td>Blueprint/user-defined type</td></tr>
+    <tr><td>Object</td><td>Instance of a class</td></tr>
+    <tr><td>Encapsulation</td><td>Binding + controlled access</td></tr>
+    <tr><td>Abstraction</td><td>Hiding implementation details</td></tr>
+    <tr><td><code>public</code></td><td>Accessible according to public access</td></tr>
+    <tr><td><code>protected</code></td><td>Accessible inside class/derived classes</td></tr>
+    <tr><td><code>private</code></td><td>Restricted direct access</td></tr>
+    <tr><td>Member function</td><td>Function belonging to a class</td></tr>
+    <tr><td>Non-member function</td><td>Function outside the class</td></tr>
+    <tr><td>Inline function</td><td>May reduce function-call overhead</td></tr>
+    <tr><td>Friend function</td><td>Non-member with special access</td></tr>
+    <tr><td>Friend class</td><td>Class with special access</td></tr>
+    <tr><td>Constructor</td><td>Initializes object</td></tr>
+    <tr><td>Destructor</td><td>Cleans up object</td></tr>
+    <tr><td>Default constructor</td><td>No parameters</td></tr>
+    <tr><td>Parameterized constructor</td><td>Takes parameters</td></tr>
+    <tr><td>Copy constructor</td><td>Creates object from another object</td></tr>
+    <tr><td>Constructor overloading</td><td>Multiple constructors with different parameters</td></tr>
+    <tr><td>Shallow copy</td><td>Copies pointer/address</td></tr>
+    <tr><td>Deep copy</td><td>Copies actual data to new memory</td></tr>
+    <tr><td>Static data member</td><td>One shared class-level copy</td></tr>
+    <tr><td>Static member function</td><td>Class-level function without <code>this</code></td></tr>
+    <tr><td>Inheritance</td><td>Reuse/extend base class</td></tr>
+    <tr><td>Single inheritance</td><td>One base -&gt; one derived</td></tr>
+    <tr><td>Multiple inheritance</td><td>Multiple bases -&gt; one derived</td></tr>
+    <tr><td>Multilevel inheritance</td><td>Chain of inheritance</td></tr>
+    <tr><td>Hierarchical inheritance</td><td>One base -&gt; multiple derived</td></tr>
+    <tr><td>Hybrid inheritance</td><td>Combination of inheritance types</td></tr>
+    <tr><td>Diamond problem</td><td>Ambiguity/common base duplication</td></tr>
+    <tr><td>Virtual inheritance</td><td>Helps solve diamond problem</td></tr>
+  </tbody>
+</table>` }
     ]
   },
   {

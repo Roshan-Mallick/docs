@@ -179,8 +179,6 @@ body {
   object-fit: contain;
 }
 
-
-
 .logo-text {
   font-size: 1rem;
   font-weight: 700;
@@ -350,7 +348,6 @@ body {
   box-shadow: var(--shadow-sm);
 }
 
-
 /* ── Sidebar Overlay ──────────────────────────── */
 
 .sidebar-overlay {
@@ -381,8 +378,6 @@ body {
   display: flex;
   flex-direction: column;
 }
-
-
 
 .sidebar-nav {
   padding: 16px 0;
@@ -2360,7 +2355,6 @@ code {
   margin-left: auto;
 }
 
-
 .hp-htsel {
   font-family: var(--mono);
   font-size: 0.72rem;
@@ -3340,9 +3334,6 @@ code {
   z-index: 0;
 }
 
-/* The phase heading the leaf links run behind, so the lines read as passing
-   under it rather than through the text. Scoped to the flow so it outranks
-   the shared .viz-flow-label margin regardless of rule order. */
 .viz-merge-flow > .viz-flow-label--merge {
   position: relative;
   z-index: 1;
@@ -3847,3 +3838,821 @@ code {
   overflow-x: auto;
   margin: 0 0 18px;
 }
+
+/* ═══════════════════════════════════════════════════════════
+   C++ OOP COURSE — Design System
+   Scoped to body.course-mode so every other topic keeps its
+   existing look. Dark-first palette, per the course spec.
+   ═══════════════════════════════════════════════════════════ */
+
+/* Course-only tokens. The site's own theme (light/dark + the orange accent)
+   is deliberately left untouched - nothing here overrides --bg, --accent or
+   any core variable, so the OOP section looks native to the rest of the site. */
+body.course-mode {
+  --cpp-purple: #8B5CF6;
+  --cpp-purple-bg: color-mix(in srgb, var(--cpp-purple) 12%, transparent);
+  --cpp-accent-soft: var(--accent-bg);
+  --cpp-accent-line: color-mix(in srgb, var(--accent) 30%, transparent);
+  --cpp-success-soft: color-mix(in srgb, var(--color-success) 8%, transparent);
+  --cpp-success-line: color-mix(in srgb, var(--color-success) 40%, transparent);
+  --cpp-warning-soft: color-mix(in srgb, var(--color-warning) 8%, transparent);
+  --cpp-purple-line: color-mix(in srgb, var(--cpp-purple) 35%, transparent);
+}
+
+/* Width, padding and behaviour are inherited from `.article-view` so this
+   section uses the same measure as every other article on the site. Only the
+   running text gets a comfortable line length; code, tables and diagrams
+   keep the full column like everywhere else. */
+body.course-mode .article-body > p,
+body.course-mode .article-body > ul,
+body.course-mode .article-body > ol,
+body.course-mode .article-body > blockquote {
+  max-width: 72ch;
+}
+
+/* ── Breadcrumb ──────────────────────────────────────────── */
+
+.cpp-breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.cpp-breadcrumb .crumb { color: var(--text-muted); }
+.cpp-breadcrumb .crumb-sep { color: var(--border-strong); }
+.cpp-breadcrumb .crumb-current { color: var(--accent); font-weight: 600; }
+
+/* ── Page header ─────────────────────────────────────────── */
+
+.cpp-page-head { margin-bottom: 32px; }
+
+.cpp-page-title {
+  font-size: 2.1rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: var(--color-heading);
+  margin-bottom: 10px;
+}
+
+.cpp-page-subtitle {
+  font-size: 1rem;
+  line-height: 1.65;
+  color: var(--text-secondary);
+  max-width: 68ch;
+}
+
+.cpp-page-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.cpp-badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  background: var(--bg-surface);
+}
+
+.cpp-badge--beginner { color: var(--color-success); border-color: var(--cpp-success-line); background: var(--cpp-success-soft); }
+.cpp-badge--intermediate { color: var(--accent); border-color: var(--cpp-accent-line); background: var(--accent-bg); }
+.cpp-badge--advanced { color: var(--cpp-purple); border-color: var(--cpp-purple-line); background: var(--cpp-purple-bg); }
+
+.article-body .cpp-lead {
+  font-size: 1.06rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  padding-bottom: 24px;
+  margin-bottom: 28px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* ── Code blocks: language label + line numbers ──────────── */
+
+.article-body pre { padding-top: 34px; }
+
+.cpp-code-lang {
+  position: absolute;
+  top: 8px;
+  left: 14px;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+pre[data-lines="true"] { display: flex; padding-left: 0; }
+
+.cpp-code-gutter {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  padding: 0 12px 0 14px;
+  margin-right: 14px;
+  border-right: 1px solid var(--border);
+  /* Match the code exactly: `.article-body code` sets 0.84em, which on top of
+     `pre`'s own size would compound and render body text at ~11px. */
+  font-size: inherit;
+  line-height: inherit;
+  font-family: var(--mono);
+  color: var(--text-muted);
+  text-align: right;
+  user-select: none;
+}
+
+.cpp-code-gutter span { display: block; }
+/* Specificity must beat `.article-body code { font-size: .84em }` or the
+   size compounds to ~11px. */
+.article-body pre code.cpp-code-body {
+  font-size: inherit;
+  line-height: inherit;
+}
+.cpp-code-body { display: block; flex: 1 0 auto; min-width: 0; padding-right: 18px; }
+
+/* ── Tables ──────────────────────────────────────────────── */
+
+.cpp-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 20px;
+  background: var(--bg-surface);
+}
+
+.cpp-table-wrap table { margin-bottom: 0 !important; min-width: 460px; }
+.cpp-table-wrap th { background: var(--bg-hover); }
+.article-body .cpp-table-wrap td strong { color: var(--color-heading); }
+
+/* ── Info cards (note / good / warning) ──────────────────── */
+
+.cpp-infocard {
+  border: 1px solid var(--border);
+  border-left-width: 3px;
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  margin: 0 0 20px;
+  background: var(--bg-surface);
+}
+
+.cpp-infocard-title {
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.cpp-infocard-body { font-size: 0.92rem; line-height: 1.65; color: var(--text-secondary); }
+.cpp-infocard-body code { background: var(--inline-code-bg); }
+
+.cpp-infocard--note { border-left-color: var(--accent); }
+.cpp-infocard--note .cpp-infocard-title { color: var(--accent); }
+
+.cpp-infocard--good { border-left-color: var(--color-success); background: var(--cpp-success-soft); }
+.cpp-infocard--good .cpp-infocard-title { color: var(--color-success); }
+
+.cpp-infocard--warn { border-left-color: var(--color-warning); background: var(--cpp-warning-soft); }
+.cpp-infocard--warn .cpp-infocard-title { color: var(--color-warning); }
+
+/* ── Key points ──────────────────────────────────────────── */
+
+.cpp-keypoints {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: linear-gradient(180deg, var(--bg-surface), var(--bg-card));
+  padding: 18px 22px;
+  margin: 28px 0 0;
+}
+
+.cpp-keypoints-title {
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+
+.cpp-keypoints ul { margin: 0 0 0 18px !important; }
+.cpp-keypoints li { margin-bottom: 8px; font-size: 0.92rem; line-height: 1.6; }
+.cpp-keypoints li:last-child { margin-bottom: 0; }
+.cpp-keypoints li::marker { color: var(--accent); }
+
+/* ── Diagrams ────────────────────────────────────────────── */
+
+.cpp-figure { margin: 0 0 24px; }
+
+.cpp-diagram {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-surface);
+  padding: 20px 16px;
+  display: flex;
+  justify-content: center;
+  overflow-x: auto;
+}
+
+.cpp-dia-svg { width: 100%; max-width: 340px; height: auto; }
+
+.cpp-dia-edge { stroke: var(--border-strong); stroke-width: 1.6; fill: none; }
+
+.cpp-dia-box rect {
+  fill: var(--bg-elevated);
+  stroke: var(--border-strong);
+  stroke-width: 1.4;
+}
+
+.cpp-dia-box text {
+  fill: var(--text-secondary);
+  font-family: var(--mono);
+  font-size: 13px;
+  text-anchor: middle;
+}
+
+.cpp-dia-box--derived rect { fill: var(--accent-bg); stroke: var(--accent); }
+.cpp-dia-box--derived text { fill: var(--text); }
+.cpp-dia-box--accent rect { fill: var(--cpp-purple-bg); stroke: var(--cpp-purple); }
+.cpp-dia-box--accent text { fill: var(--text); }
+
+.cpp-figure figcaption {
+  margin-top: 10px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+/* ── Sub-lesson list ─────────────────────────────────────── */
+
+.cpp-subtopics { margin: 24px 0 0; }
+
+.cpp-subtopics-title {
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.cpp-subtopics-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+}
+
+.cpp-subtopic {
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: border-color var(--transition), background var(--transition), transform var(--transition);
+}
+
+.cpp-subtopic:hover {
+  border-color: var(--accent);
+  background: var(--bg-hover);
+  transform: translateY(-1px);
+}
+
+.cpp-subtopic-title { font-size: 0.92rem; font-weight: 600; color: var(--color-heading); }
+.cpp-subtopic-desc { font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5; }
+.cpp-subtopic-meta { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 2px; }
+
+/* ── Overview: cards ─────────────────────────────────────── */
+
+/* The chevron keeps the accent; the label stays readable in both themes
+   (orange text on the card surface was only 2.68:1 in light mode). */
+
+.cpp-article-footer { margin-top: 44px; }
+
+.cpp-prevnext {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.cpp-pn {
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  transition: border-color var(--transition), transform var(--transition);
+}
+
+.cpp-pn:hover { border-color: var(--accent); transform: translateY(-1px); }
+.cpp-pn--next { text-align: right; align-items: flex-end; }
+.cpp-pn-dir { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); }
+.cpp-pn-title { font-size: 0.9rem; font-weight: 600; color: var(--color-heading); }
+
+/* ── Sidebar: nested groups ─────────────────────────────── */
+
+.sidebar-child.sidebar-group { padding: 6px 20px 6px 28px; }
+.sidebar-group-label { display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; }
+
+.sidebar-children-sub { padding-left: 14px; }
+.sidebar-children-sub .sidebar-child { padding-left: 30px; font-size: 0.8rem; }
+
+body.course-mode .sidebar-children-sub .sidebar-child.active {
+  color: var(--accent);
+  background: var(--accent-bg);
+  border-left-color: var(--accent);
+}
+
+/* ── Focus visibility ────────────────────────────────────── */
+
+body.course-mode button:focus-visible,
+body.course-mode a:focus-visible,
+body.course-mode input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .cpp-page-title { font-size: 1.6rem; }
+  .article-body .cpp-lead { font-size: 1rem; }
+
+  .cpp-prevnext { grid-template-columns: 1fr; }
+  .cpp-pn--next { text-align: left; align-items: flex-start; }
+
+  .cpp-subtopics-list { grid-template-columns: 1fr; }
+
+  .cpp-infocard, .cpp-keypoints { padding-left: 16px; padding-right: 16px; }
+
+  .cpp-code-gutter { padding-left: 10px; padding-right: 10px; margin-right: 10px; font-size: 0.74rem; }
+  .cpp-code-body { padding-right: 12px; }
+
+  .article-body pre { font-size: 0.78rem; }
+}
+
+@media (max-width: 480px) {
+  .sidebar-phase { font-size: 0.62rem; }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   C++ OOP — LESSON CONTENT COMPONENTS
+   Data-driven elements from data.js, filled in by initCourseUI:
+   .cpp-flow, .cpp-timeline, .cpp-steps, .cpp-mistake,
+   pre[data-output], pre[data-verdict]
+   ═══════════════════════════════════════════════════════════════ */
+
+.article-body h2,
+.article-body h3 {
+  scroll-margin-top: calc(var(--topnav-h) + 12px);
+}
+
+/* ── Vertical stage flow (execution flow, lifecycle) ─────────── */
+.cpp-flow-list {
+  display: flex;
+  flex-direction: column;
+  margin: 22px 0;
+}
+.cpp-flow-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.cpp-flow-box {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 11px 22px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  text-align: center;
+  color: var(--text);
+  max-width: 100%;
+}
+.cpp-flow-step:first-child .cpp-flow-box {
+  border-color: var(--accent);
+}
+.cpp-flow-step:last-child .cpp-flow-box {
+  border-color: var(--accent);
+}
+/* Connector drawn in CSS so it inherits theme colours in both modes. */
+.cpp-flow-arrow {
+  width: 2px;
+  height: 20px;
+  background: var(--border-strong);
+  position: relative;
+}
+.cpp-flow-arrow::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -1px;
+  transform: translateX(-50%);
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 6px solid var(--border-strong);
+}
+
+/* ── Numbered call-order timeline ──────────────────────────── */
+.cpp-timeline {
+  position: relative;
+  margin: 24px 0 8px;
+  padding-left: 4px;
+}
+.cpp-timeline::before {
+  content: "";
+  position: absolute;
+  left: 17px;
+  top: 16px;
+  bottom: 16px;
+  width: 2px;
+  background: var(--border);
+}
+.cpp-tl-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 6px 0;
+}
+.cpp-tl-n {
+  flex: 0 0 auto;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  position: relative;
+  z-index: 1;
+}
+.cpp-tl-t {
+  font-size: 0.9rem;
+  font-family: var(--mono);
+  color: var(--text);
+}
+/* Steps explicitly marked as destruction get the accent treatment. */
+.cpp-tl-item[data-kind="destroy"] .cpp-tl-n {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-bg);
+}
+
+/* ── Numbered explanation steps ─────────────────────────────── */
+.cpp-steps-list {
+  counter-reset: cppstep;
+  list-style: none;
+  padding: 0;
+  margin: 18px 0 22px;
+}
+.cpp-steps-list li {
+  counter-increment: cppstep;
+  position: relative;
+  padding: 0 0 12px 40px;
+  font-size: 0.93rem;
+  line-height: 1.65;
+  color: var(--text-secondary);
+}
+.cpp-steps-list li::before {
+  content: counter(cppstep);
+  position: absolute;
+  left: 0;
+  top: 1px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--accent-bg);
+  border: 1px solid var(--accent);
+}
+.cpp-steps-list li:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  left: 13px;
+  top: 30px;
+  bottom: 4px;
+  width: 1px;
+  background: var(--border);
+}
+
+/* ── Output / console blocks ───────────────────────────────── */
+.article-body pre[data-output="true"] {
+  background: var(--bg-surface);
+  border-left: 3px solid var(--color-success);
+}
+.article-body pre[data-output="true"] .cpp-code-body,
+.article-body pre[data-output="true"] code {
+  color: var(--text);
+  white-space: pre;
+}
+
+/* ── Wrong / correct comparison blocks ──────────────────────── */
+/* Ink colours that stay legible on the code surface in both themes
+   (solid white-on-green only reached 3.3:1). */
+body.course-mode {
+  --cpp-ok-ink: #15803D;
+  --cpp-bad-ink: #B91C1C;
+}
+html[data-theme="dark"] body.course-mode {
+  --cpp-ok-ink: #4ADE80;
+  --cpp-bad-ink: #F87171;
+}
+.article-body pre.is-wrong {
+  border-left: 3px solid var(--color-error);
+}
+.article-body pre.is-right {
+  border-left: 3px solid var(--color-success);
+}
+.cpp-code-verdict {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 2px 9px;
+  border-radius: 999px;
+  pointer-events: none;
+  background: transparent;
+}
+pre.is-wrong .cpp-code-verdict {
+  color: var(--cpp-bad-ink);
+  border: 1px solid var(--cpp-bad-ink);
+}
+pre.is-right .cpp-code-verdict {
+  color: var(--cpp-ok-ink);
+  border: 1px solid var(--cpp-ok-ink);
+}
+
+/* ── Common-mistake cards ──────────────────────────────────── */
+.cpp-mistake {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius, 12px);
+  padding: 18px 20px 6px;
+  margin: 18px 0;
+}
+.cpp-mistake-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.93rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 14px;
+}
+.cpp-mistake-n {
+  flex: 0 0 auto;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--accent-bg);
+  border: 1px solid var(--accent);
+}
+.cpp-mistake p {
+  margin: 12px 0 14px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+/* ── Sidebar: in-page section list ─────────────────────────── */
+.sidebar-child.sidebar-anchor {
+  font-size: 0.79rem;
+  color: var(--text-muted);
+  padding-left: 26px;
+  border-left: 2px solid transparent;
+  margin-left: 12px;
+  width: calc(100% - 12px);
+}
+.sidebar-child.sidebar-anchor:hover {
+  color: var(--text-secondary);
+  background: var(--bg-hover);
+}
+.sidebar-child.sidebar-anchor.active {
+  color: var(--accent);
+  border-left-color: var(--accent);
+  background: transparent;
+  font-weight: 600;
+}
+
+/* ── Responsive ────────────────────────────────────────────── */
+@media (max-width: 560px) {
+  .cpp-flow-box { padding: 10px 16px; font-size: 0.82rem; }
+  .cpp-tl-n { width: 26px; height: 26px; font-size: 0.72rem; }
+  .cpp-timeline::before { left: 14px; }
+  .cpp-tl-t { font-size: 0.8rem; }
+  .cpp-steps-list li { padding-left: 34px; }
+  .cpp-mistake { padding: 16px 14px 4px; }
+  .cpp-code-verdict { position: static; display: inline-block; margin: 6px 0 0 10px; }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   C++ OOP — MEMORY DIAGRAMS & EXPANDABLE ANSWERS
+   Object -> memory relationships, and collapsible practice answers.
+   ═══════════════════════════════════════════════════════════════ */
+
+.cpp-mem {
+  margin: 22px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.cpp-mem-svg {
+  width: 100%;
+  max-width: 400px;
+  height: auto;
+  overflow: visible;
+}
+.cpp-mem-obj rect {
+  fill: var(--accent-bg);
+  stroke: var(--accent);
+  stroke-width: 1.4;
+}
+.cpp-mem-obj text {
+  fill: var(--text);
+  font-family: var(--mono);
+  font-size: 12px;
+  text-anchor: middle;
+}
+.cpp-mem-block rect {
+  fill: var(--code-bg);
+  stroke: var(--border-strong);
+  stroke-width: 1.4;
+}
+.cpp-mem-block text {
+  fill: var(--text);
+  font-family: var(--mono);
+  font-size: 12.5px;
+  text-anchor: middle;
+}
+.cpp-mem-block .cpp-mem-tag {
+  fill: var(--text-muted);
+  font-family: var(--font);
+  font-size: 10.5px;
+  font-style: italic;
+}
+.cpp-mem-arrow {
+  stroke: var(--border-strong);
+  stroke-width: 1.6;
+  fill: none;
+}
+.cpp-mem-head {
+  fill: var(--border-strong);
+}
+.cpp-figure-caption {
+  margin-top: 6px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+/* ── Collapsible practice answers ─────────────────────────── */
+.cpp-practice {
+  margin: 20px 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--bg-surface);
+}
+.cpp-practice-q {
+  border-bottom: 1px solid var(--border);
+}
+.cpp-practice-q:last-child {
+  border-bottom: none;
+}
+.cpp-practice-q > summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 14px 42px 14px 18px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+  position: relative;
+  transition: background 0.15s ease;
+}
+.cpp-practice-q > summary::-webkit-details-marker {
+  display: none;
+}
+.cpp-practice-q > summary:hover {
+  background: var(--bg-hover);
+}
+.cpp-practice-q > summary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+.cpp-practice-n {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  margin-right: 10px;
+  border-radius: 50%;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--accent-bg);
+  border: 1px solid var(--accent);
+  vertical-align: -5px;
+}
+/* Chevron drawn in CSS so it rotates with the open state. */
+.cpp-practice-q > summary::after {
+  content: "";
+  position: absolute;
+  right: 18px;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  margin-top: -5px;
+  border-right: 2px solid var(--text-muted);
+  border-bottom: 2px solid var(--text-muted);
+  transform: rotate(45deg);
+  transition: transform 0.2s ease;
+}
+.cpp-practice-q[open] > summary::after {
+  transform: rotate(-135deg);
+}
+.cpp-practice-a {
+  padding: 0 18px 16px 50px;
+  font-size: 0.88rem;
+  line-height: 1.65;
+  color: var(--text-secondary);
+}
+.cpp-practice-a code {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 0.85em;
+}
+
+@media (max-width: 560px) {
+  .cpp-mem-svg { max-width: 100%; }
+  .cpp-practice-q > summary { padding: 12px 36px 12px 14px; font-size: 0.85rem; }
+  .cpp-practice-a { padding: 0 14px 14px 14px; }
+}
+
+
+/* ── C++ OOP: basic -> advanced phase labels ──────────────── */
+
+.sidebar-phase {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 14px 0 4px;
+  padding: 0 8px;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary, var(--text-secondary));
+}
+
+.sidebar-phase:first-child { margin-top: 4px; }
+
+.sidebar-phase-num {
+  padding: 2px 7px;
+  border-radius: 999px;
+  color: var(--accent);
+  background: var(--accent-bg);
+  border: 1px solid var(--cpp-accent-line, var(--border));
+  letter-spacing: 0.04em;
+}
+
+.cpp-badge--phase { color: var(--color-heading); border-color: var(--border-strong); background: transparent; }

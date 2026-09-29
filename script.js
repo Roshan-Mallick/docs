@@ -29,7 +29,11 @@ const themeSlider = document.getElementById("themeSlider");
 
 let currentTopicId = null;
 let currentArticleId = null;
+let currentArticleObject = null;   // the lesson being shown
+let currentArticleParents = [];    // ancestor groups, outermost first
 let searchFocusIdx = -1;
+let tocScrollSpyCleanupFn = null;
+let tocSpyTicking = false;
 
 // ═══════════════════════════════════════════════════════════
 //  THEME SLIDER
@@ -162,16 +166,81 @@ function buildSidebar() {
     const children = document.createElement("div");
     children.className = "sidebar-children";
 
+    // Flatten a topic into a leaf list, keeping each leaf's parent chain so
+    // deeply nested groups (e.g. oop-05 "Inheritance" with 6 sub-lessons)
+    // still produce a correct prev/next order and breadcrumb.
+    // C++ OOP runs basic -> advanced, so its lesson list is broken into phases.
+    let phaseNo = 0;
+    let lastPhase = null;
     topic.articles.forEach((article) => {
+      if (article.phase && article.phase !== lastPhase) {
+        phaseNo += 1;
+        const phaseHead = document.createElement("div");
+        phaseHead.className = "sidebar-phase";
+        const n = document.createElement("span");
+        n.className = "sidebar-phase-num";
+        n.textContent = `Phase ${phaseNo}`;
+        const t = document.createElement("span");
+        t.textContent = article.phase;
+        phaseHead.append(n, t);
+        children.appendChild(phaseHead);
+        lastPhase = article.phase;
+      }
+
       const child = document.createElement("div");
       child.className = "sidebar-child";
       child.dataset.id = article.id;
-      child.textContent = article.title;
       child.addEventListener("click", () => {
         openArticle(topic, article);
         closeSidebarMobile();
       });
-      children.appendChild(child);
+
+      const subItems = article.children && article.children.length
+        ? article.children.map((a) => ({ id: a.id, title: a.title, article: a }))
+        : article.outline && article.outline.length
+          ? article.outline.map((sec) => ({ id: sec.id, title: sec.title, article, anchor: sec.id }))
+          : null;
+
+      if (subItems) {
+        // A lesson that groups sub-lessons, or (via `outline`) in-page sections
+        // of one long lesson. The header opens the lesson, the arrow toggles
+        // the sub-list, and each sub-item navigates inside that lesson.
+        child.classList.add("sidebar-group");
+        const label = document.createElement("span");
+        label.className = "sidebar-group-label";
+        label.innerHTML = `<span>${article.title}</span><span class="sidebar-arrow">&#9656;</span>`;
+        child.appendChild(label);
+
+        const sub = document.createElement("div");
+        sub.className = "sidebar-children sidebar-children-sub";
+        subItems.forEach((it) => {
+          const subChild = document.createElement("div");
+          subChild.className = it.anchor ? "sidebar-child sidebar-anchor" : "sidebar-child";
+          subChild.dataset.id = it.id;
+          if (it.anchor) subChild.dataset.anchor = it.anchor;
+          subChild.textContent = it.title;
+          subChild.addEventListener("click", (e) => {
+            e.stopPropagation();
+            openArticle(topic, it.article, it.anchor);
+            closeSidebarMobile();
+          });
+          sub.appendChild(subChild);
+        });
+
+        const arrow = label.querySelector(".sidebar-arrow");
+        arrow.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const isOpen = sub.classList.contains("open");
+          sub.classList.toggle("open", !isOpen);
+          arrow.classList.toggle("open", !isOpen);
+        });
+
+        children.appendChild(child);
+        children.appendChild(sub);
+      } else {
+        child.textContent = article.title;
+        children.appendChild(child);
+      }
     });
 
     item.addEventListener("click", () => {
@@ -194,6 +263,30 @@ function buildSidebar() {
   });
 
   sidebarNav.appendChild(docSection);
+
+}
+
+/**
+ * Flatten a topic's article tree into leaves.
+ * Each entry carries `parents` (outermost -> immediate) for breadcrumbs.
+ */
+function flattenTopic(topic) {
+  const out = [];
+  const walk = (articles, parents) => {
+    articles.forEach((a) => {
+      // Every article is an entry, including a group lesson that also has
+      // sub-lessons - it has its own content and must appear in reading
+      // order, prev/next and progress.
+      out.push({ article: a, parents });
+      if (a.children && a.children.length) walk(a.children, parents.concat([a]));
+    });
+  };
+  walk(topic.articles, []);
+  return out;
+}
+
+function findArticleById(topic, id) {
+  return flattenTopic(topic).find((n) => n.article.id === id) || null;
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -207,13 +300,261 @@ function showHome() {
   document.getElementById("docCards").style.display = "";
   articleView.style.display = "none";
   rightSidebar.classList.remove("visible");
+  document.body.classList.remove("course-mode");
   document.querySelectorAll(".sidebar-item.active, .sidebar-child.active").forEach((el) => el.classList.remove("active"));
   window.scrollTo(0, 0);
 }
 
 // ═══════════════════════════════════════════════════════════
-//  CARDS & ARTICLES
+//  COURSE MODULE
+//  Only activates for topics flagged ui: "course" (currently C++ OOP).
+//  Everything below is additive: other topics keep their existing look.
 // ═══════════════════════════════════════════════════════════
+
+
+function isCourse(topic) {
+  return !!topic && topic.ui === "course";
+}
+
+
+// ── Page header + breadcrumb ───────────────────────────────
+function phaseInfo(topic, article) {
+  if (!article.phase) return null;
+  const phases = [];
+  topic.articles.forEach((a) => {
+    if (a.phase && phases[phases.length - 1] !== a.phase) phases.push(a.phase);
+  });
+  const i = phases.indexOf(article.phase);
+  return i < 0 ? null : { index: i + 1, total: phases.length, label: article.phase };
+}
+
+function renderPageHeader(topic, article, parents) {
+  if (!isCourse(topic)) return;
+  const { title, subtitle } = article;
+  const crumbs = [topic.label, ...parents.map((p) => p.title), article.title];
+  const phase = phaseInfo(topic, article);
+  const node = document.getElementById("articleHeader");
+  if (!node) return;
+
+  const prevBtn = `<button class="article-back" data-role="back">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+      Back to ${topic.label}
+    </button>`;
+
+  const crumbHTML = crumbs
+    .map((c, i) =>
+      i === crumbs.length - 1
+        ? `<span class="crumb-current">${c}</span>`
+        : `<span class="crumb">${c}</span><span class="crumb-sep">/</span>`
+    )
+    .join("");
+
+  node.innerHTML = `
+    ${prevBtn}
+    <nav class="cpp-breadcrumb" aria-label="Breadcrumb">${crumbHTML}</nav>
+    <div class="cpp-page-head">
+      <div class="cpp-page-title">${article.title}</div>
+      <div class="cpp-page-subtitle">${subtitle || article.desc}</div>
+      <div class="cpp-page-badges">
+        ${phase ? `<span class="cpp-badge cpp-badge--phase">Phase ${phase.index} of ${phase.total} &middot; ${phase.label}</span>` : ""}
+        <span class="cpp-badge cpp-badge--${article.difficulty}">${article.difficulty}</span>
+        <span class="cpp-badge">${article.time} read</span>
+      </div>
+    </div>
+  `;
+  node.querySelector('[data-role="back"]')?.addEventListener("click", showHome);
+}
+
+// ── Footer: prev/next ──────────────────────────────────────
+function renderCourseFooter(topic, article, parents) {
+  if (!isCourse(topic)) return null;
+  const wrap = document.createElement("div");
+  wrap.className = "cpp-article-footer";
+
+  const order = flattenTopic(topic);
+  const idx = order.findIndex((n) => n.article.id === article.id);
+  const prev = idx > 0 ? order[idx - 1] : null;
+  const next = idx >= 0 && idx < order.length - 1 ? order[idx + 1] : null;
+
+  if (prev || next) {
+    const nav = document.createElement("nav");
+    nav.className = "cpp-prevnext";
+    nav.setAttribute("aria-label", "Lesson navigation");
+    if (prev) {
+      nav.insertAdjacentHTML(
+        "beforeend",
+        `<button class="cpp-pn cpp-pn--prev" data-id="${prev.article.id}">
+           <span class="cpp-pn-dir">Previous</span>
+           <span class="cpp-pn-title">${prev.article.title}</span>
+         </button>`
+      );
+    }
+    if (next) {
+      nav.insertAdjacentHTML(
+        "beforeend",
+        `<button class="cpp-pn cpp-pn--next" data-id="${next.article.id}">
+           <span class="cpp-pn-dir">Next</span>
+           <span class="cpp-pn-title">${next.article.title}</span>
+         </button>`
+      );
+    }
+    wrap.appendChild(nav);
+  }
+  return wrap;
+}
+
+function bindCourseFooter(topic, wrap) {
+  if (!wrap) return;
+  wrap.querySelectorAll(".cpp-pn").forEach((b) =>
+    b.addEventListener("click", () => {
+      const node = findArticleById(topic, b.dataset.id);
+      if (node) openArticle(topic, node.article);
+    })
+  );
+}
+
+
+// ── Tables: wrap for horizontal scroll ─────────────────────
+function renderTables(root) {
+  root.querySelectorAll("table").forEach((t) => {
+    if (t.parentElement?.classList.contains("cpp-table-wrap")) return;
+    const wrap = document.createElement("div");
+    wrap.className = "cpp-table-wrap";
+    wrap.setAttribute("role", "region");
+    wrap.setAttribute("tabindex", "0");
+    t.parentNode.insertBefore(wrap, t);
+    wrap.appendChild(t);
+  });
+}
+
+// ── Sub-lesson list inside a group lesson ──────────────────
+function renderSubtopics(root, topic) {
+  root.querySelectorAll(".cpp-subtopics").forEach((el) => {
+    const group = topic.articles.find((a) => a.children && a.children.length);
+    if (!group) return;
+    el.innerHTML = `
+      <div class="cpp-subtopics-title">Lessons in this group</div>
+      <div class="cpp-subtopics-list">
+        ${group.children
+          .map(
+            (c) => `<button class="cpp-subtopic" data-id="${c.id}">
+                      <span class="cpp-subtopic-title">${c.title}</span>
+                      <span class="cpp-subtopic-desc">${c.desc}</span>
+                      <span class="cpp-subtopic-meta">${c.difficulty} · ${c.time}</span>
+                    </button>`
+          )
+          .join("")}
+      </div>`;
+    el.querySelectorAll(".cpp-subtopic").forEach((b) =>
+      b.addEventListener("click", () => {
+        const node = findArticleById(topic, b.dataset.id);
+        if (node) openArticle(topic, node.article);
+      })
+    );
+  });
+}
+
+// ── Code blocks: language label + line numbers ─────────────
+function enhanceCodeBlocks(root) {
+  root.querySelectorAll("pre").forEach((pre) => {
+    if (pre.dataset.enhanced === "1") return;
+    pre.dataset.enhanced = "1";
+
+    const lang = pre.dataset.lang;
+    if (lang) {
+      const tag = document.createElement("span");
+      tag.className = "cpp-code-lang";
+      tag.textContent = lang;
+      pre.appendChild(tag);
+    }
+
+    // Wrong/correct marker on comparison code blocks.
+    if (pre.dataset.verdict) {
+      const ok = pre.dataset.verdict === "right";
+      pre.classList.add(ok ? "is-right" : "is-wrong");
+      const v = document.createElement("span");
+      v.className = "cpp-code-verdict";
+      v.textContent = ok ? "Correct" : "Wrong";
+      pre.appendChild(v);
+    }
+
+    if (pre.dataset.lines === "true") {
+      const code = pre.querySelector("code");
+      if (!code) return;
+      const lines = code.textContent.replace(/\n$/, "").split("\n");
+      const gutter = document.createElement("span");
+      gutter.className = "cpp-code-gutter";
+      gutter.setAttribute("aria-hidden", "true");
+      gutter.innerHTML = lines.map((_, i) => `<span>${i + 1}</span>`).join("");
+      pre.insertBefore(gutter, code);
+      code.classList.add("cpp-code-body");
+    }
+  });
+}
+
+// ── Course init (called after every openArticle) ───────────
+// ---------------------------------------------------------------------------
+// Lesson content components
+// Data-driven so lessons stay declarative: each is authored in data.js as an
+// empty element with pipe-separated data, then filled in here.
+// ---------------------------------------------------------------------------
+
+// A "D:" prefix in the data marks a step as a destruction event.
+const kindOf = (t) => (/^D:/.test(t) ? "destroy" : "construct");
+
+// Vertical chain of stages with arrow connectors (execution flow, lifecycle).
+function renderFlows(root) {
+  root.querySelectorAll(".cpp-flow[data-flow]").forEach((el) => {
+    const steps = el.dataset.flow.split("|").map((t) => t.trim()).filter(Boolean);
+    el.classList.add("cpp-flow-list");
+    el.innerHTML = steps
+      .map(
+        (t, i) =>
+          `<div class="cpp-flow-step"><div class="cpp-flow-box">${t}</div>${
+            i < steps.length - 1 ? '<div class="cpp-flow-arrow" aria-hidden="true"></div>' : ""
+          }</div>`
+      )
+      .join("");
+  });
+}
+
+// Numbered sequence along a connecting rail (call-order timelines).
+function renderTimelines(root) {
+  root.querySelectorAll(".cpp-timeline[data-timeline]").forEach((el) => {
+    const steps = el.dataset.timeline.split("|").map((t) => t.trim()).filter(Boolean);
+    el.innerHTML = steps
+      .map((t, i) => {
+        const kind = kindOf(t);
+        const label = t.replace(/^D:/, "");
+        return `<div class="cpp-tl-item"${kind === "destroy" ? ' data-kind="destroy"' : ""}><span class="cpp-tl-n">${i + 1}</span><span class="cpp-tl-t">${label}</span></div>`;
+      })
+      .join("");
+  });
+}
+
+// Numbered explanation steps.
+function renderSteps(root) {
+  root.querySelectorAll(".cpp-steps[data-steps]").forEach((el) => {
+    const steps = el.dataset.steps.split("|").map((t) => t.trim()).filter(Boolean);
+    el.innerHTML = `<ol class="cpp-steps-list">${steps
+      .map((t) => `<li>${t}</li>`)
+      .join("")}</ol>`;
+  });
+}
+
+function initCourseUI(topic) {
+  if (!isCourse(topic)) return;
+  enhanceCodeBlocks(articleBody);
+  renderTables(articleBody);
+  renderSubtopics(articleBody, topic);
+  renderFlows(articleBody);
+  renderTimelines(articleBody);
+  renderSteps(articleBody);
+
+
+  articleBody.appendChild(renderCourseFooter(topic, currentArticleObject, currentArticleParents) || document.createElement("div"));
+  bindCourseFooter(topic, articleBody.querySelector(".cpp-article-footer"));
+}
 
 function buildCards() {
   docs.forEach((topic) => {
@@ -241,21 +582,33 @@ function buildCards() {
 //  ARTICLE VIEW
 // ═══════════════════════════════════════════════════════════
 
-function openArticle(topic, article) {
+function openArticle(topic, article, anchorId) {
   currentTopicId = topic.id;
   currentArticleId = article.id;
+
+  // Resolve where this lesson sits in the topic tree (for breadcrumb + prev/next)
+  const node = findArticleById(topic, article.id);
+  currentArticleObject = article;
+  currentArticleParents = node ? node.parents : [];
 
   heroSection.style.display = "none";
   document.getElementById("docCards").style.display = "none";
   articleView.style.display = "";
 
+  // Course topics get their own scoped design system
+  document.body.classList.toggle("course-mode", isCourse(topic));
+
   const fullContent = article.content;
-  articleHeader.innerHTML = `
-    <button class="article-back" id="articleBack">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
-      Back to ${topic.label}
-    </button>
-  `;
+  if (isCourse(topic)) {
+    renderPageHeader(topic, article, currentArticleParents);
+  } else {
+    articleHeader.innerHTML = `
+      <button class="article-back" id="articleBack">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+        Back to ${topic.label}
+      </button>
+    `;
+  }
   articleBody.innerHTML = fullContent;
 
   articleBody.querySelectorAll("pre").forEach((pre) => {
@@ -263,7 +616,7 @@ function openArticle(topic, article) {
     btn.className = "copy-btn";
     btn.textContent = "Copy";
     btn.addEventListener("click", () => {
-      const code = pre.querySelector("code")?.textContent || pre.textContent;
+      const code = pre.querySelector(".cpp-code-body")?.textContent || pre.querySelector("code")?.textContent || pre.textContent;
       navigator.clipboard.writeText(code).then(() => {
         btn.textContent = "Copied!";
         setTimeout(() => (btn.textContent = "Copy"), 1500);
@@ -286,6 +639,7 @@ function openArticle(topic, article) {
   initHeapSortViz(articleBody);
   initHeapTreeArt(articleBody);
   initSortFigures(articleBody);
+  initCourseUI(topic);
 
   document.querySelectorAll(".sidebar-item.active, .sidebar-child.active").forEach((el) => el.classList.remove("active"));
   const sidebarTopic = document.querySelector(`.sidebar-item[data-id="${topic.id}"]`);
@@ -299,10 +653,34 @@ function openArticle(topic, article) {
     }
   }
   const sidebarChild = document.querySelector(`.sidebar-child[data-id="${article.id}"]`);
-  if (sidebarChild) sidebarChild.classList.add("active");
+  if (sidebarChild) {
+    sidebarChild.classList.add("active");
+    // Open every ancestor group so the active lesson is always visible
+    let p = sidebarChild.parentElement;
+    while (p && !p.classList.contains("sidebar-section")) {
+      if (p.classList.contains("sidebar-children") && !p.classList.contains("open")) {
+        p.classList.add("open");
+        p.previousElementSibling?.querySelector(".sidebar-arrow")?.classList.add("open");
+      }
+      p = p.parentElement;
+    }
+  }
 
   buildTOC();
   window.scrollTo(0, 0);
+
+  // In-page section link: jump after the TOC pass so heading ids exist.
+  if (anchorId) {
+    const target = articleBody.querySelector(`[id="${anchorId}"]`);
+    if (target) {
+      requestAnimationFrame(() => {
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+        syncOutlineActive(anchorId);
+      });
+    }
+  } else {
+    syncOutlineActive(null);
+  }
 }
 
 function normalizeSortTree(root) {
@@ -3782,9 +4160,40 @@ function initSortFigures(root) {
   });
 }
 
+// Highlight the sidebar entry for `headingId` among the lesson's in-page
+// sections (the last one that started at or above it). Pass null to clear.
+function syncOutlineActive(headingId) {
+  const anchors = Array.from(document.querySelectorAll(".sidebar-anchor"));
+  if (!anchors.length) return;
+  if (!headingId) {
+    anchors.forEach((a) => a.classList.remove("active"));
+    return;
+  }
+  let best = null;
+  anchors.forEach((a) => {
+    if (a.dataset.anchor === headingId) best = a;
+  });
+  if (!best) {
+    // Pick the nearest preceding section by document order.
+    const target = document.getElementById(headingId);
+    if (target) {
+      anchors.forEach((a) => {
+        const el = document.getElementById(a.dataset.anchor);
+        if (el && el.compareDocumentPosition(target) & Node.DOCUMENT_POSITION_FOLLOWING) best = a;
+      });
+    }
+  }
+  anchors.forEach((a) => a.classList.toggle("active", a === best));
+}
+
 function buildTOC() {
   toc.innerHTML = "";
-  const headings = articleBody.querySelectorAll("h2, h3");
+  tocScrollSpyCleanup();
+  // Headings inside a [data-toc-skip] block are generated chrome (overview
+  // cards, learning path) rather than document sections.
+  const headings = Array.from(articleBody.querySelectorAll("h2, h3")).filter(
+    (h) => !h.closest("[data-toc-skip]")
+  );
   if (headings.length === 0) {
     rightSidebar.classList.remove("visible");
     mainEl.classList.remove("has-toc");
@@ -3794,8 +4203,11 @@ function buildTOC() {
   rightSidebar.classList.add("visible");
   mainEl.classList.add("has-toc");
 
+  const pairs = [];
   headings.forEach((h, i) => {
-    const id = "toc-" + i;
+    // Headings that already carry an id are anchor targets for the sidebar
+    // section list, so that id must survive; others get a generated one.
+    const id = h.id || "toc-" + i;
     h.id = id;
     const item = document.createElement("a");
     item.className = "toc-item";
@@ -3807,7 +4219,48 @@ function buildTOC() {
       h.scrollIntoView({ behavior: "smooth", block: "start" });
     });
     toc.appendChild(item);
+    pairs.push({ heading: h, item });
   });
+
+  // Scroll-spy: mark the last heading that has passed the reading line.
+  // Cheap rAF-throttled check, torn down whenever a new article is opened.
+  const onScroll = () => {
+    if (tocSpyTicking) return;
+    tocSpyTicking = true;
+    requestAnimationFrame(() => {
+      tocSpyTicking = false;
+      const topbarH = parseInt(
+        getComputedStyle(document.documentElement).getPropertyValue("--topnav-h"),
+        10
+      ) || 64;
+      const line = topbarH + 28;
+      let activeIdx = 0;
+      for (let i = 0; i < pairs.length; i++) {
+        if (pairs[i].heading.getBoundingClientRect().top - line <= 0) activeIdx = i;
+        else break;
+      }
+      // At the very bottom of the page, favour the last heading.
+      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4) {
+        activeIdx = pairs.length - 1;
+      }
+      pairs.forEach((p, i) => p.item.classList.toggle("active", i === activeIdx));
+      // Keep the sidebar's in-page section list in step with the reader.
+      if (document.querySelector(".sidebar-anchor")) {
+        syncOutlineActive(pairs[activeIdx] && pairs[activeIdx].heading.id);
+      }
+    });
+  };
+  window.addEventListener("scroll", onScroll, { passive: true });
+  tocScrollSpyCleanupFn = () => window.removeEventListener("scroll", onScroll);
+  onScroll();
+}
+
+function tocScrollSpyCleanup() {
+  if (tocScrollSpyCleanupFn) {
+    tocScrollSpyCleanupFn();
+    tocScrollSpyCleanupFn = null;
+  }
+  tocSpyTicking = false;
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -3817,14 +4270,26 @@ function buildTOC() {
 function flattenAll() {
   const flat = [];
   docs.forEach((topic) => {
-    topic.articles.forEach((article) => {
-      flat.push({ topic, article });
+    flattenTopic(topic).forEach(({ article, parents }) => {
+      flat.push({ topic, article, parents });
     });
   });
   return flat;
 }
 
 const flatAll = flattenAll();
+
+// Lazily-built, cached token set of each article's body text. Content is
+// HTML, so tags are stripped first. Computed on first search only.
+function bodyTokenSet(item) {
+  if (!item.__bodyTokens) {
+    const text = String(item.article.content || "")
+      .replace(/<[^>]*>/g, " ")
+      .replace(/&[a-zA-Z#0-9]+;/g, " ");
+    item.__bodyTokens = new Set(stemTokens(tokenize(text)));
+  }
+  return item.__bodyTokens;
+}
 
 function openSearch() {
   searchOverlay.classList.add("open");
@@ -3841,6 +4306,10 @@ function closeSearch() {
 function tokenize(text) {
   return text
     .toLowerCase()
+    // C++ scope resolution and member access join words into one token
+    // ("Math::square" -> "mathsquare") that matches nothing. Split on the
+    // operators first so each part stays searchable.
+    .replace(/::|\.|->|\/|\[|\]\(/g, " $& ")
     .replace(/[^\w\s]/g, "")
     .split(/\s+/)
     .filter((t) => t.length >= 2);
@@ -3883,10 +4352,12 @@ function runSearch(query) {
     const descTokens = stemTokens(tokenize(descText));
     const labelTokens = stemTokens(tokenize(labelText));
     const tagsTokens = stemTokens(tokenize(tagsText));
+    const bodyTokens = bodyTokenSet(item);
 
     let matchCount = 0;
     let titleHits = 0;
     let descHits = 0;
+    let bodyHits = 0;
 
     for (let i = 0; i < stemmedQuery.length; i++) {
       const st = stemmedQuery[i];
@@ -3896,16 +4367,21 @@ function runSearch(query) {
       const inLabel = labelTokens.some((t) => t === st || t.includes(raw));
       const inTags = tagsTokens.some((t) => t === st || t.includes(raw));
       const inDesc = descTokens.some((t) => t === st || t.includes(raw));
+      const inBody = bodyTokens.has(st) || bodyTokens.has(raw);
 
-      if (inTitle || inLabel || inTags || inDesc) matchCount++;
+      if (inTitle || inLabel || inTags || inDesc || inBody) matchCount++;
       if (inTitle) titleHits++;
       if (inDesc) descHits++;
+      if (inBody) bodyHits++;
     }
 
+    // Body text is searchable but deliberately weighted below title/desc so
+    // existing result ordering is preserved.
     const score =
       (matchCount / stemmedQuery.length) +
       (titleHits / stemmedQuery.length) * 1.5 +
-      (descHits / stemmedQuery.length) * 0.5;
+      (descHits / stemmedQuery.length) * 0.5 +
+      (bodyHits / stemmedQuery.length) * 0.3;
 
     return { item, score, matchCount };
   });
@@ -3926,8 +4402,11 @@ function runSearch(query) {
   results.forEach(({ item }) => {
     const div = document.createElement("div");
     div.className = "search-result-item";
+    const trail = item.parents && item.parents.length
+      ? " › " + item.parents.map((p) => p.title).join(" › ")
+      : "";
     div.innerHTML = `
-      <span class="search-result-parent">${item.topic.label}</span>
+      <span class="search-result-parent">${item.topic.label}${trail}</span>
       <span class="search-result-label">${item.article.title} — ${item.article.desc}</span>
     `;
     div.addEventListener("click", () => {
